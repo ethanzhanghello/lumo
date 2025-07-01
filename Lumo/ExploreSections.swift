@@ -274,4 +274,252 @@ struct CategoryCard: View {
             )
         }
     }
+}
+
+// MARK: - Featured Items Section
+struct FeaturedItemsSection: View {
+    @EnvironmentObject var appState: AppState
+    
+    let featuredItems = [
+        ("Popular This Week", sampleGroceryItems.filter { $0.name.contains("Organic") || $0.name.contains("Fresh") }.prefix(4)),
+        ("Back-to-School Essentials", sampleGroceryItems.filter { $0.aisle == "Office & School" || $0.aisle == "Health/Beauty" }.prefix(4)),
+        ("Seasonal Favorites", sampleGroceryItems.filter { $0.aisle == "Seasonal" || $0.name.contains("Holiday") }.prefix(4))
+    ]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Section Header
+            HStack {
+                Text("Featured Items")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Button("View All") {
+                    // Navigate to featured items
+                }
+                .font(.subheadline)
+                .foregroundColor(Color.lumoGreen)
+            }
+            .padding(.horizontal)
+            
+            // Featured Collections
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(featuredItems, id: \.0) { collection in
+                        FeaturedCollectionCard(
+                            title: collection.0,
+                            items: Array(collection.1)
+                        )
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+}
+
+// MARK: - Featured Collection Card
+struct FeaturedCollectionCard: View {
+    let title: String
+    let items: [GroceryItem]
+    @EnvironmentObject var appState: AppState
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+            
+            VStack(spacing: 8) {
+                ForEach(items.prefix(3)) { item in
+                    FeaturedItemRow(item: item)
+                }
+            }
+            .padding(.horizontal, 16)
+            
+            Button("View All \(items.count) Items") {
+                // Navigate to collection
+            }
+            .font(.caption)
+            .foregroundColor(Color.lumoGreen)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
+        }
+        .frame(width: 200)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        )
+    }
+}
+
+// MARK: - Featured Item Row
+struct FeaturedItemRow: View {
+    let item: GroceryItem
+    @EnvironmentObject var appState: AppState
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            // Item Image Placeholder
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Image(systemName: "bag.fill")
+                        .foregroundColor(.white.opacity(0.6))
+                        .font(.caption)
+                )
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.name)
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                
+                Text("$\(item.price, specifier: "%.2f")")
+                    .font(.caption2)
+                    .foregroundColor(Color.lumoGreen)
+            }
+            
+            Spacer()
+            
+            Button(action: {
+                appState.shoppingCart.addItem(item)
+            }) {
+                Image(systemName: "plus.circle.fill")
+                    .foregroundColor(Color.lumoGreen)
+                    .font(.caption)
+            }
+        }
+    }
+}
+
+// MARK: - Deals Section
+struct DealsSection: View {
+    @EnvironmentObject var appState: AppState
+    
+    let dealsItems = sampleGroceryItems.filter { _ in Bool.random() }.prefix(6)
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Section Header
+            HStack {
+                Text("Today's Deals")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Button("View All") {
+                    // Navigate to deals
+                }
+                .font(.subheadline)
+                .foregroundColor(Color.lumoGreen)
+            }
+            .padding(.horizontal)
+            
+            // Deals Grid
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 12) {
+                ForEach(Array(dealsItems), id: \.id) { item in
+                    DealCard(item: item)
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+}
+
+// MARK: - Deal Card
+struct DealCard: View {
+    let item: GroceryItem
+    @EnvironmentObject var appState: AppState
+    
+    var originalPrice: Double {
+        item.price * 1.3 // Simulate 30% discount
+    }
+    
+    var discountPercentage: Int {
+        Int(((originalPrice - item.price) / originalPrice) * 100)
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Discount Badge
+            HStack {
+                Text("\(discountPercentage)% OFF")
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.red)
+                    .cornerRadius(4)
+                
+                Spacer()
+            }
+            
+            // Item Image Placeholder
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.gray.opacity(0.3))
+                .frame(height: 80)
+                .overlay(
+                    Image(systemName: "bag.fill")
+                        .foregroundColor(.white.opacity(0.6))
+                )
+            
+            // Item Info
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.name)
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .lineLimit(2)
+                
+                HStack {
+                    Text("$\(item.price, specifier: "%.2f")")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(Color.lumoGreen)
+                    
+                    Text("$\(originalPrice, specifier: "%.2f")")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                        .strikethrough()
+                    
+                    Spacer()
+                }
+            }
+            
+            // Add to Cart Button
+            Button(action: {
+                appState.shoppingCart.addItem(item)
+            }) {
+                Text("Add to Cart")
+                    .font(.caption2)
+                    .fontWeight(.medium)
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(Color.lumoGreen)
+                    .cornerRadius(6)
+            }
+        }
+        .padding(12)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.red.opacity(0.5), lineWidth: 1)
+        )
+    }
 } 
