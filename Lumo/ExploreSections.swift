@@ -178,6 +178,181 @@ struct StoreCard: View {
     }
 }
 
+// MARK: - Smart Recommendations Section
+struct SmartRecommendationsSection: View {
+    @EnvironmentObject var appState: AppState
+    @State private var recommendations: [GroceryItem] = []
+    @State private var isLoading = true
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Section Header
+            HStack {
+                Text("Recommended for You")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Button("Refresh") {
+                    generateRecommendations()
+                }
+                .font(.subheadline)
+                .foregroundColor(Color.lumoGreen)
+            }
+            .padding(.horizontal)
+            
+            if isLoading {
+                HStack {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color.lumoGreen))
+                        .scaleEffect(0.8)
+                    Text("Finding recommendations...")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+            } else {
+                // Recommendations Grid
+                LazyVGrid(columns: [
+                    GridItem(.flexible()),
+                    GridItem(.flexible())
+                ], spacing: 12) {
+                    ForEach(recommendations, id: \.id) { item in
+                        RecommendationCard(item: item)
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+        .onAppear {
+            generateRecommendations()
+        }
+    }
+    
+    private func generateRecommendations() {
+        isLoading = true
+        
+        // Simulate API call delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            // Generate recommendations based on cart history and time of day
+            let hour = Calendar.current.component(.hour, from: Date())
+            var recommendedItems: [GroceryItem] = []
+            
+            // Morning recommendations (6-11 AM)
+            if hour >= 6 && hour < 11 {
+                recommendedItems = sampleGroceryItems.filter { item in
+                    item.name.contains("Coffee") || 
+                    item.name.contains("Bread") || 
+                    item.name.contains("Milk") ||
+                    item.name.contains("Eggs") ||
+                    item.name.contains("Cereal")
+                }
+            }
+            // Lunch recommendations (11 AM - 2 PM)
+            else if hour >= 11 && hour < 14 {
+                recommendedItems = sampleGroceryItems.filter { item in
+                    item.name.contains("Sandwich") || 
+                    item.name.contains("Salad") || 
+                    item.name.contains("Soup") ||
+                    item.name.contains("Fruit") ||
+                    item.name.contains("Juice")
+                }
+            }
+            // Dinner recommendations (5-9 PM)
+            else if hour >= 17 && hour < 21 {
+                recommendedItems = sampleGroceryItems.filter { item in
+                    item.name.contains("Pasta") || 
+                    item.name.contains("Chicken") || 
+                    item.name.contains("Beef") ||
+                    item.name.contains("Vegetables") ||
+                    item.name.contains("Wine")
+                }
+            }
+            // Default recommendations
+            else {
+                recommendedItems = sampleGroceryItems.filter { item in
+                    item.name.contains("Organic") || 
+                    item.name.contains("Fresh") || 
+                    item.name.contains("Healthy")
+                }
+            }
+            
+            // Filter out items already in cart
+            let cartItemIds = Set(appState.shoppingCart.cartItems.map { $0.item.id })
+            recommendedItems = recommendedItems.filter { !cartItemIds.contains($0.id) }
+            
+            // Take random 6 items
+            recommendations = Array(recommendedItems.shuffled().prefix(6))
+            isLoading = false
+        }
+    }
+}
+
+// MARK: - Recommendation Card
+struct RecommendationCard: View {
+    let item: GroceryItem
+    @EnvironmentObject var appState: AppState
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Item Image Placeholder
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.gray.opacity(0.3))
+                .frame(height: 80)
+                .overlay(
+                    Image(systemName: "sparkles")
+                        .foregroundColor(Color.lumoGreen)
+                        .font(.title2)
+                )
+            
+            // Item Info
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.name)
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .lineLimit(2)
+                
+                Text("$\(item.price, specifier: "%.2f")")
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .foregroundColor(Color.lumoGreen)
+                
+                Text("Aisle: \(item.aisle)")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+            }
+            
+            // Add to Cart Button
+            Button(action: {
+                appState.shoppingCart.addItem(item)
+            }) {
+                HStack {
+                    Image(systemName: "plus")
+                        .font(.caption2)
+                    Text("Add")
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                }
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .background(Color.lumoGreen)
+                .cornerRadius(6)
+            }
+        }
+        .padding(12)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.lumoGreen.opacity(0.5), lineWidth: 1)
+        )
+    }
+}
+
 // MARK: - Categories Section
 struct CategoriesSection: View {
     @Binding var selectedCategory: String?
