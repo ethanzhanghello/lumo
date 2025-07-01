@@ -26,6 +26,13 @@ struct TabBarView: View {
                     Text("Browse")
                 }
 
+            // EXPLORE TAB: ExploreView
+            ExploreView()
+                .tabItem {
+                    Image(systemName: "safari")
+                    Text("Explore")
+                }
+
             // CART TAB: ShoppingCartView
             ShoppingCartView()
                 .tabItem {
