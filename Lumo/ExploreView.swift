@@ -12,6 +12,7 @@ struct ExploreView: View {
     @State private var searchText: String = ""
     @State private var selectedCategory: String? = nil
     @State private var selectedStoreType: StoreType? = nil
+    @State private var selectedStore: Store? = nil
     
     var body: some View {
         NavigationView {
@@ -46,22 +47,38 @@ struct ExploreView: View {
                         .padding(.horizontal)
                         
                         // Nearby Stores Section
-                        NearbyStoresSection()
+                        NearbyStoresSection(selectedStore: $selectedStore)
                         
                         // Categories Section
                         CategoriesSection(selectedCategory: $selectedCategory)
                         
                         // Featured Items Section
-                        FeaturedItemsSection()
+                        FeaturedItemsSection(selectedCategory: selectedCategory)
                         
                         // Deals Section
-                        DealsSection()
+                        DealsSection(selectedCategory: selectedCategory)
                         
                         // Smart Recommendations Section
                         SmartRecommendationsSection()
                         
                         Spacer(minLength: 100)
                     }
+                }
+                // NavigationLink for Store Detail
+                NavigationLink(
+                    destination: Group {
+                        if let store = selectedStore {
+                            StoreDetailView(store: store)
+                        } else {
+                            EmptyView()
+                        }
+                    },
+                    isActive: Binding(
+                        get: { selectedStore != nil },
+                        set: { if !$0 { selectedStore = nil } }
+                    )
+                ) {
+                    EmptyView()
                 }
             }
         }

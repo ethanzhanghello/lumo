@@ -9,6 +9,7 @@ import SwiftUI
 
 // MARK: - Nearby Stores Section
 struct NearbyStoresSection: View {
+    @Binding var selectedStore: Store?
     @State private var selectedStoreType: StoreType? = nil
     
     var filteredStores: [Store] {
@@ -64,7 +65,9 @@ struct NearbyStoresSection: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(filteredStores) { store in
-                        StoreCard(store: store)
+                        Button(action: { selectedStore = store }) {
+                            StoreCard(store: store)
+                        }
                     }
                 }
                 .padding(.horizontal)
@@ -454,12 +457,22 @@ struct CategoryCard: View {
 // MARK: - Featured Items Section
 struct FeaturedItemsSection: View {
     @EnvironmentObject var appState: AppState
-    
-    let featuredItems = [
-        ("Popular This Week", sampleGroceryItems.filter { $0.name.contains("Organic") || $0.name.contains("Fresh") }.prefix(4)),
-        ("Back-to-School Essentials", sampleGroceryItems.filter { $0.aisle == "Office & School" || $0.aisle == "Health/Beauty" }.prefix(4)),
-        ("Seasonal Favorites", sampleGroceryItems.filter { $0.aisle == "Seasonal" || $0.name.contains("Holiday") }.prefix(4))
-    ]
+    var selectedCategory: String?
+
+    var featuredItems: [(String, [GroceryItem])]{
+        let all: [(String, [GroceryItem])] = [
+            ("Popular This Week", sampleGroceryItems.filter { $0.name.contains("Organic") || $0.name.contains("Fresh") }),
+            ("Back-to-School Essentials", sampleGroceryItems.filter { $0.aisle == "Office & School" || $0.aisle == "Health/Beauty" }),
+            ("Seasonal Favorites", sampleGroceryItems.filter { $0.aisle == "Seasonal" || $0.name.contains("Holiday") })
+        ]
+        if let cat = selectedCategory {
+            return all.map { (title, items) in
+                (title, items.filter { $0.aisle == cat })
+            }
+        } else {
+            return all
+        }
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -484,10 +497,12 @@ struct FeaturedItemsSection: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(featuredItems, id: \.0) { collection in
-                        FeaturedCollectionCard(
-                            title: collection.0,
-                            items: Array(collection.1)
-                        )
+                        if !collection.1.isEmpty {
+                            FeaturedCollectionCard(
+                                title: collection.0,
+                                items: Array(collection.1.prefix(4))
+                            )
+                        }
                     }
                 }
                 .padding(.horizontal)
@@ -579,8 +594,15 @@ struct FeaturedItemRow: View {
 // MARK: - Deals Section
 struct DealsSection: View {
     @EnvironmentObject var appState: AppState
-    
-    let dealsItems = sampleGroceryItems.filter { _ in Bool.random() }.prefix(6)
+    var selectedCategory: String?
+
+    var dealsItems: [GroceryItem] {
+        let filtered = sampleGroceryItems.filter { _ in Bool.random() }
+        if let cat = selectedCategory {
+            return filtered.filter { $0.aisle == cat }
+        }
+        return filtered
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -696,5 +718,28 @@ struct DealCard: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.red.opacity(0.5), lineWidth: 1)
         )
+    }
+}
+
+// MARK: - Store Detail View
+struct StoreDetailView: View {
+    let store: Store
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Text(store.name)
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            Text(store.city)
+                .foregroundColor(.white.opacity(0.7))
+            Text("Type: \(store.storeType.rawValue)")
+                .foregroundColor(.white.opacity(0.7))
+            Text("Hours: \(store.hours)")
+                .foregroundColor(.white.opacity(0.7))
+            Spacer()
+        }
+        .padding()
+        .background(Color.black.ignoresSafeArea())
     }
 } 

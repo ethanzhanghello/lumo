@@ -13,6 +13,7 @@ struct ShoppingCartView: View {
     @State private var showingCheckoutAlert = false
     @State private var checkoutResult: CheckoutResult?
     @State private var showingOrderConfirmation = false
+    @State private var isEditing = false
     
     var body: some View {
         NavigationView {
@@ -103,15 +104,19 @@ struct ShoppingCartView: View {
                             Spacer()
                         }
                     } else {
-                        ScrollView {
-                            LazyVStack(spacing: 12) {
-                                ForEach(appState.shoppingCart.cartItems) { cartItem in
-                                    CartItemRow(cartItem: cartItem)
-                                        .padding(.horizontal)
-                                }
+                        List {
+                            ForEach(appState.shoppingCart.cartItems) { cartItem in
+                                CartItemRow(cartItem: cartItem)
+                                    .listRowBackground(Color.clear)
                             }
-                            .padding(.vertical)
+                            .onMove { indices, newOffset in
+                                appState.shoppingCart.moveItems(from: indices, to: newOffset)
+                            }
+                            .onDelete { indices in
+                                appState.shoppingCart.removeItems(at: indices)
+                            }
                         }
+                        .listStyle(PlainListStyle())
                     }
                     
                     // Checkout Button
@@ -147,6 +152,7 @@ struct ShoppingCartView: View {
                     }
                 }
             }
+            .navigationBarItems(trailing: EditButton())
         }
         .alert("Confirm Checkout", isPresented: $showingCheckoutAlert) {
             Button("Cancel", role: .cancel) { }

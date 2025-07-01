@@ -34,12 +34,20 @@ struct TabBarView: View {
                 }
 
             // CART TAB: ShoppingCartView
-            ShoppingCartView()
-                .tabItem {
-                    Image(systemName: "cart.fill")
-                    Text("Cart")
-                }
-                .badge(appState.shoppingCart.totalItems == 0 ? nil : appState.shoppingCart.totalItems)
+            if appState.shoppingCart.totalItems > 0 {
+                ShoppingCartView()
+                    .tabItem {
+                        Image(systemName: "cart.fill")
+                        Text("Cart")
+                    }
+                    .badge(appState.shoppingCart.totalItems)
+            } else {
+                ShoppingCartView()
+                    .tabItem {
+                        Image(systemName: "cart.fill")
+                        Text("Cart")
+                    }
+            }
 
             // PROFILE TAB: Optional
             StoreMapView()
