@@ -2,7 +2,7 @@
 //  ExploreView.swift
 //  Lumo
 //
-//  Created by Tony on 6/18/25.
+//  Created by Ethan on 7/1/25.
 //
 
 import SwiftUI

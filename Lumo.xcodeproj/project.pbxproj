@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		940BE0B92E1494F600DC7316 /* ShoppingCartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D62E0372460036C7A9 /* ShoppingCartView.swift */; };
+		940BE0BA2E1494F900DC7316 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D42E0372460036C7A9 /* ExploreView.swift */; };
+		940BE0BB2E1494FD00DC7316 /* ExploreSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D82E0372460036C7A9 /* ExploreSections.swift */; };
 		B0D283712E03D7F200C28B2C /* ShoppingCart.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283702E03D7F200C28B2C /* ShoppingCart.swift */; };
 		B0D283752E03DAD100C28B2C /* ApiKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */; };
 		B0D283772E03E8CB00C28B2C /* GrocereyListVIew.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283762E03E8CB00C28B2C /* GrocereyListVIew.swift */; };
@@ -17,7 +20,6 @@
 		B0E915A82E00AC7D0036C7A9 /* LumoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915A72E00AC7D0036C7A9 /* LumoTests.swift */; };
 		B0E915B22E00AC7D0036C7A9 /* LumoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915B12E00AC7D0036C7A9 /* LumoUITests.swift */; };
 		B0E915B42E00AC7D0036C7A9 /* LumoUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915B32E00AC7D0036C7A9 /* LumoUITestsLaunchTests.swift */; };
-		B0E915C12E00AC8A0036C7A9 /* LumoLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = B0E915C02E00AC8A0036C7A9 /* LumoLogo.png */; };
 		B0E915C32E00B7F80036C7A9 /* StoreFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915C22E00B7F80036C7A9 /* StoreFinder.swift */; };
 		B0E915C52E00BA300036C7A9 /* TabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915C42E00BA300036C7A9 /* TabView.swift */; };
 		B0E915C72E00C0450036C7A9 /* StoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915C62E00C0440036C7A9 /* StoreData.swift */; };
@@ -61,7 +63,6 @@
 		B0E915AD2E00AC7D0036C7A9 /* LumoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LumoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0E915B12E00AC7D0036C7A9 /* LumoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LumoUITests.swift; sourceTree = "<group>"; };
 		B0E915B32E00AC7D0036C7A9 /* LumoUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LumoUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		B0E915C02E00AC8A0036C7A9 /* LumoLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LumoLogo.png; path = ../../../Downloads/LumoLogo.png; sourceTree = "<group>"; };
 		B0E915C22E00B7F80036C7A9 /* StoreFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreFinder.swift; sourceTree = "<group>"; };
 		B0E915C42E00BA300036C7A9 /* TabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabView.swift; sourceTree = "<group>"; };
 		B0E915C62E00C0440036C7A9 /* StoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreData.swift; sourceTree = "<group>"; };
@@ -71,6 +72,9 @@
 		B0E915CE2E035F770036C7A9 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
 		B0E915D02E0369E50036C7A9 /* Browse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Browse.swift; sourceTree = "<group>"; };
 		B0E915D22E0372460036C7A9 /* GroceryItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryItems.swift; sourceTree = "<group>"; };
+		B0E915D42E0372460036C7A9 /* ExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreView.swift; sourceTree = "<group>"; };
+		B0E915D62E0372460036C7A9 /* ShoppingCartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingCartView.swift; sourceTree = "<group>"; };
+		B0E915D82E0372460036C7A9 /* ExploreSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreSections.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,14 +133,16 @@
 				B0E915C22E00B7F80036C7A9 /* StoreFinder.swift */,
 				B0E915D02E0369E50036C7A9 /* Browse.swift */,
 				B0D283702E03D7F200C28B2C /* ShoppingCart.swift */,
+				B0E915D62E0372460036C7A9 /* ShoppingCartView.swift */,
 				B0E915C82E00C0D60036C7A9 /* StoreSelection.swift */,
 				B0D283762E03E8CB00C28B2C /* GrocereyListVIew.swift */,
 				B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */,
 				B0E915C42E00BA300036C7A9 /* TabView.swift */,
+				B0E915D42E0372460036C7A9 /* ExploreView.swift */,
+				B0E915D82E0372460036C7A9 /* ExploreSections.swift */,
 				B0E915992E00AC7D0036C7A9 /* Assets.xcassets */,
 				B0E915D22E0372460036C7A9 /* GroceryItems.swift */,
 				B0E915CA2E03182E0036C7A9 /* StoreMap.swift */,
-				B0E915C02E00AC8A0036C7A9 /* LumoLogo.png */,
 				B0E9159B2E00AC7D0036C7A9 /* Lumo.entitlements */,
 				B0E9159C2E00AC7D0036C7A9 /* Preview Content */,
 			);
@@ -274,7 +280,6 @@
 			files = (
 				B0E9159E2E00AC7D0036C7A9 /* Preview Assets.xcassets in Resources */,
 				B0E9159A2E00AC7D0036C7A9 /* Assets.xcassets in Resources */,
-				B0E915C12E00AC8A0036C7A9 /* LumoLogo.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -299,6 +304,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				940BE0BB2E1494FD00DC7316 /* ExploreSections.swift in Sources */,
+				940BE0BA2E1494F900DC7316 /* ExploreView.swift in Sources */,
+				940BE0B92E1494F600DC7316 /* ShoppingCartView.swift in Sources */,
 				B0E915CB2E03182E0036C7A9 /* StoreMap.swift in Sources */,
 				B0E915982E00AC7C0036C7A9 /* ContentView.swift in Sources */,
 				B0E915C72E00C0450036C7A9 /* StoreData.swift in Sources */,

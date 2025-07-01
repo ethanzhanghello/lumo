@@ -39,7 +39,7 @@ struct TabBarView: View {
                     Image(systemName: "cart.fill")
                     Text("Cart")
                 }
-                .badge(appState.shoppingCart.totalItems > 0 ? appState.shoppingCart.totalItems : nil)
+                .badge(appState.shoppingCart.totalItems == 0 ? nil : appState.shoppingCart.totalItems)
 
             // PROFILE TAB: Optional
             StoreMapView()

@@ -125,7 +125,7 @@ class ShoppingCart: ObservableObject {
     
     func checkout() -> CheckoutResult {
         guard !cartItems.isEmpty else {
-            return CheckoutResult(success: false, message: "Cart is empty")
+            return CheckoutResult(success: false, message: "Cart is empty", order: nil)
         }
         
         // Simulate checkout process
