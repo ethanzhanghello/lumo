@@ -28,17 +28,17 @@ struct RootView: View {
                     if destination == "StoreFinder" {
                         StoreFinderView(navigationPath: $navigationPath) // Pass NavigationPath down
                             .navigationTitle("")
-                            .navigationBarHidden(true)
+                            .toolbar(.hidden, for: .navigationBar)
                     } else if destination == "StoreSelection" {
                         StoreSelectionView(stores: sampleLAStores) // No binding needed here, AppState handles dismissal
                             .navigationTitle("")
-                            .navigationBarHidden(true)
+                            .toolbar(.hidden, for: .navigationBar)
                     } else if destination == "TabBar" {
                         TabBarView()
-                            .navigationBarHidden(true) // TabBarView usually doesn't need a navigation bar
+                            .toolbar(.hidden, for: .navigationBar) // TabBarView usually doesn't need a navigation bar
                     }
                 }
-                .navigationBarHidden(true) // Hide the initial navigation bar for LumoWelcomeView
+                .toolbar(.hidden, for: .navigationBar) // Hide the initial navigation bar for LumoWelcomeView
         }
         // This observer listens for changes in selectedStoreName and triggers navigation
         .onReceive(appState.$selectedStoreName) { newStoreName in

@@ -338,17 +338,36 @@ struct LocationMarker: View {
 
 // Cart and other action buttons (floating)
 struct FloatingActionButtons: View {
+    @EnvironmentObject var appState: AppState
+    @State private var showingCart = false
+    
     var body: some View {
         VStack(spacing: 0) {
             // Top button (Cart)
-            Button(action: {}) {
-                Image(systemName: "cart.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(Color.cyan) // #00F0C0
-                    .padding()
-                    .frame(maxWidth: .infinity)
+            Button(action: {
+                showingCart = true
+            }) {
+                ZStack {
+                    Image(systemName: "cart.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                        .foregroundColor(Color.cyan) // #00F0C0
+                    
+                    // Cart badge showing item count
+                    if appState.shoppingCart.totalItems > 0 {
+                        Text("\(appState.shoppingCart.totalItems)")
+                            .font(.caption2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.black)
+                            .padding(4)
+                            .background(Color.red)
+                            .clipShape(Circle())
+                            .offset(x: 10, y: -10)
+                    }
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
             }
             .background(Color.darkGrayBackground)
 
@@ -373,6 +392,10 @@ struct FloatingActionButtons: View {
         .background(Color.black)
         .clipShape(RoundedRectangle(cornerRadius: 30))
         .shadow(radius: 4)
+        .sheet(isPresented: $showingCart) {
+            ShoppingCartView()
+                .environmentObject(appState)
+        }
     }
 }
 

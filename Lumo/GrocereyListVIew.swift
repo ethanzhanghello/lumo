@@ -84,17 +84,17 @@ struct GroceryListView: View {
             // MARK: - List of Grocery Items in Cart
             ScrollView {
                 VStack(spacing: 10) {
-                    if appState.shoppingCart.items.isEmpty {
+                    if appState.shoppingCart.isEmpty {
                         Text("Your shopping cart is empty. Add some items!")
                             .foregroundColor(.white.opacity(0.7))
                             .padding()
                     } else {
-                        ForEach(appState.shoppingCart.items) { item in
-                            GroceryListItemRow(item: item)
+                        ForEach(appState.shoppingCart.cartItems) { cartItem in
+                            GroceryListItemRow(cartItem: cartItem)
                                 .padding(.horizontal)
                                 .swipeActions(edge: .trailing) {
                                     Button(role: .destructive) {
-                                        deleteItem(item)
+                                        deleteItem(cartItem.item)
                                     } label: {
                                         Label("Delete", systemImage: "trash.fill")
                                     }
@@ -202,7 +202,7 @@ struct GroceryListView: View {
 
         // Filter out items already in the cart from potential recommendations
         let availableItems = sampleGroceryItems.filter { item in
-            !appState.shoppingCart.items.contains(where: { $0.id == item.id })
+            !appState.shoppingCart.cartItems.contains(where: { $0.item.id == item.id })
         }
 
         while uniqueRecommendations.count < numberOfRecommendations && uniqueRecommendations.count < availableItems.count {
@@ -223,23 +223,26 @@ struct GroceryListView: View {
 
 // MARK: - GroceryListItemRow Helper View
 struct GroceryListItemRow: View {
-    let item: GroceryItem
+    let cartItem: CartItem
 
     var body: some View {
         HStack {
 
             VStack(alignment: .leading) {
-                Text(item.name)
+                Text(cartItem.item.name)
                     .font(.body)
                     .foregroundColor(.white)
-                Text("Aisle: \(item.aisle)")
+                Text("Aisle: \(cartItem.item.aisle)")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.7))
+                Text("Qty: \(cartItem.quantity)")
+                    .font(.caption)
+                    .foregroundColor(Color.lumoGreen)
             }
             .padding(.leading)
 
             Spacer()
-            Text("$\(item.price, specifier: "%.2f")")
+            Text("$\(cartItem.totalPrice, specifier: "%.2f")")
                 .font(.body)
                 .foregroundColor(.white)
         }
@@ -284,6 +287,9 @@ struct RecommendedItemCard: View {
 }
 
 // MARK: - ShareSheet Wrapper for UIActivityViewController
+#if canImport(UIKit)
+import UIKit
+
 struct ShareSheet: UIViewControllerRepresentable {
     var activityItems: [Any]
     var applicationActivities: [UIActivity]? = nil
@@ -295,6 +301,16 @@ struct ShareSheet: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
+#else
+// Fallback for macOS
+struct ShareSheet: View {
+    var activityItems: [Any]
+    
+    var body: some View {
+        Text("Sharing not available on macOS")
+    }
+}
+#endif
 
 
 // MARK: - Preview Provider

@@ -6,11 +6,15 @@
 //
 
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 @main
 struct LumoApp: App {
     @StateObject var appState = AppState()
     init() {
+        #if canImport(UIKit)
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor.black
@@ -25,6 +29,7 @@ struct LumoApp: App {
         if #available(iOS 15.0, *) {
             UITabBar.appearance().scrollEdgeAppearance = appearance
         }
+        #endif
     }
     
     var body: some Scene {

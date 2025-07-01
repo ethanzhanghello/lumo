@@ -19,12 +19,20 @@ struct TabBarView: View {
                     Text("Home")
                 }
 
-            // BROWSE TAB: Replace with your browse view
-            StoreMapView()
+            // BROWSE TAB: BrowseView
+            BrowseView()
                 .tabItem {
                     Image(systemName: "magnifyingglass")
-                    Text("Lumo")
+                    Text("Browse")
                 }
+
+            // CART TAB: ShoppingCartView
+            ShoppingCartView()
+                .tabItem {
+                    Image(systemName: "cart.fill")
+                    Text("Cart")
+                }
+                .badge(appState.shoppingCart.totalItems > 0 ? appState.shoppingCart.totalItems : nil)
 
             // PROFILE TAB: Optional
             StoreMapView()

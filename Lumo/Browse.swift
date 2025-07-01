@@ -39,7 +39,7 @@ struct GroceryItemCard: View {
             Spacer()
             Button(action: {
                 appState.shoppingCart.addItem(item)
-                print("Added \(item.name) to cart. Total items: \(appState.shoppingCart.items.count)")
+                print("Added \(item.name) to cart. Total items: \(appState.shoppingCart.totalItems)")
             }) {
                 Image(systemName: "cart.fill.badge.plus")
                     .font(.title2)
@@ -376,7 +376,7 @@ struct QuickButton: View {
             // Find the corresponding grocery item and add it to the cart
             if let item = sampleGroceryItems.first(where: { $0.name == title }) {
                 appState.shoppingCart.addItem(item)
-                print("Added \(item.name) to cart. Total items: \(appState.shoppingCart.items.count)")
+                print("Added \(item.name) to cart. Total items: \(appState.shoppingCart.totalItems)")
             }
         }) {
             Text(title)
