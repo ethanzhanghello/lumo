@@ -359,6 +359,8 @@ struct RecommendationCard: View {
 // MARK: - Categories Section
 struct CategoriesSection: View {
     @Binding var selectedCategory: String?
+    @State private var showingCategoryStores = false
+    @State private var tappedCategory: String? = nil
     
     let categories = [
         ("Dairy & Eggs", "drop.fill", Color.blue),
@@ -398,17 +400,25 @@ struct CategoriesSection: View {
                 GridItem(.flexible())
             ], spacing: 12) {
                 ForEach(categories, id: \.0) { category in
-                    CategoryCard(
-                        title: category.0,
-                        icon: category.1,
-                        color: category.2,
-                        isSelected: selectedCategory == category.0
-                    ) {
-                        selectedCategory = selectedCategory == category.0 ? nil : category.0
+                    Button(action: {
+                        tappedCategory = category.0
+                        showingCategoryStores = true
+                    }) {
+                        CategoryCard(
+                            title: category.0,
+                            icon: category.1,
+                            color: category.2,
+                            isSelected: selectedCategory == category.0
+                        )
                     }
                 }
             }
             .padding(.horizontal)
+        }
+        .sheet(isPresented: $showingCategoryStores) {
+            if let category = tappedCategory {
+                CategoryStoresView(category: category)
+            }
         }
     }
 }
@@ -419,10 +429,11 @@ struct CategoryCard: View {
     let icon: String
     let color: Color
     let isSelected: Bool
-    let action: () -> Void
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            // Action for tapping the category card
+        }) {
             VStack(spacing: 12) {
                 ZStack {
                     Circle()
@@ -724,22 +735,437 @@ struct DealCard: View {
 // MARK: - Store Detail View
 struct StoreDetailView: View {
     let store: Store
-
-    var body: some View {
-        VStack(spacing: 24) {
-            Text(store.name)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-            Text(store.city)
-                .foregroundColor(.white.opacity(0.7))
-            Text("Type: \(store.storeType.rawValue)")
-                .foregroundColor(.white.opacity(0.7))
-            Text("Hours: \(store.hours)")
-                .foregroundColor(.white.opacity(0.7))
-            Spacer()
+    @Environment(\.dismiss) private var dismiss
+    @State private var searchText = ""
+    @State private var selectedCategory: String? = nil
+    
+    var filteredItems: [GroceryItem] {
+        var items = sampleGroceryItems // All available items at this store
+        
+        // Filter by search text
+        if !searchText.isEmpty {
+            items = items.filter { $0.name.localizedCaseInsensitiveContains(searchText) || 
+                                   $0.description.localizedCaseInsensitiveContains(searchText) }
         }
-        .padding()
-        .background(Color.black.ignoresSafeArea())
+        
+        // Filter by selected category
+        if let category = selectedCategory {
+            items = items.filter { $0.aisle == category }
+        }
+        
+        return items
+    }
+    
+    var categories: [String] {
+        Array(Set(sampleGroceryItems.map { $0.aisle })).sorted()
+    }
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Store Header
+                    VStack(spacing: 16) {
+                        HStack {
+                            Button(action: { dismiss() }) {
+                                Image(systemName: "chevron.left")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                            }
+                            
+                            Spacer()
+                            
+                            Text(store.name)
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            
+                            Spacer()
+                            
+                            Button(action: {}) {
+                                Image(systemName: "heart")
+                                    .font(.title2)
+                                    .foregroundColor(.red)
+                            }
+                        }
+                        
+                        // Store Info
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(store.city)
+                                    .font(.subheadline)
+                                    .foregroundColor(.white.opacity(0.7))
+                                Text("Type: \(store.storeType.rawValue)")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.6))
+                            }
+                            
+                            Spacer()
+                            
+                            VStack(alignment: .trailing, spacing: 4) {
+                                HStack {
+                                    Image(systemName: "star.fill")
+                                        .font(.caption)
+                                        .foregroundColor(.yellow)
+                                    Text(String(format: "%.1f", store.rating))
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                }
+                                Text(store.hours)
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.6))
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    
+                    // Search Bar
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
+                        TextField("Search items...", text: $searchText)
+                            .foregroundColor(.white)
+                            .textFieldStyle(.plain)
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+                    .padding(.top)
+                    
+                    // Category Filter
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            // All categories filter
+                            CategoryFilterButton(
+                                title: "All",
+                                isSelected: selectedCategory == nil,
+                                action: { selectedCategory = nil }
+                            )
+                            
+                            // Category filters
+                            ForEach(categories, id: \.self) { category in
+                                CategoryFilterButton(
+                                    title: category,
+                                    isSelected: selectedCategory == category,
+                                    action: { selectedCategory = category }
+                                )
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .padding(.top)
+                    
+                    // Items List
+                    if filteredItems.isEmpty {
+                        VStack(spacing: 20) {
+                            Spacer()
+                            
+                            Image(systemName: "bag")
+                                .font(.system(size: 60))
+                                .foregroundColor(.gray)
+                            
+                            Text(searchText.isEmpty ? "No items found" : "No items match your search")
+                                .font(.title2)
+                                .fontWeight(.medium)
+                                .foregroundColor(.white)
+                            
+                            if !searchText.isEmpty {
+                                Text("Try different keywords")
+                                    .font(.subheadline)
+                                    .foregroundColor(.white.opacity(0.7))
+                            }
+                            
+                            Spacer()
+                        }
+                    } else {
+                        ScrollView {
+                            LazyVGrid(columns: [
+                                GridItem(.flexible()),
+                                GridItem(.flexible())
+                            ], spacing: 16) {
+                                ForEach(filteredItems) { item in
+                                    StoreItemCard(item: item, store: store)
+                                }
+                            }
+                            .padding()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Category Filter Button
+struct CategoryFilterButton: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.caption)
+                .fontWeight(.medium)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(isSelected ? Color.lumoGreen : Color.gray.opacity(0.3))
+                .foregroundColor(isSelected ? .black : .white)
+                .cornerRadius(16)
+        }
+    }
+}
+
+// MARK: - Store Item Card
+struct StoreItemCard: View {
+    let item: GroceryItem
+    let store: Store
+    @EnvironmentObject var appState: AppState
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Item Image Placeholder
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.gray.opacity(0.3))
+                .frame(height: 100)
+                .overlay(
+                    Image(systemName: "bag.fill")
+                        .foregroundColor(.white.opacity(0.6))
+                        .font(.title2)
+                )
+            
+            // Item Info
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.name)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.white)
+                    .lineLimit(2)
+                
+                Text(item.description)
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.7))
+                    .lineLimit(1)
+                
+                Text("Aisle: \(item.aisle)")
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.6))
+                
+                HStack {
+                    Text("$\(item.price, specifier: "%.2f")")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(Color.lumoGreen)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        appState.shoppingCart.addItem(item)
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(Color.lumoGreen)
+                            .font(.title3)
+                    }
+                }
+            }
+        }
+        .padding(12)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        )
+    }
+}
+
+// MARK: - Category Stores View
+struct CategoryStoresView: View {
+    let category: String
+    @Environment(\.dismiss) private var dismiss
+    @State private var searchText = ""
+    
+    var storesWithCategoryItems: [Store] {
+        // Filter stores that have items from this category
+        return sampleLAStores.filter { store in
+            // For demo purposes, assume all stores have items from all categories
+            // In a real app, you'd check the store's actual inventory
+            return true
+        }
+    }
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Header
+                    VStack(spacing: 16) {
+                        HStack {
+                            Button(action: { dismiss() }) {
+                                Image(systemName: "chevron.left")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                            }
+                            
+                            Spacer()
+                            
+                            Text(category)
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            
+                            Spacer()
+                            
+                            Button(action: {}) {
+                                Image(systemName: "magnifyingglass")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        
+                        Text("Stores with \(category) items")
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    
+                    // Search Bar
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
+                        TextField("Search stores...", text: $searchText)
+                            .foregroundColor(.white)
+                            .textFieldStyle(.plain)
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+                    .padding(.top)
+                    
+                    // Stores List
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(storesWithCategoryItems) { store in
+                                CategoryStoreCard(store: store, category: category)
+                            }
+                        }
+                        .padding()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Category Store Card
+struct CategoryStoreCard: View {
+    let store: Store
+    let category: String
+    @State private var showingStoreDetail = false
+    
+    var categoryItems: [GroceryItem] {
+        // Get items from this category
+        return sampleGroceryItems.filter { $0.aisle == category }.prefix(3).map { $0 }
+    }
+    
+    var body: some View {
+        Button(action: {
+            showingStoreDetail = true
+        }) {
+            VStack(alignment: .leading, spacing: 12) {
+                // Store Header
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(store.name)
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        
+                        Text(store.city)
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.7))
+                        
+                        HStack {
+                            Image(systemName: "star.fill")
+                                .font(.caption)
+                                .foregroundColor(.yellow)
+                            Text(String(format: "%.1f", store.rating))
+                                .font(.caption)
+                                .foregroundColor(.white)
+                            
+                            Text("•")
+                                .foregroundColor(.white.opacity(0.5))
+                            
+                            Text(store.storeType.rawValue)
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("\(categoryItems.count)+ items")
+                            .font(.caption)
+                            .foregroundColor(Color.lumoGreen)
+                        
+                        Text("in \(category)")
+                            .font(.caption2)
+                            .foregroundColor(.white.opacity(0.6))
+                    }
+                }
+                
+                // Sample Items
+                HStack(spacing: 8) {
+                    ForEach(categoryItems, id: \.id) { item in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(item.name)
+                                .font(.caption2)
+                                .foregroundColor(.white)
+                                .lineLimit(1)
+                            
+                            Text("$\(item.price, specifier: "%.2f")")
+                                .font(.caption2)
+                                .foregroundColor(Color.lumoGreen)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(8)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+                    }
+                }
+                
+                // View Store Button
+                HStack {
+                    Text("View Store")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundColor(Color.lumoGreen)
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(Color.lumoGreen)
+                }
+            }
+            .padding()
+            .background(Color.gray.opacity(0.1))
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .sheet(isPresented: $showingStoreDetail) {
+            StoreDetailView(store: store)
+        }
     }
 } 

@@ -178,12 +178,6 @@ struct ShoppingCartView: View {
 struct CartItemRow: View {
     let cartItem: CartItem
     @EnvironmentObject var appState: AppState
-    @State private var quantity: Int
-    
-    init(cartItem: CartItem) {
-        self.cartItem = cartItem
-        self._quantity = State(initialValue: cartItem.quantity)
-    }
     
     var body: some View {
         HStack(spacing: 12) {
@@ -219,25 +213,23 @@ struct CartItemRow: View {
             VStack(alignment: .trailing, spacing: 8) {
                 HStack(spacing: 8) {
                     Button(action: {
-                        if quantity > 1 {
-                            quantity -= 1
-                            appState.shoppingCart.updateQuantity(for: cartItem.item, to: quantity)
+                        if cartItem.quantity > 1 {
+                            appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity - 1)
                         }
                     }) {
                         Image(systemName: "minus.circle.fill")
-                            .foregroundColor(quantity > 1 ? Color.lumoGreen : .gray)
+                            .foregroundColor(cartItem.quantity > 1 ? Color.lumoGreen : .gray)
                             .font(.title3)
                     }
-                    .disabled(quantity <= 1)
+                    .disabled(cartItem.quantity <= 1)
                     
-                    Text("\(quantity)")
+                    Text("\(cartItem.quantity)")
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(minWidth: 30)
                     
                     Button(action: {
-                        quantity += 1
-                        appState.shoppingCart.updateQuantity(for: cartItem.item, to: quantity)
+                        appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity + 1)
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .foregroundColor(Color.lumoGreen)
@@ -249,6 +241,15 @@ struct CartItemRow: View {
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundColor(Color.lumoGreen)
+            }
+            
+            // X Button for quick removal
+            Button(action: {
+                appState.shoppingCart.removeItem(cartItem.item)
+            }) {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundColor(.red)
+                    .font(.title2)
             }
         }
         .padding()
