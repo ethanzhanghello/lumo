@@ -10,7 +10,7 @@ import SwiftUI
 
 // MARK: - CartItem Model (to track quantities)
 struct CartItem: Identifiable, Codable, Hashable {
-    var id: String { "\(item.name)-\(quantity)" } // Use computed property for stable ID
+    var id: String { item.name } // Use only item name for stable ID
     let item: GroceryItem
     var quantity: Int
     
