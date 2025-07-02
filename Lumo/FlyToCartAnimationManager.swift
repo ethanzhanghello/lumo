@@ -20,11 +20,13 @@ class FlyToCartAnimationManager: ObservableObject {
     @Published var cartPulse: Bool = false
     
     func trigger(image: Image, start: CGPoint, end: CGPoint) {
+        print("[FlyToCart] Triggered: start=\(start), end=\(end)")
         currentRequest = AnimationRequest(image: image, start: start, end: end)
         isAnimating = true
     }
     
     func complete() {
+        print("[FlyToCart] Animation complete")
         isAnimating = false
         currentRequest = nil
         cartPulse = true

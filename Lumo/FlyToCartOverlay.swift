@@ -19,11 +19,13 @@ struct FlyToCartOverlay: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 48, height: 48)
+                    .border(Color.red, width: 2) // DEBUG: red border
                     .position(x: lerp(req.start.x, req.end.x, animProgress),
                               y: bezierY(t: animProgress, start: req.start, end: req.end))
                     .scaleEffect(1 - 0.3 * animProgress)
                     .opacity(Double(1 - animProgress))
                     .onAppear {
+                        print("[FlyToCartOverlay] onAppear: start=\(req.start), end=\(req.end)")
                         animProgress = 0
                         animating = true
                         withAnimation(.easeInOut(duration: 0.45)) {
