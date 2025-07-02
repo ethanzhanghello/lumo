@@ -178,6 +178,10 @@ struct ShoppingCartView: View {
 struct CartItemRow: View {
     let itemId: String
     @EnvironmentObject var appState: AppState
+    @State private var quantityOffset: CGFloat = 0
+    @State private var quantityOpacity: Double = 1
+    @State private var minusButtonScale: CGFloat = 1
+    @State private var plusButtonScale: CGFloat = 1
     
     var cartItem: CartItem? {
         appState.shoppingCart.cartItems.first { $0.id == itemId }
@@ -218,11 +222,33 @@ struct CartItemRow: View {
                 VStack(alignment: .trailing, spacing: 8) {
                     HStack(spacing: 8) {
                         Button(action: {
-                            appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity - 1)
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                minusButtonScale = 1.2
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                    minusButtonScale = 1
+                                }
+                            }
+                            
+                            // Animate quantity text
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                quantityOffset = -10
+                                quantityOpacity = 0
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity - 1)
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    quantityOffset = 0
+                                    quantityOpacity = 1
+                                }
+                            }
                         }) {
                             Image(systemName: "minus.circle.fill")
                                 .foregroundColor(cartItem.quantity > 1 ? Color.lumoGreen : .gray)
                                 .font(.title3)
+                                .scaleEffect(minusButtonScale)
                         }
                         .disabled(cartItem.quantity <= 1)
                         
@@ -230,13 +256,37 @@ struct CartItemRow: View {
                             .font(.headline)
                             .foregroundColor(.white)
                             .frame(minWidth: 30)
+                            .offset(y: quantityOffset)
+                            .opacity(quantityOpacity)
                         
                         Button(action: {
-                            appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity + 1)
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                plusButtonScale = 1.2
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                    plusButtonScale = 1
+                                }
+                            }
+                            
+                            // Animate quantity text
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                quantityOffset = 10
+                                quantityOpacity = 0
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity + 1)
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    quantityOffset = 0
+                                    quantityOpacity = 1
+                                }
+                            }
                         }) {
                             Image(systemName: "plus.circle.fill")
                                 .foregroundColor(Color.lumoGreen)
                                 .font(.title3)
+                                .scaleEffect(plusButtonScale)
                         }
                     }
                     
