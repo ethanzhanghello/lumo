@@ -54,36 +54,39 @@ class ShoppingCart: ObservableObject {
     // MARK: - Item Management Functions
     
     func addItem(_ item: GroceryItem, quantity: Int = 1) {
+        print("[DEBUG] addItem called for \(item.name), quantity: \(quantity)")
         if let existingIndex = cartItems.firstIndex(where: { $0.item.name == item.name }) {
-            // Item already exists, increase quantity
             cartItems[existingIndex].quantity += quantity
-            print("Updated quantity for \(item.name) to \(cartItems[existingIndex].quantity)")
+            print("[DEBUG] Updated quantity for \(item.name) to \(cartItems[existingIndex].quantity)")
         } else {
-            // Item doesn't exist, add new cart item
             let newCartItem = CartItem(item: item, quantity: quantity)
             cartItems.append(newCartItem)
-            print("Added new item: \(item.name) with quantity \(quantity)")
+            print("[DEBUG] Added new item: \(item.name) with quantity \(quantity)")
         }
     }
 
     func removeItem(_ item: GroceryItem) {
+        print("[DEBUG] removeItem called for \(item.name)")
         if let index = cartItems.firstIndex(where: { $0.item.name == item.name }) {
             cartItems.remove(at: index)
-            print("Removed item: \(item.name)")
+            print("[DEBUG] Removed item: \(item.name)")
         } else {
-            print("Item \(item.name) not found in cart.")
+            print("[DEBUG] Item \(item.name) not found in cart.")
         }
     }
 
     func updateQuantity(for item: GroceryItem, to quantity: Int) {
+        print("[DEBUG] updateQuantity called for \(item.name), to: \(quantity)")
         if let index = cartItems.firstIndex(where: { $0.item.name == item.name }) {
             if quantity <= 0 {
                 cartItems.remove(at: index)
-                print("Removed item: \(item.name) (quantity set to 0)")
+                print("[DEBUG] Removed item: \(item.name) (quantity set to 0)")
             } else {
                 cartItems[index].quantity = quantity
-                print("Updated quantity for \(item.name) to \(quantity)")
+                print("[DEBUG] Updated quantity for \(item.name) to \(quantity)")
             }
+        } else {
+            print("[DEBUG] Item \(item.name) not found in cart for updateQuantity.")
         }
     }
 

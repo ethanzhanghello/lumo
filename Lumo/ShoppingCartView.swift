@@ -109,12 +109,6 @@ struct ShoppingCartView: View {
                                 CartItemRow(itemId: cartItem.id)
                                     .listRowBackground(Color.clear)
                             }
-                            .onMove { indices, newOffset in
-                                appState.shoppingCart.moveItems(from: indices, to: newOffset)
-                            }
-                            .onDelete { indices in
-                                appState.shoppingCart.removeItems(at: indices)
-                            }
                         }
                         .listStyle(PlainListStyle())
                     }
@@ -138,21 +132,12 @@ struct ShoppingCartView: View {
                                 .cornerRadius(12)
                             }
                             .padding(.horizontal)
-                            
-                            Button(action: {
-                                appState.shoppingCart.clearCart()
-                            }) {
-                                Text("Clear Cart")
-                                    .font(.subheadline)
-                                    .foregroundColor(.red)
-                            }
-                            .padding(.bottom)
                         }
                         .background(Color.black)
                     }
                 }
             }
-            .navigationBarItems(trailing: EditButton())
+            .navigationBarItems(trailing: EmptyView())
         }
         .alert("Confirm Checkout", isPresented: $showingCheckoutAlert) {
             Button("Cancel", role: .cancel) { }

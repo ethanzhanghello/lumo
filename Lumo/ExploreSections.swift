@@ -885,8 +885,6 @@ struct StoreDetailView: View {
                             ], spacing: 16) {
                                 ForEach(filteredItems) { item in
                                     ItemCard(item: item)
-                                        .environmentObject(appState)
-                                        .environmentObject(flyToCartManager)
                                 }
                             }
                             .padding()
@@ -1169,21 +1167,50 @@ struct CategoryStoreCard: View {
 }
 
 struct ItemCard: View {
-    @EnvironmentObject var flyToCartManager: FlyToCartAnimationManager
     @EnvironmentObject var appState: AppState
     let item: GroceryItem
-    @State private var buttonFrame: CGRect = .zero
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // ... existing code ...
-            Button(action: {
-                // Get global position of button
-                if let window = UIApplication.shared.windows.first {
-                    let start = CGPoint(x: buttonFrame.midX, y: buttonFrame.midY)
-                    // Assume cart icon is at top right for now
-                    let end = CGPoint(x: window.bounds.width - 40, y: 60)
-                    flyToCartManager.trigger(image: Image(systemName: "bag.fill"), start: start, end: end)
+            // Item Image Placeholder
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.gray.opacity(0.3))
+                .frame(height: 80)
+                .overlay(
+                    Image(systemName: "bag.fill")
+                        .foregroundColor(.white.opacity(0.6))
+                        .font(.title2)
+                )
+            
+            // Item Info
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.name)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.white)
+                    .lineLimit(2)
+                
+                Text(item.description)
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.7))
+                    .lineLimit(1)
+                
+                Text("Aisle: \(item.aisle)")
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.6))
+                
+                HStack {
+                    Text("$\(item.price, specifier: "%.2f")")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(Color.lumoGreen)
+                    
+                    Spacer()
                 }
+            }
+            
+            // Add to Cart Button
+            Button(action: {
                 appState.shoppingCart.addItem(item)
             }) {
                 HStack {
@@ -1199,21 +1226,15 @@ struct ItemCard: View {
                 .background(Color.lumoGreen)
                 .cornerRadius(6)
             }
-            .background(GeometryReader { geo in
-                Color.clear
-                    .preference(key: ButtonFrameKey.self, value: geo.frame(in: .global))
-            })
-            .onPreferenceChange(ButtonFrameKey.self) { value in
-                buttonFrame = value
-            }
         }
-        // ... existing code ...
+        .padding(12)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        )
     }
 }
 
-struct ButtonFrameKey: PreferenceKey {
-    static var defaultValue: CGRect = .zero
-    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
-        value = nextValue()
-    }
-} 
+ 
