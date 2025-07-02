@@ -6,13 +6,24 @@
 //
 
 import Foundation
-import Foundation
+import SwiftUI
+import Combine
 
 class AppState: ObservableObject {
     @Published var selectedStoreName: String? = nil
-    @Published var shoppingCart: ShoppingCart // Add this line
-
+    @Published var shoppingCart: ShoppingCart
+    
+    private var cancellables = Set<AnyCancellable>()
+    
     init() {
-        self.shoppingCart = ShoppingCart() // Initialize the shopping cart
+        self.shoppingCart = ShoppingCart()
+        
+        // Observe shopping cart changes and trigger UI updates
+        shoppingCart.$cartItems
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
 }

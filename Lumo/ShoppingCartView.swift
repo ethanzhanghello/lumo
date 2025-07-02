@@ -106,7 +106,7 @@ struct ShoppingCartView: View {
                     } else {
                         List {
                             ForEach(appState.shoppingCart.cartItems) { cartItem in
-                                CartItemRow(cartItem: cartItem)
+                                CartItemRow(itemId: cartItem.id)
                                     .listRowBackground(Color.clear)
                             }
                             .onMove { indices, newOffset in
@@ -176,90 +176,96 @@ struct ShoppingCartView: View {
 }
 
 struct CartItemRow: View {
-    let cartItem: CartItem
+    let itemId: UUID
     @EnvironmentObject var appState: AppState
     
+    var cartItem: CartItem? {
+        appState.shoppingCart.cartItems.first { $0.id == itemId }
+    }
+    
     var body: some View {
-        HStack(spacing: 12) {
-            // Item Image Placeholder
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.gray.opacity(0.3))
-                .frame(width: 60, height: 60)
-                .overlay(
-                    Image(systemName: "bag.fill")
-                        .foregroundColor(.white.opacity(0.6))
-                )
-            
-            // Item Details
-            VStack(alignment: .leading, spacing: 4) {
-                Text(cartItem.item.name)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .lineLimit(2)
+        if let cartItem = cartItem {
+            HStack(spacing: 12) {
+                // Item Image Placeholder
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 60, height: 60)
+                    .overlay(
+                        Image(systemName: "bag.fill")
+                            .foregroundColor(.white.opacity(0.6))
+                    )
                 
-                Text(cartItem.item.description)
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
-                    .lineLimit(1)
-                
-                Text("Aisle: \(cartItem.item.aisle)")
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.6))
-            }
-            
-            Spacer()
-            
-            // Quantity Controls
-            VStack(alignment: .trailing, spacing: 8) {
-                HStack(spacing: 8) {
-                    Button(action: {
-                        if cartItem.quantity > 1 {
-                            appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity - 1)
-                        }
-                    }) {
-                        Image(systemName: "minus.circle.fill")
-                            .foregroundColor(cartItem.quantity > 1 ? Color.lumoGreen : .gray)
-                            .font(.title3)
-                    }
-                    .disabled(cartItem.quantity <= 1)
-                    
-                    Text("\(cartItem.quantity)")
+                // Item Details
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(cartItem.item.name)
                         .font(.headline)
                         .foregroundColor(.white)
-                        .frame(minWidth: 30)
+                        .lineLimit(2)
                     
-                    Button(action: {
-                        appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity + 1)
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(Color.lumoGreen)
-                            .font(.title3)
-                    }
+                    Text(cartItem.item.description)
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.7))
+                        .lineLimit(1)
+                    
+                    Text("Aisle: \(cartItem.item.aisle)")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.6))
                 }
                 
-                Text("$\(cartItem.totalPrice, specifier: "%.2f")")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(Color.lumoGreen)
+                Spacer()
+                
+                // Quantity Controls
+                VStack(alignment: .trailing, spacing: 8) {
+                    HStack(spacing: 8) {
+                        Button(action: {
+                            if cartItem.quantity > 1 {
+                                appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity - 1)
+                            }
+                        }) {
+                            Image(systemName: "minus.circle.fill")
+                                .foregroundColor(cartItem.quantity > 1 ? Color.lumoGreen : .gray)
+                                .font(.title3)
+                        }
+                        .disabled(cartItem.quantity <= 1)
+                        
+                        Text("\(cartItem.quantity)")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(minWidth: 30)
+                        
+                        Button(action: {
+                            appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity + 1)
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(Color.lumoGreen)
+                                .font(.title3)
+                        }
+                    }
+                    
+                    Text("$\(cartItem.totalPrice, specifier: "%.2f")")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color.lumoGreen)
+                }
+                
+                // X Button for quick removal
+                Button(action: {
+                    appState.shoppingCart.removeItem(cartItem.item)
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.red)
+                        .font(.title2)
+                }
             }
-            
-            // X Button for quick removal
-            Button(action: {
-                appState.shoppingCart.removeItem(cartItem.item)
-            }) {
-                Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(.red)
-                    .font(.title2)
-            }
-        }
-        .padding()
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(12)
-        .swipeActions(edge: .trailing) {
-            Button(role: .destructive) {
-                appState.shoppingCart.removeItem(cartItem.item)
-            } label: {
-                Label("Delete", systemImage: "trash.fill")
+            .padding()
+            .background(Color.gray.opacity(0.1))
+            .cornerRadius(12)
+            .swipeActions(edge: .trailing) {
+                Button(role: .destructive) {
+                    appState.shoppingCart.removeItem(cartItem.item)
+                } label: {
+                    Label("Delete", systemImage: "trash.fill")
+                }
             }
         }
     }
