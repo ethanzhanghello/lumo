@@ -13,6 +13,7 @@ import UIKit
 @main
 struct LumoApp: App {
     @StateObject var appState = AppState()
+    @StateObject var flyToCartManager = FlyToCartAnimationManager()
     init() {
         #if canImport(UIKit)
         let appearance = UITabBarAppearance()
@@ -34,8 +35,13 @@ struct LumoApp: App {
     
     var body: some Scene {
         WindowGroup {
-            TabBarView()
-                .environmentObject(appState)
+            ZStack {
+                TabBarView()
+                    .environmentObject(appState)
+                    .environmentObject(flyToCartManager)
+                FlyToCartOverlay()
+                    .environmentObject(flyToCartManager)
+            }
         }
     }
 }

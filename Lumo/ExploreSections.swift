@@ -2,7 +2,7 @@
 //  ExploreSections.swift
 //  Lumo
 //
-//  Created by Ethan on 7/1/25.
+//  Created by Ethan on 7/1/25. Edited by Ethan on 7/2/25.
 //
 
 import SwiftUI
@@ -431,37 +431,33 @@ struct CategoryCard: View {
     let isSelected: Bool
     
     var body: some View {
-        Button(action: {
-            // Action for tapping the category card
-        }) {
-            VStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(isSelected ? color : color.opacity(0.3))
-                        .frame(width: 60, height: 60)
-                    
-                    Image(systemName: icon)
-                        .font(.title2)
-                        .foregroundColor(isSelected ? .white : color)
-                }
+        VStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(isSelected ? color : color.opacity(0.3))
+                    .frame(width: 60, height: 60)
                 
-                Text(title)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundColor(isSelected ? .white : color)
             }
-            .frame(height: 100)
-            .frame(maxWidth: .infinity)
-            .padding(12)
-            .background(isSelected ? color.opacity(0.2) : Color.gray.opacity(0.1))
-            .cornerRadius(16)
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(isSelected ? color : Color.gray.opacity(0.3), lineWidth: isSelected ? 2 : 1)
-            )
+            
+            Text(title)
+                .font(.caption)
+                .fontWeight(.medium)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
         }
+        .frame(height: 100)
+        .frame(maxWidth: .infinity)
+        .padding(12)
+        .background(isSelected ? color.opacity(0.2) : Color.gray.opacity(0.1))
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(isSelected ? color : Color.gray.opacity(0.3), lineWidth: isSelected ? 2 : 1)
+        )
     }
 }
 
@@ -888,7 +884,9 @@ struct StoreDetailView: View {
                                 GridItem(.flexible())
                             ], spacing: 16) {
                                 ForEach(filteredItems) { item in
-                                    StoreItemCard(item: item, store: store)
+                                    ItemCard(item: item)
+                                        .environmentObject(appState)
+                                        .environmentObject(flyToCartManager)
                                 }
                             }
                             .padding()
@@ -1167,5 +1165,55 @@ struct CategoryStoreCard: View {
         .sheet(isPresented: $showingStoreDetail) {
             StoreDetailView(store: store)
         }
+    }
+}
+
+struct ItemCard: View {
+    @EnvironmentObject var flyToCartManager: FlyToCartAnimationManager
+    @EnvironmentObject var appState: AppState
+    let item: GroceryItem
+    @State private var buttonFrame: CGRect = .zero
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // ... existing code ...
+            Button(action: {
+                // Get global position of button
+                if let window = UIApplication.shared.windows.first {
+                    let start = CGPoint(x: buttonFrame.midX, y: buttonFrame.midY)
+                    // Assume cart icon is at top right for now
+                    let end = CGPoint(x: window.bounds.width - 40, y: 60)
+                    flyToCartManager.trigger(image: Image(systemName: "bag.fill"), start: start, end: end)
+                }
+                appState.shoppingCart.addItem(item)
+            }) {
+                HStack {
+                    Image(systemName: "plus")
+                        .font(.caption2)
+                    Text("Add")
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                }
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .background(Color.lumoGreen)
+                .cornerRadius(6)
+            }
+            .background(GeometryReader { geo in
+                Color.clear
+                    .preference(key: ButtonFrameKey.self, value: geo.frame(in: .global))
+            })
+            .onPreferenceChange(ButtonFrameKey.self) { value in
+                buttonFrame = value
+            }
+        }
+        // ... existing code ...
+    }
+}
+
+struct ButtonFrameKey: PreferenceKey {
+    static var defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        value = nextValue()
     }
 } 

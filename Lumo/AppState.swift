@@ -2,7 +2,7 @@
 //  AppState.swift
 //  Lumo
 //
-//  Created by Tony on 6/18/25.
+//  Created by Tony on 6/18/25. Edited by Ethan on 7/2/25.
 //
 
 import Foundation

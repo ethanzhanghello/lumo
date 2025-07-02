@@ -2,7 +2,7 @@
 //  ShoppingCartView.swift
 //  Lumo
 //
-//  Created by Ethan on 7/1/25.
+//  Created by Ethan on 7/1/25. Edited by Ethan on 7/2/25.
 //
 
 import SwiftUI
@@ -176,7 +176,7 @@ struct ShoppingCartView: View {
 }
 
 struct CartItemRow: View {
-    let itemId: UUID
+    let itemId: String
     @EnvironmentObject var appState: AppState
     
     var cartItem: CartItem? {
@@ -218,9 +218,7 @@ struct CartItemRow: View {
                 VStack(alignment: .trailing, spacing: 8) {
                     HStack(spacing: 8) {
                         Button(action: {
-                            if cartItem.quantity > 1 {
-                                appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity - 1)
-                            }
+                            appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity - 1)
                         }) {
                             Image(systemName: "minus.circle.fill")
                                 .foregroundColor(cartItem.quantity > 1 ? Color.lumoGreen : .gray)

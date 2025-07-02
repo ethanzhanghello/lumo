@@ -8,7 +8,7 @@ import SwiftUI
 
 // MARK: - SmartSuggestion Model (Existing)
 struct SmartSuggestion: Identifiable, Codable, Hashable {
-    let id = UUID()
+    var id: String { title } // Use title as stable identifier
     let title: String
     let description: String
     // No explicit icon property for now, assuming emoji or system icons if needed

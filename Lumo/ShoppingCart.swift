@@ -10,7 +10,7 @@ import SwiftUI
 
 // MARK: - CartItem Model (to track quantities)
 struct CartItem: Identifiable, Codable, Hashable {
-    let id = UUID()
+    var id: String { "\(item.name)-\(quantity)" } // Use computed property for stable ID
     let item: GroceryItem
     var quantity: Int
     
@@ -54,7 +54,7 @@ class ShoppingCart: ObservableObject {
     // MARK: - Item Management Functions
     
     func addItem(_ item: GroceryItem, quantity: Int = 1) {
-        if let existingIndex = cartItems.firstIndex(where: { $0.item.id == item.id }) {
+        if let existingIndex = cartItems.firstIndex(where: { $0.item.name == item.name }) {
             // Item already exists, increase quantity
             cartItems[existingIndex].quantity += quantity
             print("Updated quantity for \(item.name) to \(cartItems[existingIndex].quantity)")
@@ -67,7 +67,7 @@ class ShoppingCart: ObservableObject {
     }
 
     func removeItem(_ item: GroceryItem) {
-        if let index = cartItems.firstIndex(where: { $0.item.id == item.id }) {
+        if let index = cartItems.firstIndex(where: { $0.item.name == item.name }) {
             cartItems.remove(at: index)
             print("Removed item: \(item.name)")
         } else {
@@ -76,7 +76,7 @@ class ShoppingCart: ObservableObject {
     }
 
     func updateQuantity(for item: GroceryItem, to quantity: Int) {
-        if let index = cartItems.firstIndex(where: { $0.item.id == item.id }) {
+        if let index = cartItems.firstIndex(where: { $0.item.name == item.name }) {
             if quantity <= 0 {
                 cartItems.remove(at: index)
                 print("Removed item: \(item.name) (quantity set to 0)")

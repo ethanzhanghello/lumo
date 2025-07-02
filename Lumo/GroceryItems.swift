@@ -11,7 +11,7 @@ import Foundation
 // Defines the structure for a single grocery item, including its name,
 // a brief description, price, and the aisle where it can be found.
 struct GroceryItem: Identifiable, Codable, Hashable {
-    var id = UUID()        // Unique identifier for each item
+    var id: String { name } // Use name as stable identifier
     let name: String       // Name of the grocery item
     let description: String // Short description of the item
     let price: Double      // Price of the item
