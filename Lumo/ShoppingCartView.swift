@@ -280,25 +280,15 @@ struct CartItemRow: View {
                         .fontWeight(.semibold)
                         .foregroundColor(Color.lumoGreen)
                 }
-                
-                // X Button for quick removal
-                Button(action: {
-                    appState.shoppingCart.removeItem(cartItem.item)
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.red)
-                        .font(.title2)
-                }
             }
             .padding()
             .background(Color.gray.opacity(0.1))
             .cornerRadius(12)
-            .swipeActions(edge: .trailing) {
-                Button(role: .destructive) {
-                    appState.shoppingCart.removeItem(cartItem.item)
-                } label: {
-                    Label("Delete", systemImage: "trash.fill")
-                }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                // Navigate to item detail view
+                // TODO: Implement item detail navigation
+                print("[DEBUG] Tapped on item: \(cartItem.item.name)")
             }
         }
     }
