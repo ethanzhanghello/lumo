@@ -56,6 +56,13 @@ struct MainTabView: View {
                     Text("Map")
                 }
             
+            // AI ASSISTANT TAB
+            ChatbotView()
+                .tabItem {
+                    Image(systemName: "brain.head.profile")
+                    Text("AI Assistant")
+                }
+            
             // PROFILE TAB
             ProfileView()
                 .tabItem {

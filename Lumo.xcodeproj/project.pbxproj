@@ -37,6 +37,12 @@
 		B0E915E32E0372460036C7A9 /* CouponDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915E42E0372460036C7A9 /* CouponDetailView.swift */; };
 		B0E915E52E0372460036C7A9 /* DealsData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915E62E0372460036C7A9 /* DealsData.swift */; };
 		B0E915E82E0372460036C7AA /* CategoryFilterButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915E72E0372460036C7AA /* CategoryFilterButton.swift */; };
+		B0E915E92E0372460036C7AA /* ChatbotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915EA2E0372460036C7AA /* ChatbotView.swift */; };
+		B0E915EB2E0372460036C7AA /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915EC2E0372460036C7AA /* ChatMessage.swift */; };
+		B0E915ED2E0372460036C7AA /* ChatbotEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915EE2E0372460036C7AA /* ChatbotEngine.swift */; };
+		B0E915EF2E0372460036C7AA /* ChatResponseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915F02E0372460036C7AA /* ChatResponseViews.swift */; };
+		B0E915F12E0372460036C7AA /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915F22E0372460036C7AA /* Recipe.swift */; };
+		B0E915F32E0372460036C7AA /* RecipeDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915F42E0372460036C7AA /* RecipeDatabase.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +97,12 @@
 		B0E915E42E0372460036C7A9 /* CouponDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CouponDetailView.swift; sourceTree = "<group>"; };
 		B0E915E62E0372460036C7A9 /* DealsData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DealsData.swift; sourceTree = "<group>"; };
 		B0E915E72E0372460036C7AA /* CategoryFilterButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryFilterButton.swift; sourceTree = "<group>"; };
+		B0E915EA2E0372460036C7AA /* ChatbotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatbotView.swift; sourceTree = "<group>"; };
+		B0E915EC2E0372460036C7AA /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
+		B0E915EE2E0372460036C7AA /* ChatbotEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatbotEngine.swift; sourceTree = "<group>"; };
+		B0E915F02E0372460036C7AA /* ChatResponseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatResponseViews.swift; sourceTree = "<group>"; };
+		B0E915F22E0372460036C7AA /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
+		B0E915F42E0372460036C7AA /* RecipeDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDatabase.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +175,12 @@
 				B0E915E22E0372460036C7A9 /* DealDetailView.swift */,
 				B0E915E42E0372460036C7A9 /* CouponDetailView.swift */,
 				B0E915E62E0372460036C7A9 /* DealsData.swift */,
+				B0E915EA2E0372460036C7AA /* ChatbotView.swift */,
+				B0E915EC2E0372460036C7AA /* ChatMessage.swift */,
+				B0E915EE2E0372460036C7AA /* ChatbotEngine.swift */,
+				B0E915F02E0372460036C7AA /* ChatResponseViews.swift */,
+				B0E915F22E0372460036C7AA /* Recipe.swift */,
+				B0E915F42E0372460036C7AA /* RecipeDatabase.swift */,
 				B0E915992E00AC7D0036C7A9 /* Assets.xcassets */,
 				B0E915D22E0372460036C7A9 /* GroceryItems.swift */,
 				B0E915CA2E03182E0036C7A9 /* StoreMap.swift */,
@@ -351,8 +369,14 @@
 				B0E915DF2E0372460036C7A9 /* DealFiltersView.swift in Sources */,
 				B0E915E12E0372460036C7A9 /* DealDetailView.swift in Sources */,
 				B0E915E32E0372460036C7A9 /* CouponDetailView.swift in Sources */,
-				B0E915E52E0372460036C7A9 /* MockData.swift in Sources */,
+				B0E915E52E0372460036C7A9 /* DealsData.swift in Sources */,
 				B0E915E82E0372460036C7AA /* CategoryFilterButton.swift in Sources */,
+				B0E915E92E0372460036C7AA /* ChatbotView.swift in Sources */,
+				B0E915EB2E0372460036C7AA /* ChatMessage.swift in Sources */,
+				B0E915ED2E0372460036C7AA /* ChatbotEngine.swift in Sources */,
+				B0E915EF2E0372460036C7AA /* ChatResponseViews.swift in Sources */,
+				B0E915F12E0372460036C7AA /* Recipe.swift in Sources */,
+				B0E915F32E0372460036C7AA /* RecipeDatabase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
