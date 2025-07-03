@@ -34,19 +34,15 @@ struct RootView: View {
                             .navigationTitle("")
                             .toolbar(.hidden, for: .navigationBar)
                     } else if destination == "TabBar" {
-                        TabBarView()
-                            .toolbar(.hidden, for: .navigationBar) // TabBarView usually doesn't need a navigation bar
+                        MainTabView()
+                            .toolbar(.hidden, for: .navigationBar) // MainTabView usually doesn't need a navigation bar
                     }
                 }
                 .toolbar(.hidden, for: .navigationBar) // Hide the initial navigation bar for LumoWelcomeView
         }
         // This observer listens for changes in selectedStoreName and triggers navigation
-        .onReceive(appState.$selectedStoreName) { newStoreName in
-            if newStoreName != nil {
-                // If a store is selected, clear the current stack and push TabBarView
-                navigationPath = NavigationPath() // Clears all views from the stack
-                navigationPath.append("TabBar")   // Pushes TabBarView onto the now empty stack
-            }
+        .onReceive(appState.$selectedStore) { newStore in
+            // Handle store selection changes
         }
     }
 }

@@ -1,70 +1,68 @@
 //
-//  TabBarView.swift
+//  TabView.swift
 //  Lumo
 //
-//  Created by Tony on 6/16/25.
+//  Created by Tony on 6/18/25. Edited by Ethan on 7/3/25.
 //
 
 import SwiftUI
 
-struct TabBarView: View {
-    @EnvironmentObject var appState: AppState
-
+struct MainTabView: View {
+    @StateObject private var appState = AppState()
+    
     var body: some View {
         TabView {
-            // HOME TAB: StoreMapView
-            StoreMapView()
-                .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("Home")
-                }
-
-            // BROWSE TAB: BrowseView
-            BrowseView()
-                .tabItem {
-                    Image(systemName: "magnifyingglass")
-                    Text("Browse")
-                }
-
-            // EXPLORE TAB: ExploreView
+            // EXPLORE TAB
             ExploreView()
                 .tabItem {
-                    Image(systemName: "safari")
+                    Image(systemName: "magnifyingglass")
                     Text("Explore")
                 }
-
-            // CART TAB: ShoppingCartView
-            if appState.shoppingCart.totalItems > 0 {
-                ShoppingCartView()
+            
+            // BROWSE TAB
+            BrowseView()
+                .tabItem {
+                    Image(systemName: "list.bullet")
+                    Text("Browse")
+                }
+            
+            // GROCERY LIST TAB: GroceryListView
+            if appState.groceryList.totalItems > 0 {
+                GroceryListView()
                     .tabItem {
-                        Image(systemName: "cart.fill")
-                        Text("Cart")
+                        Image(systemName: "list.bullet")
+                        Text("Grocery List")
                     }
-                    .badge(appState.shoppingCart.totalItems)
+                    .badge(appState.groceryList.totalItems)
             } else {
-                ShoppingCartView()
+                GroceryListView()
                     .tabItem {
-                        Image(systemName: "cart.fill")
-                        Text("Cart")
+                        Image(systemName: "list.bullet")
+                        Text("Grocery List")
                     }
             }
-
-            // PROFILE TAB: Optional
+            
+            // MAP TAB
             StoreMapView()
+                .tabItem {
+                    Image(systemName: "map")
+                    Text("Map")
+                }
+            
+            // PROFILE TAB
+            ProfileView()
                 .tabItem {
                     Image(systemName: "person.crop.circle")
                     Text("Profile")
                 }
         }
+        .accentColor(Color.lumoGreen)
+        .environmentObject(appState)
     }
 }
 
-struct TabBarView_Previews: PreviewProvider {
+struct MainTabView_Previews: PreviewProvider {
     static var previews: some View {
-        TabBarView()
-            .previewLayout(.sizeThatFits)
-            .background(Color.black)
-            .environmentObject(AppState()) // Provide AppState for preview
-
+        MainTabView()
     }
 }
