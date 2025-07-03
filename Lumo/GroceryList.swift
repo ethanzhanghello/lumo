@@ -72,12 +72,18 @@ class GroceryList: ObservableObject {
     }
     
     func updateQuantity(for item: GroceryItem, to newQuantity: Int) {
+        print("updateQuantity called for \(item.name) to \(newQuantity)")
         if let index = groceryItems.firstIndex(where: { $0.item.id == item.id }) {
+            print("Found item at index \(index), current quantity: \(groceryItems[index].quantity)")
             if newQuantity <= 0 {
+                print("Removing item because new quantity is \(newQuantity)")
                 groceryItems.remove(at: index)
             } else {
+                print("Updating quantity from \(groceryItems[index].quantity) to \(newQuantity)")
                 groceryItems[index].quantity = newQuantity
             }
+        } else {
+            print("Item not found in grocery list")
         }
     }
     

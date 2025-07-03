@@ -392,63 +392,68 @@ struct GroceryItemCard: View {
                     .foregroundColor(isChecked ? .lumoGreen : .gray)
                     .font(.title2)
             }
+            .buttonStyle(PlainButtonStyle())
             
-            // Item Image
+            // Item Image and Details (tappable area for item details)
             Button(action: {
                 showingItemDetail = true
             }) {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(width: 60, height: 60)
-                    .overlay(
-                        Image(systemName: "bag.fill")
-                            .foregroundColor(.white.opacity(0.6))
-                    )
-            }
-            
-            // Item Details
-            VStack(alignment: .leading, spacing: 4) {
-                Text(groceryItem.item.name)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .lineLimit(2)
-                    .strikethrough(isChecked)
-                
-                if !groceryItem.item.brand.isEmpty {
-                    Text(groceryItem.item.brand)
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.7))
-                }
-                
-                HStack {
-                    Text("Aisle \(groceryItem.item.aisle)")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.6))
+                HStack(spacing: 12) {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(width: 60, height: 60)
+                        .overlay(
+                            Image(systemName: "bag.fill")
+                                .foregroundColor(.white.opacity(0.6))
+                        )
                     
-                    if groceryItem.item.hasDeal {
-                        Text("2 for $5")
-                            .font(.caption)
+                    // Item Details
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(groceryItem.item.name)
+                            .font(.headline)
                             .foregroundColor(.white)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.orange)
-                            .cornerRadius(4)
+                            .lineLimit(2)
+                            .strikethrough(isChecked)
+                        
+                        if !groceryItem.item.brand.isEmpty {
+                            Text(groceryItem.item.brand)
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                        
+                        HStack {
+                            Text("Aisle \(groceryItem.item.aisle)")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.6))
+                            
+                            if groceryItem.item.hasDeal {
+                                Text("2 for $5")
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.orange)
+                                    .cornerRadius(4)
+                            }
+                        }
                     }
+                    
+                    Spacer()
                 }
             }
-            .onTapGesture {
-                showingItemDetail = true
-            }
+            .buttonStyle(PlainButtonStyle())
             
-            Spacer()
-            
-            // Quantity Controls
+            // Quantity Controls (separate from item details)
             VStack(alignment: .trailing, spacing: 8) {
                 HStack(spacing: 8) {
                     Button(action: {
+                        print("Decrement button tapped for \(groceryItem.item.name), current quantity: \(groceryItem.quantity)")
                         animateQuantityChange {
                             if groceryItem.quantity > 1 {
+                                print("Updating quantity from \(groceryItem.quantity) to \(groceryItem.quantity - 1)")
                                 appState.groceryList.updateQuantity(for: groceryItem.item, to: groceryItem.quantity - 1)
+                            } else {
+                                print("Cannot decrement below 1")
                             }
                         }
                     }) {
@@ -458,6 +463,7 @@ struct GroceryItemCard: View {
                             .scaleEffect(minusButtonScale)
                     }
                     .disabled(groceryItem.quantity <= 1)
+                    .buttonStyle(PlainButtonStyle())
                     
                     Text("\(groceryItem.quantity)")
                         .font(.headline)
@@ -467,7 +473,9 @@ struct GroceryItemCard: View {
                         .opacity(quantityOpacity)
                     
                     Button(action: {
+                        print("Increment button tapped for \(groceryItem.item.name), current quantity: \(groceryItem.quantity)")
                         animateQuantityChange {
+                            print("Updating quantity from \(groceryItem.quantity) to \(groceryItem.quantity + 1)")
                             appState.groceryList.updateQuantity(for: groceryItem.item, to: groceryItem.quantity + 1)
                         }
                     }) {
@@ -476,6 +484,7 @@ struct GroceryItemCard: View {
                             .font(.title3)
                             .scaleEffect(plusButtonScale)
                     }
+                    .buttonStyle(PlainButtonStyle())
                 }
                 
                 Text("$\(groceryItem.totalPrice, specifier: "%.2f")")
