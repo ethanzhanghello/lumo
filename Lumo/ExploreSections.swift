@@ -284,7 +284,7 @@ struct SmartRecommendationsSection: View {
             }
             
             // Filter out items already in cart
-            let cartItemIds = Set(appState.shoppingCart.cartItems.map { $0.item.id })
+            let cartItemIds = Set(appState.groceryList.groceryItems.map { $0.item.id })
             recommendedItems = recommendedItems.filter { !cartItemIds.contains($0.id) }
             
             // Take random 6 items
@@ -330,7 +330,7 @@ struct RecommendationCard: View {
             
             // Add to Cart Button
             Button(action: {
-                appState.shoppingCart.addItem(item)
+                appState.groceryList.addItem(item)
             }) {
                 HStack {
                     Image(systemName: "plus")
@@ -469,12 +469,12 @@ struct FeaturedItemsSection: View {
     var featuredItems: [(String, [GroceryItem])]{
         let all: [(String, [GroceryItem])] = [
             ("Popular This Week", sampleGroceryItems.filter { $0.name.contains("Organic") || $0.name.contains("Fresh") }),
-            ("Back-to-School Essentials", sampleGroceryItems.filter { $0.aisle == "Office & School" || $0.aisle == "Health/Beauty" }),
-            ("Seasonal Favorites", sampleGroceryItems.filter { $0.aisle == "Seasonal" || $0.name.contains("Holiday") })
+            ("Back-to-School Essentials", sampleGroceryItems.filter { $0.name.contains("Office & School") || $0.name.contains("Health/Beauty") }),
+            ("Seasonal Favorites", sampleGroceryItems.filter { $0.name.contains("Seasonal") || $0.name.contains("Holiday") })
         ]
         if let cat = selectedCategory {
             return all.map { (title, items) in
-                (title, items.filter { $0.aisle == cat })
+                (title, items.filter { $0.category == cat })
             }
         } else {
             return all
@@ -588,7 +588,7 @@ struct FeaturedItemRow: View {
             Spacer()
             
             Button(action: {
-                appState.shoppingCart.addItem(item)
+                appState.groceryList.addItem(item)
             }) {
                 Image(systemName: "plus.circle.fill")
                     .foregroundColor(Color.lumoGreen)
@@ -606,7 +606,7 @@ struct DealsSection: View {
     var dealsItems: [GroceryItem] {
         let filtered = sampleGroceryItems.filter { _ in Bool.random() }
         if let cat = selectedCategory {
-            return filtered.filter { $0.aisle == cat }
+            return filtered.filter { $0.category == cat }
         }
         return filtered
     }
@@ -706,7 +706,7 @@ struct DealCard: View {
             
             // Add to Cart Button
             Button(action: {
-                appState.shoppingCart.addItem(item)
+                appState.groceryList.addItem(item)
             }) {
                 Text("Add to Cart")
                     .font(.caption2)
@@ -746,14 +746,14 @@ struct StoreDetailView: View {
         
         // Filter by selected category
         if let category = selectedCategory {
-            items = items.filter { $0.aisle == category }
+            items = items.filter { $0.category == category }
         }
         
         return items
     }
     
     var categories: [String] {
-        Array(Set(sampleGroceryItems.map { $0.aisle })).sorted()
+        Array(Set(sampleGroceryItems.map { $0.category })).sorted()
     }
     
     var body: some View {
@@ -960,7 +960,7 @@ struct StoreItemCard: View {
                     Spacer()
                     
                     Button(action: {
-                        appState.shoppingCart.addItem(item)
+                        appState.groceryList.addItem(item)
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .foregroundColor(Color.lumoGreen)
@@ -976,10 +976,6 @@ struct StoreItemCard: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
         )
-        .sheet(isPresented: $showingItemDetail) {
-            ItemDetailView(item: item)
-                .environmentObject(appState)
-        }
     }
 }
 
@@ -1073,7 +1069,7 @@ struct CategoryStoreCard: View {
     
     var categoryItems: [GroceryItem] {
         // Get items from this category
-        return sampleGroceryItems.filter { $0.aisle == category }.prefix(3).map { $0 }
+        return sampleGroceryItems.filter { $0.category == category }.prefix(3).map { $0 }
     }
     
     var body: some View {
@@ -1225,7 +1221,7 @@ struct ItemCard: View {
             
             // Add to Cart Button
             Button(action: {
-                appState.shoppingCart.addItem(item)
+                appState.groceryList.addItem(item)
             }) {
                 HStack {
                     Image(systemName: "plus")
@@ -1248,10 +1244,6 @@ struct ItemCard: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
         )
-        .sheet(isPresented: $showingItemDetail) {
-            ItemDetailView(item: item)
-                .environmentObject(appState)
-        }
     }
 }
 

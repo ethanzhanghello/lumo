@@ -119,7 +119,7 @@ struct ItemDetailView: View {
                         
                         // Add to Cart Button
                         Button(action: {
-                            appState.shoppingCart.addItem(item, quantity: quantity)
+                            appState.groceryList.addItem(item, quantity: quantity)
                             dismiss()
                         }) {
                             HStack {

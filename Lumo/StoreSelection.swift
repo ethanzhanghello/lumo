@@ -147,7 +147,7 @@ struct StoreSelectionView: View {
                     Button(action: {
                         print("Selected store: \(currentStore.name)")
                         // This action will trigger the .onReceive in RootView
-                        appState.selectedStoreName = currentStore.name
+                        appState.selectedStore = currentStore
                         // No explicit dismiss or navigation here
                     }) {
                         Text("Select This Store")

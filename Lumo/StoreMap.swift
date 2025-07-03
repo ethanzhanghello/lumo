@@ -339,37 +339,37 @@ struct LocationMarker: View {
 // Cart and other action buttons (floating)
 struct FloatingActionButtons: View {
     @EnvironmentObject var appState: AppState
-    @State private var showingCart = false
+    @State private var showingGroceryList = false
     
     var body: some View {
         VStack(spacing: 0) {
             // Top button (Cart)
             Button(action: {
-                showingCart = true
+                showingGroceryList = true
             }) {
-                ZStack {
-                    Image(systemName: "cart.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                        .foregroundColor(Color.cyan) // #00F0C0
-                    
-                    // Cart badge showing item count
-                    if appState.shoppingCart.totalItems > 0 {
-                        Text("\(appState.shoppingCart.totalItems)")
-                            .font(.caption2)
+                HStack {
+                    Image(systemName: "list.bullet")
+                    Text("Grocery List")
+                    Spacer()
+                    if appState.groceryList.totalItems > 0 {
+                        Text("\(appState.groceryList.totalItems)")
+                            .font(.caption)
                             .fontWeight(.bold)
                             .foregroundColor(.black)
-                            .padding(4)
-                            .background(Color.red)
+                            .frame(width: 20, height: 20)
+                            .background(Color.lumoGreen)
                             .clipShape(Circle())
-                            .offset(x: 10, y: -10)
                     }
                 }
+                .foregroundColor(.white)
                 .padding()
-                .frame(maxWidth: .infinity)
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(12)
             }
-            .background(Color.darkGrayBackground)
+            .sheet(isPresented: $showingGroceryList) {
+                GroceryListView()
+                    .environmentObject(appState)
+            }
 
             // Divider line
             Rectangle()
@@ -392,10 +392,6 @@ struct FloatingActionButtons: View {
         .background(Color.black)
         .clipShape(RoundedRectangle(cornerRadius: 30))
         .shadow(radius: 4)
-        .sheet(isPresented: $showingCart) {
-            ShoppingCartView()
-                .environmentObject(appState)
-        }
     }
 }
 

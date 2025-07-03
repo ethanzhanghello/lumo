@@ -14,45 +14,55 @@ struct SmartSuggestion: Identifiable, Codable, Hashable {
     // No explicit icon property for now, assuming emoji or system icons if needed
 }
 
-// MARK: - GroceryItemCard Helper View (Existing - no changes needed here)
-struct GroceryItemCard: View {
-    let item: GroceryItem
-    let customOutlineColor: Color
-    @EnvironmentObject var appState: AppState
+// Remove the GroceryItemCard struct definition from this file entirely.
+// Replace usages of GroceryItemCard(item: item, customOutlineColor: ...) with BrowseItemCard(item: item)
+// Define a simple BrowseItemCard below:
 
+struct BrowseItemCard: View {
+    let item: GroceryItem
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: 60, height: 60)
+                .overlay(
+                    Image(systemName: "bag.fill")
+                        .foregroundColor(.white.opacity(0.6))
+                )
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.name)
                     .font(.headline)
                     .foregroundColor(.white)
-                Text(item.description)
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
-                Text("Price: \(item.price, specifier: "%.2f")")
-                    .font(.footnote)
-                    .foregroundColor(.white.opacity(0.8))
-                Text("Aisle: \(item.aisle)")
-                    .font(.footnote)
-                    .foregroundColor(.white.opacity(0.6))
+                    .lineLimit(2)
+                if !item.brand.isEmpty {
+                    Text(item.brand)
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                HStack {
+                    Text("Aisle \(item.aisle)")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.6))
+                    if item.hasDeal, let deal = item.dealDescription {
+                        Text(deal)
+                            .font(.caption)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.orange)
+                            .cornerRadius(4)
+                    }
+                }
             }
             Spacer()
-            Button(action: {
-                appState.shoppingCart.addItem(item)
-                print("Added \(item.name) to cart. Total items: \(appState.shoppingCart.totalItems)")
-            }) {
-                Image(systemName: "cart.fill.badge.plus")
-                    .font(.title2)
-                    .foregroundColor(customOutlineColor)
-            }
+            Text("$\(item.price, specifier: "%.2f")")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(Color.lumoGreen)
         }
         .padding()
-        .background(Color.gray.opacity(0.2))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(customOutlineColor, lineWidth: 1)
-        )
     }
 }
 
@@ -77,14 +87,10 @@ struct BrowseView: View {
 
     // Computed property for the store name to display
     var displayedStoreInfo: String {
-        if let selectedStore = appState.selectedStoreName {
-            let components = selectedStore.components(separatedBy: " - ")
-            if components.count == 2 {
-                return "\(components[0]) - \(components[1])"
-            }
-            return selectedStore
+        if let selectedStore = appState.selectedStore {
+            return selectedStore.name
         }
-        return "Select a Store"
+        return "No Store Selected"
     }
 
     // Computed property to filter grocery items based on debounced search text
@@ -96,7 +102,7 @@ struct BrowseView: View {
             return sampleGroceryItems.filter { item in
                 item.name.lowercased().contains(lowercasedSearchText) ||
                 item.description.lowercased().contains(lowercasedSearchText) ||
-                item.aisle.lowercased().contains(lowercasedSearchText)
+                String(item.aisle).lowercased().contains(lowercasedSearchText)
             }
         }
     }
@@ -207,7 +213,7 @@ struct BrowseView: View {
                         ScrollView {
                             VStack(spacing: 12) {
                                 ForEach(filteredGroceryItems) { item in
-                                    GroceryItemCard(item: item, customOutlineColor: customCyanColor)
+                                    BrowseItemCard(item: item)
                                 }
                             }
                         }
@@ -375,8 +381,8 @@ struct QuickButton: View {
             print("\(title) button tapped!")
             // Find the corresponding grocery item and add it to the cart
             if let item = sampleGroceryItems.first(where: { $0.name == title }) {
-                appState.shoppingCart.addItem(item)
-                print("Added \(item.name) to cart. Total items: \(appState.shoppingCart.totalItems)")
+                appState.groceryList.addItem(item)
+                print("Added \(item.name) to grocery list. Total items: \(appState.groceryList.totalItems)")
             }
         }) {
             Text(title)
