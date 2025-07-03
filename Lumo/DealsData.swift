@@ -556,6 +556,17 @@ struct DealsData {
         return Product.sampleProducts.first { $0.id == id }
     }
     
+    static func searchProducts(query: String) -> [Product] {
+        let lowercasedQuery = query.lowercased()
+        return Product.sampleProducts.filter { product in
+            product.name.lowercased().contains(lowercasedQuery) ||
+            product.brand.lowercased().contains(lowercasedQuery) ||
+            product.category.lowercased().contains(lowercasedQuery) ||
+            product.tags.contains { $0.lowercased().contains(lowercasedQuery) } ||
+            product.description.lowercased().contains(lowercasedQuery)
+        }
+    }
+    
     static func getActiveDeals() -> [Deal] {
         let now = Date()
         return Deal.sampleDeals.filter { $0.startDate <= now && $0.endDate >= now }
