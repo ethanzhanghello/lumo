@@ -26,6 +26,13 @@ struct MainTabView: View {
                     Text("Browse")
                 }
             
+            // DEALS TAB
+            DealsView()
+                .tabItem {
+                    Image(systemName: "tag")
+                    Text("Deals")
+                }
+            
             // GROCERY LIST TAB: GroceryListView
             if appState.groceryList.totalItems > 0 {
                 GroceryListView()
