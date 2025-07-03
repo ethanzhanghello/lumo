@@ -167,6 +167,7 @@ struct CartItemRow: View {
     @State private var quantityOpacity: Double = 1
     @State private var minusButtonScale: CGFloat = 1
     @State private var plusButtonScale: CGFloat = 1
+    @State private var showingItemDetail = false
     
     var cartItem: CartItem? {
         appState.shoppingCart.cartItems.first { $0.id == itemId }
@@ -183,6 +184,9 @@ struct CartItemRow: View {
                         Image(systemName: "bag.fill")
                             .foregroundColor(.white.opacity(0.6))
                     )
+                    .onTapGesture {
+                        showingItemDetail = true
+                    }
                 
                 // Item Details
                 VStack(alignment: .leading, spacing: 4) {
@@ -190,6 +194,9 @@ struct CartItemRow: View {
                         .font(.headline)
                         .foregroundColor(.white)
                         .lineLimit(2)
+                        .onTapGesture {
+                            showingItemDetail = true
+                        }
                     
                     Text(cartItem.item.description)
                         .font(.caption)
@@ -200,6 +207,9 @@ struct CartItemRow: View {
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.6))
                 }
+                .onTapGesture {
+                    showingItemDetail = true
+                }
                 
                 Spacer()
                 
@@ -207,6 +217,7 @@ struct CartItemRow: View {
                 VStack(alignment: .trailing, spacing: 8) {
                     HStack(spacing: 8) {
                         Button(action: {
+                            // Button animation
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                                 minusButtonScale = 1.2
                             }
@@ -216,14 +227,19 @@ struct CartItemRow: View {
                                 }
                             }
                             
-                            // Animate quantity text
+                            // Quantity animation
                             withAnimation(.easeInOut(duration: 0.15)) {
                                 quantityOffset = -10
                                 quantityOpacity = 0
                             }
                             
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity - 1)
+                                // Update quantity
+                                if cartItem.quantity > 1 {
+                                    appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity - 1)
+                                }
+                                
+                                // Reset animation
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     quantityOffset = 0
                                     quantityOpacity = 1
@@ -245,6 +261,7 @@ struct CartItemRow: View {
                             .opacity(quantityOpacity)
                         
                         Button(action: {
+                            // Button animation
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                                 plusButtonScale = 1.2
                             }
@@ -254,14 +271,17 @@ struct CartItemRow: View {
                                 }
                             }
                             
-                            // Animate quantity text
+                            // Quantity animation
                             withAnimation(.easeInOut(duration: 0.15)) {
                                 quantityOffset = 10
                                 quantityOpacity = 0
                             }
                             
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                // Update quantity
                                 appState.shoppingCart.updateQuantity(for: cartItem.item, to: cartItem.quantity + 1)
+                                
+                                // Reset animation
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     quantityOffset = 0
                                     quantityOpacity = 1
@@ -284,11 +304,9 @@ struct CartItemRow: View {
             .padding()
             .background(Color.gray.opacity(0.1))
             .cornerRadius(12)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                // Navigate to item detail view
-                // TODO: Implement item detail navigation
-                print("[DEBUG] Tapped on item: \(cartItem.item.name)")
+            .sheet(isPresented: $showingItemDetail) {
+                ItemDetailView(item: cartItem.item)
+                    .environmentObject(appState)
             }
         }
     }

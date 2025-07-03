@@ -976,6 +976,10 @@ struct StoreItemCard: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
         )
+        .sheet(isPresented: $showingItemDetail) {
+            ItemDetailView(item: item)
+                .environmentObject(appState)
+        }
     }
 }
 
@@ -1169,6 +1173,7 @@ struct CategoryStoreCard: View {
 struct ItemCard: View {
     @EnvironmentObject var appState: AppState
     let item: GroceryItem
+    @State private var showingItemDetail = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -1181,6 +1186,9 @@ struct ItemCard: View {
                         .foregroundColor(.white.opacity(0.6))
                         .font(.title2)
                 )
+                .onTapGesture {
+                    showingItemDetail = true
+                }
             
             // Item Info
             VStack(alignment: .leading, spacing: 4) {
@@ -1189,6 +1197,9 @@ struct ItemCard: View {
                     .fontWeight(.medium)
                     .foregroundColor(.white)
                     .lineLimit(2)
+                    .onTapGesture {
+                        showingItemDetail = true
+                    }
                 
                 Text(item.description)
                     .font(.caption2)
@@ -1207,6 +1218,9 @@ struct ItemCard: View {
                     
                     Spacer()
                 }
+            }
+            .onTapGesture {
+                showingItemDetail = true
             }
             
             // Add to Cart Button
@@ -1234,6 +1248,10 @@ struct ItemCard: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
         )
+        .sheet(isPresented: $showingItemDetail) {
+            ItemDetailView(item: item)
+                .environmentObject(appState)
+        }
     }
 }
 
