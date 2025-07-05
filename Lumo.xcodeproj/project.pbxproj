@@ -10,9 +10,16 @@
 		940BE0B92E1494F600DC7316 /* GroceryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D62E0372460036C7A9 /* GroceryListView.swift */; };
 		940BE0BA2E1494F900DC7316 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D42E0372460036C7A9 /* ExploreView.swift */; };
 		940BE0BB2E1494FD00DC7316 /* ExploreSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D82E0372460036C7A9 /* ExploreSections.swift */; };
+		94F8C4452E18C8E2005A09D9 /* FlyToCartAnimationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */; };
+		94F8C4472E18C8EA005A09D9 /* FlyToCartOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */; };
+		94F8C4482E18C9AE005A09D9 /* MealPlanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FA2E0372460036C7AA /* MealPlanManager.swift */; };
+		94F8C4492E18C9E3005A09D9 /* MealPlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FC2E0372460036C7AA /* MealPlanningView.swift */; };
+		94F8C44A2E18C9E6005A09D9 /* SmartSubstitutionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FE2E0372460036C7AA /* SmartSubstitutionManager.swift */; };
+		94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */; };
+		94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */; };
+		94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916042E0372460036C7AA /* DietaryGoalsView.swift */; };
 		B0D283712E03D7F200C28B2C /* GroceryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283702E03D7F200C28B2C /* GroceryList.swift */; };
 		B0D283752E03DAD100C28B2C /* ApiKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */; };
-
 		B0E915962E00AC7C0036C7A9 /* LumoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915952E00AC7C0036C7A9 /* LumoApp.swift */; };
 		B0E915982E00AC7C0036C7A9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915972E00AC7C0036C7A9 /* ContentView.swift */; };
 		B0E9159A2E00AC7D0036C7A9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0E915992E00AC7D0036C7A9 /* Assets.xcassets */; };
@@ -43,6 +50,8 @@
 		B0E915EF2E0372460036C7AA /* ChatResponseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915F02E0372460036C7AA /* ChatResponseViews.swift */; };
 		B0E915F12E0372460036C7AA /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915F22E0372460036C7AA /* Recipe.swift */; };
 		B0E915F32E0372460036C7AA /* RecipeDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915F42E0372460036C7AA /* RecipeDatabase.swift */; };
+		B0E915F52E0372460036C7AA /* ChatbotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915F62E0372460036C7AA /* ChatbotTests.swift */; };
+		B0E915F72E0372460036C7AA /* ChatbotUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915F82E0372460036C7AA /* ChatbotUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,9 +72,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartAnimationManager.swift; sourceTree = "<group>"; };
+		94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartOverlay.swift; sourceTree = "<group>"; };
 		B0D283702E03D7F200C28B2C /* GroceryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryList.swift; sourceTree = "<group>"; };
 		B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeyManager.swift; sourceTree = "<group>"; };
-
 		B0E915922E00AC7C0036C7A9 /* Lumo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lumo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0E915952E00AC7C0036C7A9 /* LumoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LumoApp.swift; sourceTree = "<group>"; };
 		B0E915972E00AC7C0036C7A9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -103,6 +113,14 @@
 		B0E915F02E0372460036C7AA /* ChatResponseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatResponseViews.swift; sourceTree = "<group>"; };
 		B0E915F22E0372460036C7AA /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
 		B0E915F42E0372460036C7AA /* RecipeDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDatabase.swift; sourceTree = "<group>"; };
+		B0E915F62E0372460036C7AA /* ChatbotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatbotTests.swift; sourceTree = "<group>"; };
+		B0E915F82E0372460036C7AA /* ChatbotUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatbotUITests.swift; sourceTree = "<group>"; };
+		B0E915FA2E0372460036C7AA /* MealPlanManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPlanManager.swift; sourceTree = "<group>"; };
+		B0E915FC2E0372460036C7AA /* MealPlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPlanningView.swift; sourceTree = "<group>"; };
+		B0E915FE2E0372460036C7AA /* SmartSubstitutionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartSubstitutionManager.swift; sourceTree = "<group>"; };
+		B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartSubstitutionsView.swift; sourceTree = "<group>"; };
+		B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingHistoryView.swift; sourceTree = "<group>"; };
+		B0E916042E0372460036C7AA /* DietaryGoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DietaryGoalsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +171,8 @@
 		B0E915942E00AC7C0036C7A9 /* Lumo */ = {
 			isa = PBXGroup;
 			children = (
+				94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */,
+				94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */,
 				B0E915952E00AC7C0036C7A9 /* LumoApp.swift */,
 				B0E915972E00AC7C0036C7A9 /* ContentView.swift */,
 				B0E915C62E00C0440036C7A9 /* StoreData.swift */,
@@ -163,7 +183,6 @@
 				B0D283702E03D7F200C28B2C /* GroceryList.swift */,
 				B0E915D62E0372460036C7A9 /* GroceryListView.swift */,
 				B0E915C82E00C0D60036C7A9 /* StoreSelection.swift */,
-
 				B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */,
 				B0E915C42E00BA300036C7A9 /* TabView.swift */,
 				B0E915D42E0372460036C7A9 /* ExploreView.swift */,
@@ -181,6 +200,12 @@
 				B0E915F02E0372460036C7AA /* ChatResponseViews.swift */,
 				B0E915F22E0372460036C7AA /* Recipe.swift */,
 				B0E915F42E0372460036C7AA /* RecipeDatabase.swift */,
+				B0E915FA2E0372460036C7AA /* MealPlanManager.swift */,
+				B0E915FC2E0372460036C7AA /* MealPlanningView.swift */,
+				B0E915FE2E0372460036C7AA /* SmartSubstitutionManager.swift */,
+				B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */,
+				B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */,
+				B0E916042E0372460036C7AA /* DietaryGoalsView.swift */,
 				B0E915992E00AC7D0036C7A9 /* Assets.xcassets */,
 				B0E915D22E0372460036C7A9 /* GroceryItems.swift */,
 				B0E915CA2E03182E0036C7A9 /* StoreMap.swift */,
@@ -203,6 +228,7 @@
 			isa = PBXGroup;
 			children = (
 				B0E915A72E00AC7D0036C7A9 /* LumoTests.swift */,
+				B0E915F62E0372460036C7AA /* ChatbotTests.swift */,
 			);
 			path = LumoTests;
 			sourceTree = "<group>";
@@ -211,6 +237,7 @@
 			isa = PBXGroup;
 			children = (
 				B0E915B12E00AC7D0036C7A9 /* LumoUITests.swift */,
+				B0E915F82E0372460036C7AA /* ChatbotUITests.swift */,
 				B0E915B32E00AC7D0036C7A9 /* LumoUITestsLaunchTests.swift */,
 			);
 			path = LumoUITests;
@@ -354,23 +381,30 @@
 				B0E915C72E00C0450036C7A9 /* StoreData.swift in Sources */,
 				B0E915D12E0369E50036C7A9 /* Browse.swift in Sources */,
 				B0E915CD2E0349A30036C7A9 /* AppState.swift in Sources */,
+				94F8C4492E18C9E3005A09D9 /* MealPlanningView.swift in Sources */,
 				B0E915962E00AC7C0036C7A9 /* LumoApp.swift in Sources */,
 				B0E915CF2E035F770036C7A9 /* Root.swift in Sources */,
+				94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */,
 				B0D283712E03D7F200C28B2C /* GroceryList.swift in Sources */,
+				94F8C4472E18C8EA005A09D9 /* FlyToCartOverlay.swift in Sources */,
 				B0E915C52E00BA300036C7A9 /* TabView.swift in Sources */,
 				B0D283752E03DAD100C28B2C /* ApiKeyManager.swift in Sources */,
-				B0D283772E03E8CB00C28B2C /* GrocereyListVIew.swift in Sources */,
 				B0E915D32E0372460036C7A9 /* GroceryItems.swift in Sources */,
 				B0E915C92E00C0D60036C7A9 /* StoreSelection.swift in Sources */,
+				94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */,
+				94F8C4482E18C9AE005A09D9 /* MealPlanManager.swift in Sources */,
 				B0E915C32E00B7F80036C7A9 /* StoreFinder.swift in Sources */,
 				B0E915DA2E0372460036C7A9 /* ItemDetailView.swift in Sources */,
+				94F8C44A2E18C9E6005A09D9 /* SmartSubstitutionManager.swift in Sources */,
 				B0E915DB2E0372460036C7A9 /* ProfileView.swift in Sources */,
 				B0E915DD2E0372460036C7A9 /* DealsView.swift in Sources */,
 				B0E915DF2E0372460036C7A9 /* DealFiltersView.swift in Sources */,
 				B0E915E12E0372460036C7A9 /* DealDetailView.swift in Sources */,
 				B0E915E32E0372460036C7A9 /* CouponDetailView.swift in Sources */,
 				B0E915E52E0372460036C7A9 /* DealsData.swift in Sources */,
+				94F8C4452E18C8E2005A09D9 /* FlyToCartAnimationManager.swift in Sources */,
 				B0E915E82E0372460036C7AA /* CategoryFilterButton.swift in Sources */,
+				94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */,
 				B0E915E92E0372460036C7AA /* ChatbotView.swift in Sources */,
 				B0E915EB2E0372460036C7AA /* ChatMessage.swift in Sources */,
 				B0E915ED2E0372460036C7AA /* ChatbotEngine.swift in Sources */,
@@ -385,6 +419,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B0E915A82E00AC7D0036C7A9 /* LumoTests.swift in Sources */,
+				B0E915F52E0372460036C7AA /* ChatbotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -393,6 +428,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B0E915B22E00AC7D0036C7A9 /* LumoUITests.swift in Sources */,
+				B0E915F72E0372460036C7AA /* ChatbotUITests.swift in Sources */,
 				B0E915B42E00AC7D0036C7A9 /* LumoUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

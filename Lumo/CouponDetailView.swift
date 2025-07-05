@@ -181,12 +181,12 @@ struct CouponDetailView: View {
                 .foregroundColor(.white)
             
             VStack(spacing: 12) {
-                DetailRow(icon: "tag.fill", title: "Value", value: coupon.title, iconColor: .lumoGreen)
-                DetailRow(icon: "cart.fill", title: "Category", value: coupon.category, iconColor: .blue)
-                DetailRow(icon: "building.2.fill", title: "Brand", value: coupon.brand, iconColor: .purple)
+                                                            CouponDetailRow(icon: "tag.fill", title: "Value", value: coupon.title, iconColor: .lumoGreen)
+                                            CouponDetailRow(icon: "cart.fill", title: "Category", value: coupon.category, iconColor: .blue)
+                                            CouponDetailRow(icon: "building.2.fill", title: "Brand", value: coupon.brand, iconColor: .purple)
                 
                 if coupon.minimumPurchase > 0 {
-                    DetailRow(icon: "dollarsign.circle.fill", title: "Minimum Purchase", value: String(format: "$%.2f", coupon.minimumPurchase), iconColor: .orange)
+                                                                CouponDetailRow(icon: "dollarsign.circle.fill", title: "Minimum Purchase", value: String(format: "$%.2f", coupon.minimumPurchase), iconColor: .orange)
                 }
             }
         }
@@ -318,7 +318,7 @@ struct CouponDetailView: View {
 }
 
 // MARK: - Detail Row Component
-struct DetailRow: View {
+struct CouponDetailRow: View {
     let icon: String
     let title: String
     let value: String

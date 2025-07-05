@@ -15,8 +15,8 @@ struct Recipe: Identifiable, Codable {
     let difficulty: RecipeDifficulty
     let prepTime: Int // minutes
     let cookTime: Int // minutes
-    let servings: Int
-    let ingredients: [RecipeIngredient]
+    var servings: Int
+    var ingredients: [RecipeIngredient]
     let instructions: [String]
     let nutritionInfo: NutritionInfo
     let tags: [String]

@@ -33,6 +33,13 @@ struct MainTabView: View {
                     Text("Deals")
                 }
             
+            // MEAL PLANNING TAB
+            MealPlanningView()
+                .tabItem {
+                    Image(systemName: "calendar")
+                    Text("Meal Plan")
+                }
+            
             // GROCERY LIST TAB: GroceryListView
             if appState.groceryList.totalItems > 0 {
                 GroceryListView()
