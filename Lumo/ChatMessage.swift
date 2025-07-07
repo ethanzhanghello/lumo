@@ -64,4 +64,7 @@ enum ChatAction: String, Codable, CaseIterable {
     case timeFilter = "time_filter"
     case allergenCheck = "allergen_check"
     case storeInfo = "store_info"
+    case addToCart = "add_to_cart"
+    case showIngredients = "show_ingredients"
+    case surpriseMeal = "surprise_meal"
 } 

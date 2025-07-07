@@ -7,60 +7,72 @@
 
 import SwiftUI
 
-// MARK: - Recipe Response View
-struct RecipeResponseView: View {
+// MARK: - Modern Recipe Card
+struct ModernRecipeCard: View {
     let recipe: Recipe
     let actionButtons: [ChatActionButton]
     let onAction: (ChatAction) -> Void
+    @State private var showContent = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Recipe Header
-            HStack {
+        VStack(alignment: .leading, spacing: 20) {
+            // Recipe Header with Image
+            HStack(spacing: 16) {
+                // Recipe Image
                 AsyncImage(url: URL(string: recipe.imageURL ?? "")) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                 } placeholder: {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.gray.opacity(0.3))
-                        .overlay(
-                            Image(systemName: "fork.knife")
-                                .foregroundColor(.gray)
-                        )
-                }
-                .frame(width: 60, height: 60)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(recipe.name)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    HStack(spacing: 8) {
-                        Label("\(recipe.totalTime) min", systemImage: "clock")
-                        Label("\(recipe.servings) servings", systemImage: "person.2")
-                        Label("$\(String(format: "%.2f", recipe.estimatedCost))", systemImage: "dollarsign.circle")
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                LinearGradient(
+                                    colors: [.orange.opacity(0.3), .red.opacity(0.2)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                        
+                        Image(systemName: "fork.knife")
+                            .font(.system(size: 24, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
                     }
-                    .font(.caption)
-                    .foregroundColor(.gray)
                 }
+                .frame(width: 80, height: 80)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                )
                 
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: 4) {
-                    HStack(spacing: 2) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(recipe.name)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+                        .lineLimit(2)
+                    
+                    // Recipe Stats
+                    HStack(spacing: 16) {
+                        RecipeStat(icon: "clock", value: "\(recipe.totalTime)m")
+                        RecipeStat(icon: "person.2", value: "\(recipe.servings)")
+                        RecipeStat(icon: "dollarsign.circle", value: "$\(String(format: "%.2f", recipe.estimatedCost))")
+                    }
+                    
+                    // Rating
+                    HStack(spacing: 4) {
                         ForEach(0..<5) { index in
                             Image(systemName: index < Int(recipe.rating) ? "star.fill" : "star")
                                 .foregroundColor(.yellow)
-                                .font(.caption)
+                                .font(.system(size: 12))
                         }
+                        Text("(\(recipe.reviewCount))")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.white.opacity(0.6))
                     }
-                    Text("(\(recipe.reviewCount))")
-                        .font(.caption2)
-                        .foregroundColor(.gray)
                 }
+                
+                Spacer()
             }
             
             // Dietary Tags
@@ -69,23 +81,37 @@ struct RecipeResponseView: View {
                     HStack(spacing: 8) {
                         ForEach(recipe.dietaryInfo.dietaryTags, id: \.self) { tag in
                             Text(tag)
-                                .font(.caption)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.green.opacity(0.2))
+                                .font(.system(size: 11, weight: .semibold))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.green.opacity(0.2))
+                                        .overlay(
+                                            Capsule()
+                                                .stroke(Color.green.opacity(0.3), lineWidth: 1)
+                                        )
+                                )
                                 .foregroundColor(.green)
-                                .clipShape(Capsule())
                         }
                     }
+                    .padding(.horizontal, 4)
                 }
             }
             
             // Ingredients Preview
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Ingredients")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("Ingredients")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Spacer()
+                    
+                    Text("\(recipe.ingredients.count) items")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.white.opacity(0.6))
+                }
                 
                 LazyVGrid(columns: [
                     GridItem(.flexible()),
@@ -94,319 +120,472 @@ struct RecipeResponseView: View {
                     ForEach(recipe.ingredients.prefix(6), id: \.id) { ingredient in
                         HStack {
                             Text("• \(ingredient.displayAmount) \(ingredient.name)")
-                                .font(.caption)
-                                .foregroundColor(.gray)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(.white.opacity(0.8))
+                                .lineLimit(1)
+                            
                             Spacer()
-                            Text("Aisle \(ingredient.aisle)")
-                                .font(.caption2)
+                            
+                            Text("A\(ingredient.aisle)")
+                                .font(.system(size: 10, weight: .bold))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.blue.opacity(0.2))
                                 .foregroundColor(.blue)
+                                .clipShape(Capsule())
                         }
                     }
                 }
                 
                 if recipe.ingredients.count > 6 {
-                    Text("+ \(recipe.ingredients.count - 6) more ingredients")
-                        .font(.caption)
-                        .foregroundColor(.blue)
+                    Button(action: {}) {
+                        Text("+ \(recipe.ingredients.count - 6) more ingredients")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.blue)
+                    }
                 }
             }
             
             // Action Buttons
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 12) {
-                ForEach(actionButtons) { button in
-                    Button(action: {
-                        onAction(button.action)
-                    }) {
-                        HStack {
-                            Image(systemName: button.icon)
-                                .font(.caption)
-                            Text(button.title)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                        }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color(hex: button.color))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                }
+            ModernActionButtonsView(buttons: actionButtons) { action in
+                onAction(action)
             }
         }
-        .padding(16)
-        .background(Color.gray.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(0.08),
+                            Color.white.opacity(0.03)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                )
+        )
+        .opacity(showContent ? 1 : 0)
+        .offset(y: showContent ? 0 : 20)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.5).delay(0.2)) {
+                showContent = true
+            }
+        }
     }
 }
 
-// MARK: - Product Response View
-struct ProductResponseView: View {
+// MARK: - Modern Product Card
+struct ModernProductCard: View {
     let product: Product
     let actionButtons: [ChatActionButton]
     let onAction: (ChatAction) -> Void
+    @State private var showContent = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 20) {
             // Product Header
-            HStack {
+            HStack(spacing: 16) {
+                // Product Image
                 AsyncImage(url: URL(string: product.imageURL)) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                 } placeholder: {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.gray.opacity(0.3))
-                        .overlay(
-                            Image(systemName: "cube.box")
-                                .foregroundColor(.gray)
-                        )
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                LinearGradient(
+                                    colors: [.blue.opacity(0.3), .purple.opacity(0.2)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                        
+                        Image(systemName: "cube.box")
+                            .font(.system(size: 24, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
+                    }
                 }
-                .frame(width: 60, height: 60)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .frame(width: 80, height: 80)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                )
                 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(product.name)
-                        .font(.headline)
-                        .fontWeight(.bold)
+                        .font(.system(size: 16, weight: .bold))
                         .foregroundColor(.white)
+                        .lineLimit(2)
                     
                     Text(product.brand)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.white.opacity(0.7))
                     
+                    // Price
                     HStack(spacing: 8) {
                         Text("$\(String(format: "%.2f", product.price))")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
+                            .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.green)
                         
                         if let discountPrice = product.discountPrice {
                             Text("$\(String(format: "%.2f", discountPrice))")
-                                .font(.caption)
+                                .font(.system(size: 12, weight: .medium))
                                 .strikethrough()
-                                .foregroundColor(.gray)
+                                .foregroundColor(.white.opacity(0.5))
                         }
                     }
                 }
                 
                 Spacer()
                 
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text("Aisle \(product.aisle)")
-                        .font(.caption)
-                        .fontWeight(.semibold)
+                VStack(alignment: .trailing, spacing: 8) {
+                    // Aisle Badge
+                    Text("A\(product.aisle)")
+                        .font(.system(size: 12, weight: .bold))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(Color.blue.opacity(0.2))
+                                .overlay(
+                                    Capsule()
+                                        .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                                )
+                        )
                         .foregroundColor(.blue)
                     
-                    Text(product.shelfPosition)
-                        .font(.caption2)
-                        .foregroundColor(.gray)
-                }
-            }
-            
-            // Stock Status
-            HStack {
-                Label("Stock: \(product.stockQty)", systemImage: "cube.box")
-                    .font(.caption)
-                    .foregroundColor(product.stockQty > product.lowStockThreshold ? .green : .orange)
-                
-                Spacer()
-                
-                if product.stockQty <= product.lowStockThreshold {
-                    Label("Low Stock", systemImage: "exclamationmark.triangle")
-                        .font(.caption)
-                        .foregroundColor(.orange)
-                }
-            }
-            
-            // Deal Info
-            if let dealType = product.dealType {
-                HStack {
-                    Image(systemName: "tag.fill")
-                        .foregroundColor(.yellow)
-                    Text(dealType.rawValue)
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.yellow)
-                    
-                    Spacer()
-                    
-                    if let discountPrice = product.discountPrice {
-                        Text("Save $\(String(format: "%.2f", product.price - discountPrice))")
-                            .font(.caption)
-                            .foregroundColor(.green)
+                    // Deal Badge
+                    if product.dealType != nil {
+                        Text("DEAL")
+                            .font(.system(size: 10, weight: .bold))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.red.opacity(0.2))
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                                    )
+                            )
+                            .foregroundColor(.red)
                     }
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color.yellow.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+            }
+            
+            // Product Details
+            VStack(alignment: .leading, spacing: 12) {
+                if !product.description.isEmpty {
+                    Text(product.description)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.white.opacity(0.8))
+                        .lineLimit(3)
+                }
+                
+                // Category and Brand Info
+                HStack(spacing: 16) {
+                    ProductInfoBadge(icon: "tag", text: product.category)
+                    ProductInfoBadge(icon: "building.2", text: product.brand)
+                }
             }
             
             // Action Buttons
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 12) {
-                ForEach(actionButtons) { button in
-                    Button(action: {
-                        onAction(button.action)
-                    }) {
-                        HStack {
-                            Image(systemName: button.icon)
-                                .font(.caption)
-                            Text(button.title)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                        }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color(hex: button.color))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                }
+            ModernActionButtonsView(buttons: actionButtons) { action in
+                onAction(action)
             }
         }
-        .padding(16)
-        .background(Color.gray.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(0.08),
+                            Color.white.opacity(0.03)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                )
+        )
+        .opacity(showContent ? 1 : 0)
+        .offset(y: showContent ? 0 : 20)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.5).delay(0.2)) {
+                showContent = true
+            }
+        }
     }
 }
 
-// MARK: - Deal Response View
-struct DealResponseView: View {
+// MARK: - Modern Deal Card
+struct ModernDealCard: View {
     let deal: Deal
     let actionButtons: [ChatActionButton]
     let onAction: (ChatAction) -> Void
+    @State private var showContent = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Deal Header
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(deal.title)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    Text(deal.description)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .lineLimit(2)
-                }
-                
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text("\(deal.discountValue)\(deal.dealType == .percentageOff ? "%" : "$")")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.green)
-                    
-                    Text("OFF")
-                        .font(.caption)
-                        .foregroundColor(.green)
-                }
-            }
-            
-            // Deal Details
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Label("Valid until \(formatDate(deal.endDate))", systemImage: "calendar")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                    
-                    Spacer()
-                    
-                    Label("\(deal.applicableStores.count) stores", systemImage: "building.2")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                
-                if !deal.benefits.isEmpty {
-                    Text("Benefits:")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                    
-                    ForEach(deal.benefits.prefix(3), id: \.self) { benefit in
-                        Text("• \(benefit)")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                    }
-                }
-            }
-            
-            // Action Buttons
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 12) {
-                ForEach(actionButtons) { button in
-                    Button(action: {
-                        onAction(button.action)
-                    }) {
-                        HStack {
-                            Image(systemName: button.icon)
-                                .font(.caption)
-                            Text(button.title)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                        }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color(hex: button.color))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                }
+        VStack(alignment: .leading, spacing: 20) {
+            dealHeader
+            dealDetails
+            dealActions
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(0.08),
+                            Color.white.opacity(0.03)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                )
+        )
+        .opacity(showContent ? 1 : 0)
+        .offset(y: showContent ? 0 : 20)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.5).delay(0.2)) {
+                showContent = true
             }
         }
-        .padding(16)
-        .background(Color.gray.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
-    
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
+
+    private var dealHeader: some View {
+        HStack(spacing: 16) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(
+                        LinearGradient(
+                            colors: [.green.opacity(0.3), .teal.opacity(0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 80, height: 80)
+                Image(systemName: "tag.fill")
+                    .font(.system(size: 32, weight: .medium))
+                    .foregroundColor(.green)
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+            )
+            VStack(alignment: .leading, spacing: 8) {
+                Text(deal.title)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.white)
+                    .lineLimit(2)
+                Text(deal.applicableStores.first?.name ?? "All Stores")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white.opacity(0.7))
+                HStack(spacing: 8) {
+                    Text("\(Int(deal.discountValue))% OFF")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.green)
+                    if let originalPrice = deal.maximumDiscount, originalPrice > 0 {
+                        Text("Max $\(String(format: "%.2f", originalPrice))")
+                            .font(.system(size: 12, weight: .medium))
+                            .strikethrough()
+                            .foregroundColor(.white.opacity(0.5))
+                    }
+                }
+            }
+            Spacer()
+        }
+    }
+
+    private var dealDetails: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if !deal.description.isEmpty {
+                Text(deal.description)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white.opacity(0.8))
+                    .lineLimit(3)
+            }
+            HStack(spacing: 16) {
+                DealInfoBadge(icon: "calendar", text: deal.endDate.formatted(date: .abbreviated, time: .omitted))
+                DealInfoBadge(icon: "location", text: deal.applicableStores.first?.name ?? "All Stores")
+            }
+        }
+    }
+
+    private var dealActions: some View {
+        ModernActionButtonsView(buttons: actionButtons) { action in
+            onAction(action)
+        }
     }
 }
 
-// MARK: - Action Buttons View
-struct ChatActionButtonsView: View {
+// MARK: - Modern Action Buttons View
+struct ModernActionButtonsView: View {
     let buttons: [ChatActionButton]
     let onAction: (ChatAction) -> Void
+    @State private var showButtons = false
     
     var body: some View {
         LazyVGrid(columns: [
             GridItem(.flexible()),
             GridItem(.flexible())
         ], spacing: 12) {
-            ForEach(buttons) { button in
-                Button(action: {
+            ForEach(Array(buttons.enumerated()), id: \.element.id) { index, button in
+                ModernActionButton(button: button) {
                     onAction(button.action)
-                }) {
-                    HStack {
-                        Image(systemName: button.icon)
-                            .font(.caption)
-                        Text(button.title)
-                            .font(.caption)
-                            .fontWeight(.medium)
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color(hex: button.color))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
+                .opacity(showButtons ? 1 : 0)
+                .offset(y: showButtons ? 0 : 20)
+                .animation(.easeOut(duration: 0.4).delay(Double(index) * 0.1), value: showButtons)
+            }
+        }
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.5).delay(0.3)) {
+                showButtons = true
             }
         }
     }
 }
+
+// MARK: - Modern Action Button
+struct ModernActionButton: View {
+    let button: ChatActionButton
+    let action: () -> Void
+    @State private var isPressed = false
+    
+    var body: some View {
+        Button(action: {
+            // Haptic feedback
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+            
+            action()
+        }) {
+            HStack(spacing: 8) {
+                Image(systemName: button.icon)
+                    .font(.system(size: 14, weight: .semibold))
+                
+                Text(button.title)
+                    .font(.system(size: 13, weight: .semibold))
+                    .lineLimit(1)
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(hex: button.color).opacity(0.8),
+                                Color(hex: button.color).opacity(0.6)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(hex: button.color).opacity(0.3), lineWidth: 1)
+                    )
+            )
+            .scaleEffect(isPressed ? 0.95 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: isPressed)
+        }
+        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
+            isPressed = pressing
+        }, perform: {})
+    }
+}
+
+// MARK: - Supporting Views
+struct RecipeStat: View {
+    let icon: String
+    let value: String
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.white.opacity(0.6))
+            
+            Text(value)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundColor(.white.opacity(0.8))
+        }
+    }
+}
+
+struct ProductInfoBadge: View {
+    let icon: String
+    let text: String
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.white.opacity(0.6))
+            
+            Text(text)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.white.opacity(0.8))
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            Capsule()
+                .fill(Color.white.opacity(0.1))
+                .overlay(
+                    Capsule()
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                )
+        )
+    }
+}
+
+struct DealInfoBadge: View {
+    let icon: String
+    let text: String
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.white.opacity(0.6))
+            
+            Text(text)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.white.opacity(0.8))
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            Capsule()
+                .fill(Color.white.opacity(0.1))
+                .overlay(
+                    Capsule()
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                )
+        )
+    }
+}
+
+
 
  
