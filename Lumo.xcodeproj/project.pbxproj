@@ -10,6 +10,12 @@
 		940BE0B92E1494F600DC7316 /* GroceryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D62E0372460036C7A9 /* GroceryListView.swift */; };
 		940BE0BA2E1494F900DC7316 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D42E0372460036C7A9 /* ExploreView.swift */; };
 		940BE0BB2E1494FD00DC7316 /* ExploreSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D82E0372460036C7A9 /* ExploreSections.swift */; };
+		944E8F092E1DB40C00BB97F5 /* InventoryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F032E1DB40C00BB97F5 /* InventoryData.swift */; };
+		944E8F0A2E1DB40C00BB97F5 /* SuggestionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F082E1DB40C00BB97F5 /* SuggestionEngine.swift */; };
+		944E8F0B2E1DB40C00BB97F5 /* SharedListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F072E1DB40C00BB97F5 /* SharedListManager.swift */; };
+		944E8F0C2E1DB40C00BB97F5 /* PantryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F042E1DB40C00BB97F5 /* PantryManager.swift */; };
+		944E8F0D2E1DB40C00BB97F5 /* BudgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F022E1DB40C00BB97F5 /* BudgetManager.swift */; };
+		944E8F0E2E1DB40C00BB97F5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 944E8F052E1DB40C00BB97F5 /* Preview Assets.xcassets */; };
 		94F8C4452E18C8E2005A09D9 /* FlyToCartAnimationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */; };
 		94F8C4472E18C8EA005A09D9 /* FlyToCartOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */; };
 		94F8C4482E18C9AE005A09D9 /* MealPlanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FA2E0372460036C7AA /* MealPlanManager.swift */; };
@@ -72,6 +78,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		944E8F022E1DB40C00BB97F5 /* BudgetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetManager.swift; sourceTree = "<group>"; };
+		944E8F032E1DB40C00BB97F5 /* InventoryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryData.swift; sourceTree = "<group>"; };
+		944E8F042E1DB40C00BB97F5 /* PantryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PantryManager.swift; sourceTree = "<group>"; };
+		944E8F052E1DB40C00BB97F5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		944E8F072E1DB40C00BB97F5 /* SharedListManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedListManager.swift; sourceTree = "<group>"; };
+		944E8F082E1DB40C00BB97F5 /* SuggestionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionEngine.swift; sourceTree = "<group>"; };
 		94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartAnimationManager.swift; sourceTree = "<group>"; };
 		94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartOverlay.swift; sourceTree = "<group>"; };
 		B0D283702E03D7F200C28B2C /* GroceryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryList.swift; sourceTree = "<group>"; };
@@ -148,6 +160,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		944E8F062E1DB40C00BB97F5 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				944E8F052E1DB40C00BB97F5 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 		B0E915892E00AC7C0036C7A9 = {
 			isa = PBXGroup;
 			children = (
@@ -171,6 +191,12 @@
 		B0E915942E00AC7C0036C7A9 /* Lumo */ = {
 			isa = PBXGroup;
 			children = (
+				944E8F022E1DB40C00BB97F5 /* BudgetManager.swift */,
+				944E8F032E1DB40C00BB97F5 /* InventoryData.swift */,
+				944E8F042E1DB40C00BB97F5 /* PantryManager.swift */,
+				944E8F062E1DB40C00BB97F5 /* Preview Content */,
+				944E8F072E1DB40C00BB97F5 /* SharedListManager.swift */,
+				944E8F082E1DB40C00BB97F5 /* SuggestionEngine.swift */,
 				94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */,
 				94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */,
 				B0E915952E00AC7C0036C7A9 /* LumoApp.swift */,
@@ -348,6 +374,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B0E9159E2E00AC7D0036C7A9 /* Preview Assets.xcassets in Resources */,
+				944E8F0E2E1DB40C00BB97F5 /* Preview Assets.xcassets in Resources */,
 				B0E9159A2E00AC7D0036C7A9 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -403,6 +430,11 @@
 				B0E915E32E0372460036C7A9 /* CouponDetailView.swift in Sources */,
 				B0E915E52E0372460036C7A9 /* DealsData.swift in Sources */,
 				94F8C4452E18C8E2005A09D9 /* FlyToCartAnimationManager.swift in Sources */,
+				944E8F092E1DB40C00BB97F5 /* InventoryData.swift in Sources */,
+				944E8F0A2E1DB40C00BB97F5 /* SuggestionEngine.swift in Sources */,
+				944E8F0B2E1DB40C00BB97F5 /* SharedListManager.swift in Sources */,
+				944E8F0C2E1DB40C00BB97F5 /* PantryManager.swift in Sources */,
+				944E8F0D2E1DB40C00BB97F5 /* BudgetManager.swift in Sources */,
 				B0E915E82E0372460036C7AA /* CategoryFilterButton.swift in Sources */,
 				94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */,
 				B0E915E92E0372460036C7AA /* ChatbotView.swift in Sources */,

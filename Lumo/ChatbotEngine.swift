@@ -15,6 +15,11 @@ class ChatbotEngine: ObservableObject {
     
     private let openAIService = OpenAIService()
     private let intentRecognizer = IntentRecognizer()
+    let appState: AppState // Make this accessible
+    
+    init(appState: AppState) {
+        self.appState = appState
+    }
     
     // MARK: - Message Handling
     func sendMessage(_ content: String) async {
@@ -50,21 +55,51 @@ class ChatbotEngine: ObservableObject {
             return await handleStoreInfo(content)
         case .dietaryFilter:
             return await handleDietaryFilter(content)
+        case .inventoryCheck:
+            return await handleInventoryCheck(content)
+        case .pantryManagement:
+            return await handlePantryManagement(content)
+        case .sharedList:
+            return await handleSharedList(content)
+        case .budgetOptimization:
+            return await handleBudgetOptimization(content)
+        case .smartSuggestions:
+            return await handleSmartSuggestions(content)
         case .general:
             return await handleGeneralQuery(content)
         }
     }
     
-    // MARK: - Intent Handlers
+    // MARK: - Enhanced Intent Handlers
     private func handleRecipeRequest(_ query: String) async -> ChatMessage {
         let recipes = RecipeDatabase.searchRecipes(query: query)
         let actionButtons = [
             ChatActionButton(title: "Add to List", action: .addToList, icon: "plus.circle"),
             ChatActionButton(title: "Show Aisle", action: .showAisle, icon: "location"),
             ChatActionButton(title: "Scale Recipe", action: .scaleRecipe, icon: "arrow.up.arrow.down"),
-            ChatActionButton(title: "Find Alternatives", action: .findAlternatives, icon: "arrow.triangle.2.circlepath")
+            ChatActionButton(title: "Find Alternatives", action: .findAlternatives, icon: "arrow.triangle.2.circlepath"),
+            ChatActionButton(title: "Add to Favorites", action: .addToFavorites, icon: "heart"),
+            ChatActionButton(title: "Check Pantry", action: .pantryCheck, icon: "cabinet")
         ]
+        
         if let recipe = recipes.first {
+            // Check inventory for ingredients
+            let ingredients = recipe.ingredients.compactMap { ingredient in
+                sampleGroceryItems.first { $0.name.lowercased() == ingredient.name.lowercased() }
+            }
+            
+            var inventoryStatus = ""
+            for ingredient in ingredients {
+                let status = appState.checkItemAvailability(ingredient)
+                if status == .outOfStock {
+                    inventoryStatus += "⚠️ \(ingredient.name) is out of stock\n"
+                } else if status == .lowStock {
+                    inventoryStatus += "📉 \(ingredient.name) is low in stock\n"
+                }
+            }
+            
+            let costEstimate = appState.estimateMealPlanCost(for: [recipe])
+            
             let response = """
             Here's a great recipe for you! 🍳
             
@@ -73,11 +108,14 @@ class ChatbotEngine: ObservableObject {
             
             ⏱️ **Time**: \(recipe.prepTime + recipe.cookTime) minutes
             👥 **Servings**: \(recipe.servings)
-            💰 **Estimated Cost**: $\(String(format: "%.2f", recipe.estimatedCost))
+            💰 **Estimated Cost**: $\(String(format: "%.2f", costEstimate.totalCost))
+            💸 **Savings**: $\(String(format: "%.2f", costEstimate.savingsAmount)) (\(String(format: "%.1f", costEstimate.savingsPercentage))%)
             ⭐ **Rating**: \(recipe.rating)/5 (\(recipe.reviewCount) reviews)
             
             **Ingredients** (Aisle locations included):
             \(recipe.ingredients.map { "• \($0.displayAmount) \($0.name) (Aisle \($0.aisle))" }.joined(separator: "\n"))
+            
+            \(inventoryStatus.isEmpty ? "" : "\n**Inventory Status**:\n\(inventoryStatus)")
             
             Would you like me to add all ingredients to your shopping list and create a route through the store?
             """
@@ -99,20 +137,64 @@ class ChatbotEngine: ObservableObject {
             ChatActionButton(title: "Add to List", action: .addToList, icon: "plus.circle"),
             ChatActionButton(title: "Find Route", action: .showAisle, icon: "location"),
             ChatActionButton(title: "Find Alternatives", action: .findAlternatives, icon: "arrow.triangle.2.circlepath"),
-            ChatActionButton(title: "Show Deals", action: .showDeals, icon: "tag")
+            ChatActionButton(title: "Show Deals", action: .showDeals, icon: "tag"),
+            ChatActionButton(title: "Add to Favorites", action: .addToFavorites, icon: "heart"),
+            ChatActionButton(title: "Check Pantry", action: .pantryCheck, icon: "cabinet")
         ]
+        
         if let product = products.first {
+            // Convert Product to GroceryItem for inventory check
+            let groceryItem = GroceryItem(
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                category: product.category,
+                aisle: product.aisle,
+                brand: product.brand,
+                hasDeal: product.dealType != nil,
+                dealDescription: product.dealType?.rawValue
+            )
+            
+            let stockStatus = appState.checkItemAvailability(groceryItem)
+            let substitutions = appState.getItemSubstitutions(groceryItem)
+            let budgetAlternatives = appState.getBudgetFriendlyAlternatives(for: groceryItem)
+            
+            var statusMessage = ""
+            switch stockStatus {
+            case .inStock:
+                statusMessage = "✅ In Stock"
+            case .lowStock:
+                statusMessage = "📉 Low Stock"
+            case .outOfStock:
+                statusMessage = "❌ Out of Stock"
+            case .onOrder:
+                statusMessage = "📦 On Order"
+            case .discontinued:
+                statusMessage = "🚫 Discontinued"
+            }
+            
+            var alternativesMessage = ""
+            if !substitutions.isEmpty {
+                alternativesMessage += "\n**Substitutions Available**:\n"
+                alternativesMessage += substitutions.prefix(3).map { "• \($0.name) - $\(String(format: "%.2f", $0.price))" }.joined(separator: "\n")
+            }
+            
+            if !budgetAlternatives.isEmpty {
+                alternativesMessage += "\n**Budget Alternatives**:\n"
+                alternativesMessage += budgetAlternatives.prefix(3).map { "• \($0.name) - $\(String(format: "%.2f", $0.price))" }.joined(separator: "\n")
+            }
+            
             let response = """
             Found it! 📍
             
             **\(product.name)** by \(product.brand)
             📍 **Location**: Aisle \(product.aisle), \(product.shelfPosition)
             💰 **Price**: $\(String(format: "%.2f", product.price))
-            📦 **Stock**: \(product.stockQty) available
+            📦 **Stock**: \(statusMessage)
             
             \(product.dealType != nil ? "🎉 **Deal**: \(product.dealType?.rawValue ?? "") - Save $\(String(format: "%.2f", product.price - (product.discountPrice ?? product.price)))" : "")
             
-            \(product.stockQty <= product.lowStockThreshold ? "⚠️ **Low Stock Alert**" : "")
+            \(alternativesMessage)
             """
             return ChatMessage(
                 content: response,
@@ -283,6 +365,210 @@ class ChatbotEngine: ObservableObject {
         )
     }
     
+    private func handleInventoryCheck(_ query: String) async -> ChatMessage {
+        let lowStockItems = appState.getLowStockAlerts()
+        let outOfStockItems = appState.getOutOfStockAlerts()
+        
+        let actionButtons = [
+            ChatActionButton(title: "View Low Stock", action: .showInventory, icon: "exclamationmark.triangle"),
+            ChatActionButton(title: "Find Substitutions", action: .findAlternatives, icon: "arrow.triangle.2.circlepath"),
+            ChatActionButton(title: "Check Pantry", action: .pantryCheck, icon: "cabinet")
+        ]
+        
+        var response = "📦 **Inventory Status Report**\n\n"
+        
+        if !lowStockItems.isEmpty {
+            response += "⚠️ **Low Stock Items** (\(lowStockItems.count)):\n"
+            response += lowStockItems.prefix(5).map { "• \($0.item.name) - \($0.currentStock) left" }.joined(separator: "\n")
+            response += "\n\n"
+        }
+        
+        if !outOfStockItems.isEmpty {
+            response += "❌ **Out of Stock Items** (\(outOfStockItems.count)):\n"
+            response += outOfStockItems.prefix(5).map { "• \($0.item.name)" }.joined(separator: "\n")
+            response += "\n\n"
+        }
+        
+        if lowStockItems.isEmpty && outOfStockItems.isEmpty {
+            response += "✅ All items are well-stocked!"
+        }
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: actionButtons
+        )
+    }
+    
+    private func handlePantryManagement(_ query: String) async -> ChatMessage {
+        let expiringItems = appState.getExpiringItems(within: 7)
+        let expiredItems = appState.getExpiredItems()
+        // let pantryCheck = appState.pantryManager.checkPantry(for: appState.groceryList.groceryItems)
+        let pantryCheck = PantryCheckResult(itemsToRemove: [], itemsToKeep: [], missingEssentials: []) // Placeholder
+        
+        let actionButtons = [
+            ChatActionButton(title: "View Pantry", action: .showPantry, icon: "cabinet"),
+            ChatActionButton(title: "Scan Barcode", action: .scanBarcode, icon: "barcode"),
+            ChatActionButton(title: "Remove Expired", action: .removeExpired, icon: "trash"),
+            ChatActionButton(title: "Add to Pantry", action: .addToPantry, icon: "plus.circle")
+        ]
+        
+        var response = "🏠 **Pantry Management**\n\n"
+        
+        if !expiringItems.isEmpty {
+            response += "⏰ **Expiring Soon** (\(expiringItems.count)):\n"
+            response += expiringItems.prefix(5).map { item in
+                let days = item.daysUntilExpiration ?? 0
+                return "• \(item.item.name) - expires in \(days) days"
+            }.joined(separator: "\n")
+            response += "\n\n"
+        }
+        
+        if !expiredItems.isEmpty {
+            response += "🚫 **Expired Items** (\(expiredItems.count)):\n"
+            response += expiredItems.prefix(5).map { "• \($0.item.name)" }.joined(separator: "\n")
+            response += "\n\n"
+        }
+        
+        if pantryCheck.hasItemsToRemove {
+            response += "✅ **Already in Pantry** (\(pantryCheck.itemsToRemove.count)):\n"
+            response += "These items on your list are already in your pantry and can be removed.\n\n"
+        }
+        
+        if pantryCheck.hasMissingEssentials {
+            response += "📝 **Missing Essentials** (\(pantryCheck.missingEssentials.count)):\n"
+            response += "Consider adding these essential items to your list.\n\n"
+        }
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: actionButtons
+        )
+    }
+    
+    private func handleSharedList(_ query: String) async -> ChatMessage {
+        let activeLists = appState.getActiveSharedLists()
+        let urgentItems = appState.getUrgentSharedItems()
+        
+        let actionButtons = [
+            ChatActionButton(title: "View Lists", action: .showSharedLists, icon: "person.3"),
+            ChatActionButton(title: "Add Item", action: .addToSharedList, icon: "plus.circle"),
+            ChatActionButton(title: "Urgent Items", action: .showUrgent, icon: "exclamationmark.triangle"),
+            ChatActionButton(title: "Share List", action: .shareList, icon: "square.and.arrow.up")
+        ]
+        
+        var response = "👨‍👩‍👧‍👦 **Shared Lists**\n\n"
+        
+        if !activeLists.isEmpty {
+            response += "📋 **Active Lists** (\(activeLists.count)):\n"
+            for list in activeLists.prefix(3) {
+                let progress = Int((Double(list.items.count) / Double(max(list.totalItems, 1))) * 100)
+                response += "• \(list.name) - \(progress)% complete (\(list.items.count)/\(list.totalItems))\n"
+            }
+            response += "\n"
+        }
+        
+        if !urgentItems.isEmpty {
+            response += "⚠️ **Urgent Items** (\(urgentItems.count)):\n"
+            response += urgentItems.prefix(5).map { "• \($0.item.name) - added by \($0.addedBy)" }.joined(separator: "\n")
+            response += "\n"
+        }
+        
+        response += "👥 **Shared With**:\n"
+        for list in activeLists {
+            if !list.sharedWith.isEmpty {
+                response += "• \(list.name): \(list.sharedWith.joined(separator: ", "))\n"
+            }
+        }
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: actionButtons
+        )
+    }
+    
+    private func handleBudgetOptimization(_ query: String) async -> ChatMessage {
+        let costEstimate = appState.estimateShoppingCost()
+        let efficiencyScore = appState.getShoppingEfficiencyScore()
+        
+        let actionButtons = [
+            ChatActionButton(title: "View Budget", action: .showBudget, icon: "dollarsign.circle"),
+            ChatActionButton(title: "Optimize List", action: .optimizeBudget, icon: "chart.line.uptrend.xyaxis"),
+            ChatActionButton(title: "Find Deals", action: .showDeals, icon: "tag"),
+            ChatActionButton(title: "Budget Alternatives", action: .findAlternatives, icon: "arrow.triangle.2.circlepath")
+        ]
+        
+        let response = """
+        💰 **Budget Analysis**
+        
+        **Current Shopping List**:
+        💵 Total Cost: $\(String(format: "%.2f", costEstimate.totalCost))
+        💸 Savings: $\(String(format: "%.2f", costEstimate.savingsAmount)) (\(String(format: "%.1f", costEstimate.savingsPercentage))%)
+        
+        **Efficiency Score**: \(Int(efficiencyScore))/100
+        
+        **Category Breakdown**:
+        \(costEstimate.breakdown.map { "• \($0.key): $\(String(format: "%.2f", $0.value))" }.joined(separator: "\n"))
+        
+        Would you like me to optimize your list for a specific budget?
+        """
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: actionButtons
+        )
+    }
+    
+    private func handleSmartSuggestions(_ query: String) async -> ChatMessage {
+        let seasonalSuggestions = appState.getSeasonalSuggestions()
+        let frequentSuggestions = appState.getFrequentSuggestions()
+        let weatherSuggestions = appState.getWeatherBasedSuggestions()
+        let holidaySuggestions = appState.getHolidaySuggestions()
+        
+        let actionButtons = [
+            ChatActionButton(title: "Seasonal Items", action: .showSeasonal, icon: "leaf"),
+            ChatActionButton(title: "Frequent Items", action: .showFrequent, icon: "clock.arrow.circlepath"),
+            ChatActionButton(title: "Weather Based", action: .showWeather, icon: "cloud.sun"),
+            ChatActionButton(title: "Holiday Items", action: .showHoliday, icon: "gift"),
+            ChatActionButton(title: "Add All", action: .addAllSuggestions, icon: "plus.circle")
+        ]
+        
+        var response = "🧠 **Smart Suggestions**\n\n"
+        
+        if !seasonalSuggestions.isEmpty {
+            response += "🍂 **Seasonal Items** (\(seasonalSuggestions.count)):\n"
+            response += seasonalSuggestions.prefix(3).map { "• \($0.item.name) - \($0.reason)" }.joined(separator: "\n")
+            response += "\n"
+        }
+        
+        if !frequentSuggestions.isEmpty {
+            response += "🔄 **Frequent Purchases** (\(frequentSuggestions.count)):\n"
+            response += frequentSuggestions.prefix(3).map { "• \($0.item.name) - \($0.reason)" }.joined(separator: "\n")
+            response += "\n"
+        }
+        
+        if !weatherSuggestions.isEmpty {
+            response += "🌤️ **Weather Based** (\(weatherSuggestions.count)):\n"
+            response += weatherSuggestions.prefix(3).map { "• \($0.item.name) - \($0.reason)" }.joined(separator: "\n")
+            response += "\n"
+        }
+        
+        if !holidaySuggestions.isEmpty {
+            response += "🎉 **Holiday Items** (\(holidaySuggestions.count)):\n"
+            response += holidaySuggestions.prefix(3).map { "• \($0.item.name) - \($0.reason)" }.joined(separator: "\n")
+            response += "\n"
+        }
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: actionButtons
+        )
+    }
+    
     private func handleGeneralQuery(_ query: String) async -> ChatMessage {
         let aiResponse = await openAIService.getGeneralResponse(for: query)
         return ChatMessage(content: aiResponse, isUser: false)
@@ -306,8 +592,14 @@ class IntentRecognizer {
         case mealPlanning
         case storeInfo
         case dietaryFilter
+        case inventoryCheck
+        case pantryManagement
+        case sharedList
+        case budgetOptimization
+        case smartSuggestions
         case general
     }
+    
     func recognizeIntent(from query: String) -> Intent {
         let lowercased = query.lowercased()
         
@@ -359,6 +651,43 @@ class IntentRecognizer {
            lowercased.contains("gluten") || lowercased.contains("allergy") || lowercased.contains("healthy") ||
            lowercased.contains("organic") || lowercased.contains("nut") || lowercased.contains("dairy") {
             return .dietaryFilter
+        }
+        
+        // Inventory check keywords
+        if lowercased.contains("inventory") || lowercased.contains("stock") || lowercased.contains("low") ||
+           lowercased.contains("out of stock") || lowercased.contains("on order") || lowercased.contains("discontinued") ||
+           lowercased.contains("availability") || lowercased.contains("in stock") {
+            return .inventoryCheck
+        }
+        
+        // Pantry management keywords
+        if lowercased.contains("pantry") || lowercased.contains("expiring") || lowercased.contains("expired") ||
+           lowercased.contains("scan barcode") || lowercased.contains("remove expired") || lowercased.contains("add to pantry") ||
+           lowercased.contains("cabinet") || lowercased.contains("essentials") || lowercased.contains("missing") {
+            return .pantryManagement
+        }
+        
+        // Shared list keywords
+        if lowercased.contains("shared list") || lowercased.contains("family") || lowercased.contains("sync") ||
+           lowercased.contains("view lists") || lowercased.contains("add item") || lowercased.contains("urgent") ||
+           lowercased.contains("collaborative") || lowercased.contains("family members") || lowercased.contains("real time") {
+            return .sharedList
+        }
+        
+        // Budget optimization keywords
+        if lowercased.contains("budget") || lowercased.contains("optimize") || lowercased.contains("savings") ||
+           lowercased.contains("original cost") || lowercased.contains("discounted cost") || lowercased.contains("category") ||
+           lowercased.contains("deals") || lowercased.contains("cost estimation") || lowercased.contains("efficiency") ||
+           lowercased.contains("total cost") || lowercased.contains("spending") {
+            return .budgetOptimization
+        }
+        
+        // Smart suggestions keywords
+        if lowercased.contains("smart suggestions") || lowercased.contains("seasonal") || lowercased.contains("frequent") ||
+           lowercased.contains("weather") || lowercased.contains("holiday") || lowercased.contains("add all") ||
+           lowercased.contains("suggestions") || lowercased.contains("recommendations") || lowercased.contains("trending") ||
+           lowercased.contains("time based") || lowercased.contains("what can i make") {
+            return .smartSuggestions
         }
         
         return .general

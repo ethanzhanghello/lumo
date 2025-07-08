@@ -8,6 +8,128 @@
 import Foundation
 import SwiftUI
 
+// MARK: - Type Definitions
+enum StockStatus: String, CaseIterable {
+    case inStock = "In Stock"
+    case lowStock = "Low Stock"
+    case outOfStock = "Out of Stock"
+    case onOrder = "On Order"
+    case discontinued = "Discontinued"
+}
+
+struct CostEstimate {
+    let totalCost: Double
+    let savingsAmount: Double
+    let savingsPercentage: Double
+    let breakdown: [String: Double]
+    
+    init(totalCost: Double, savingsAmount: Double = 0, breakdown: [String: Double] = [:]) {
+        self.totalCost = totalCost
+        self.savingsAmount = savingsAmount
+        self.savingsPercentage = totalCost > 0 ? (savingsAmount / totalCost) * 100 : 0
+        self.breakdown = breakdown
+    }
+}
+
+struct InventoryItem: Identifiable, Codable {
+    let id = UUID()
+    let item: GroceryItem
+    let currentStock: Int
+    let lowStockThreshold: Int
+    let lastUpdated: Date
+    let supplier: String?
+    
+    var isLowStock: Bool {
+        return currentStock <= lowStockThreshold
+    }
+    
+    var isOutOfStock: Bool {
+        return currentStock == 0
+    }
+}
+
+struct PantryItem: Identifiable, Codable {
+    let id = UUID()
+    let item: GroceryItem
+    let quantity: Int
+    let expirationDate: Date?
+    let dateAdded: Date
+    let notes: String?
+    
+    var isExpired: Bool {
+        guard let expirationDate = expirationDate else { return false }
+        return Date() > expirationDate
+    }
+    
+    var daysUntilExpiration: Int? {
+        guard let expirationDate = expirationDate else { return nil }
+        return Calendar.current.dateComponents([.day], from: Date(), to: expirationDate).day
+    }
+}
+
+struct SharedList: Identifiable, Codable {
+    let id = UUID()
+    let name: String
+    let createdBy: String
+    let createdAt: Date
+    let items: [SharedListItem]
+    let isActive: Bool
+    let sharedWith: [String]
+    
+    var totalItems: Int {
+        return items.count
+    }
+    
+    var urgentItems: [SharedListItem] {
+        return items.filter { $0.isUrgent }
+    }
+}
+
+struct SharedListItem: Identifiable, Codable {
+    let id = UUID()
+    let item: GroceryItem
+    let quantity: Int
+    let addedBy: String
+    let addedAt: Date
+    let notes: String?
+    let isUrgent: Bool
+    let priority: Priority
+    
+    enum Priority: String, CaseIterable, Codable {
+        case low = "Low"
+        case medium = "Medium"
+        case high = "High"
+        case urgent = "Urgent"
+    }
+}
+
+struct SmartSuggestion: Identifiable, Codable {
+    let id = UUID()
+    let item: GroceryItem
+    let reason: String
+    let confidence: Double
+    let category: SuggestionCategory
+    let priority: Int
+    
+    enum SuggestionCategory: String, CaseIterable, Codable {
+        case seasonal = "Seasonal"
+        case frequent = "Frequent"
+        case weather = "Weather"
+        case holiday = "Holiday"
+        case budget = "Budget"
+        case dietary = "Dietary"
+        case pantry = "Pantry"
+    }
+}
+
+struct BudgetOptimizationResult {
+    let optimizedItems: [GroceryItem]
+    let totalCost: Double
+    let savings: Double
+    let recommendations: [String]
+}
+
+// MARK: - GroceryItem
 struct GroceryItem: Identifiable, Codable, Hashable {
     let id = UUID()
     let name: String

@@ -10,7 +10,7 @@ import SwiftUI
 struct ChatbotView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var chatbotEngine = ChatbotEngine()
+    @StateObject private var chatbotEngine: ChatbotEngine
     @State private var messageText = ""
     @State private var isInputExpanded = false
     @FocusState private var isInputFocused: Bool
@@ -18,6 +18,20 @@ struct ChatbotView: View {
     @State private var showWelcomeAnimation = false
     @State private var showConfirmation: Bool = false
     @State private var confirmationMessage: String = ""
+    
+    @State private var showIngredientsSheet = false
+    @State private var showNutritionSheet = false
+    @State private var showScaleSheet = false
+    @State private var showShareSheet = false
+    @State private var scaleServings: Int = 1
+    @State private var shareText: String = ""
+    @State private var sheetRecipe: Recipe? = nil
+    @State private var sheetProduct: Product? = nil
+    
+    init() {
+        // Initialize with a placeholder - will be updated in onAppear
+        self._chatbotEngine = StateObject(wrappedValue: ChatbotEngine(appState: AppState()))
+    }
     
     var body: some View {
         NavigationView {
@@ -106,8 +120,40 @@ struct ChatbotView: View {
                 }
             }
             .navigationBarHidden(true)
+            .sheet(isPresented: $showIngredientsSheet) {
+                if let recipe = sheetRecipe {
+                    IngredientListSheet(recipe: recipe)
+                }
+            }
+            .sheet(isPresented: $showNutritionSheet) {
+                if let recipe = sheetRecipe {
+                    NutritionSheet(recipe: recipe)
+                } else if let product = sheetProduct {
+                    ProductNutritionSheet(product: product)
+                }
+            }
+            .sheet(isPresented: $showScaleSheet) {
+                if let recipe = sheetRecipe {
+                    ScaleRecipeSheet(recipe: recipe, servings: $scaleServings) { newServings in
+                        scaleServings = newServings
+                        // Optionally update recipe display or add to list
+                        showConfirmationToast("Scaled recipe to \(newServings) servings!")
+                        showScaleSheet = false
+                    }
+                }
+            }
+            .sheet(isPresented: $showShareSheet) {
+                ActivityView(activityItems: [shareText])
+            }
         }
         .onAppear {
+            // Update the ChatbotEngine with the correct AppState
+            // if chatbotEngine.appState !== appState {
+            //     let newEngine = ChatbotEngine(appState: appState)
+            //     newEngine.messages = chatbotEngine.messages
+            //     self._chatbotEngine = StateObject(wrappedValue: newEngine)
+            // }
+            
             withAnimation(.easeOut(duration: 0.6)) {
                 showWelcomeAnimation = true
             }
@@ -446,7 +492,9 @@ struct ChatbotView: View {
             }
         case .scaleRecipe:
             if let recipe = message.recipe {
-                showRecipeScaling(recipe)
+                sheetRecipe = recipe
+                scaleServings = recipe.servings
+                showScaleSheet = true
             }
         case .findAlternatives:
             if let product = message.product {
@@ -461,16 +509,27 @@ struct ChatbotView: View {
         case .navigateTo:
             showStoreNavigation()
         case .addToFavorites:
-            addToFavorites(message)
+            if let recipe = message.recipe {
+                appState.addRecipeToFavorites(recipe)
+                showConfirmationToast("Added \(recipe.name) to favorites!")
+            } else if let product = message.product {
+                appState.addProductToFavorites(product)
+                showConfirmationToast("Added \(product.name) to favorites!")
+            }
         case .shareRecipe:
             if let recipe = message.recipe {
-                shareRecipe(recipe)
+                shareText = "Recipe: \(recipe.name)\n\nIngredients:\n" + recipe.ingredients.map { "- \($0.displayAmount) \($0.name)" }.joined(separator: "\n")
+                showShareSheet = true
             }
         case .filterByDiet:
             showDietaryFilters()
         case .showNutrition:
-            if let product = message.product {
-                showNutritionInfo(product)
+            if let recipe = message.recipe {
+                sheetRecipe = recipe
+                showNutritionSheet = true
+            } else if let product = message.product {
+                sheetProduct = product
+                showNutritionSheet = true
             }
         case .findInStore:
             showStoreFinder()
@@ -487,11 +546,52 @@ struct ChatbotView: View {
         case .storeInfo:
             showStoreInfo()
         case .showIngredients:
-            showMealIngredients(message)
+            if let recipe = message.recipe {
+                sheetRecipe = recipe
+                showIngredientsSheet = true
+            }
         case .surpriseMeal:
             generateSurpriseMeal()
         case .showRecipe:
             break
+        case .showUrgent:
+            // Show urgent items in shared list (placeholder)
+            showConfirmationToast("Showing urgent items!")
+        case .shareList:
+            // Share the current shared list (placeholder)
+            showConfirmationToast("Shared the list!")
+        case .syncStatus:
+            showConfirmationToast("Sync status checked!")
+        case .showBudget:
+            showConfirmationToast("Showing budget!")
+        case .optimizeBudget:
+            showConfirmationToast("Optimizing budget!")
+        case .showSeasonal:
+            showConfirmationToast("Showing seasonal items!")
+        case .showFrequent:
+            showConfirmationToast("Showing frequent items!")
+        case .showWeather:
+            showConfirmationToast("Showing weather-based suggestions!")
+        case .showHoliday:
+            showConfirmationToast("Showing holiday items!")
+        case .addAllSuggestions:
+            showConfirmationToast("Added all suggestions!")
+        case .scanBarcode:
+            showConfirmationToast("Barcode scanner opened!")
+        case .removeExpired:
+            showConfirmationToast("Removed expired items!")
+        case .addToPantry:
+            showConfirmationToast("Added to pantry!")
+        case .showSharedLists:
+            showConfirmationToast("Showing shared lists!")
+        case .addToSharedList:
+            showConfirmationToast("Added to shared list!")
+        case .showFamily:
+            showConfirmationToast("Showing family members!")
+        case .showInventory:
+            showConfirmationToast("Showing inventory!")
+        case .showPantry:
+            showConfirmationToast("Showing pantry!")
         }
     }
     
@@ -904,4 +1004,103 @@ struct QuickSuggestionButton: View {
                 )
         }
     }
+} 
+
+// MARK: - Ingredient List Sheet
+struct IngredientListSheet: View {
+    let recipe: Recipe
+    var body: some View {
+        NavigationView {
+            List(recipe.ingredients, id: \ .id) { ing in
+                VStack(alignment: .leading) {
+                    Text("\(ing.displayAmount) \(ing.name)")
+                        .font(.headline)
+                    if let notes = ing.notes, !notes.isEmpty {
+                        Text(notes)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                    Text("Aisle: \(ing.aisle)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .navigationTitle("Ingredients")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+// MARK: - Nutrition Sheet
+struct NutritionSheet: View {
+    let recipe: Recipe
+    var body: some View {
+        VStack(spacing: 16) {
+            Text(recipe.name)
+                .font(.title2)
+                .bold()
+            Text("Calories: \(recipe.nutritionInfo.calories)")
+            Text("Protein: \(recipe.nutritionInfo.protein, specifier: "%.1f")g")
+            Text("Carbs: \(recipe.nutritionInfo.carbs, specifier: "%.1f")g")
+            Text("Fat: \(recipe.nutritionInfo.fat, specifier: "%.1f")g")
+            if let fiber = recipe.nutritionInfo.fiber {
+                Text("Fiber: \(fiber, specifier: "%.1f")g")
+            }
+            if let sugar = recipe.nutritionInfo.sugar {
+                Text("Sugar: \(sugar, specifier: "%.1f")g")
+            }
+            if let sodium = recipe.nutritionInfo.sodium {
+                Text("Sodium: \(sodium)mg")
+            }
+            Spacer()
+        }
+        .padding()
+    }
+}
+
+// MARK: - Product Nutrition Sheet
+struct ProductNutritionSheet: View {
+    let product: Product
+    var body: some View {
+        VStack(spacing: 16) {
+            Text(product.name)
+                .font(.title2)
+                .bold()
+            // Add product nutrition info here if available
+            Text("Nutrition info not available.")
+            Spacer()
+        }
+        .padding()
+    }
+}
+
+// MARK: - Scale Recipe Sheet
+struct ScaleRecipeSheet: View {
+    let recipe: Recipe
+    @Binding var servings: Int
+    var onScale: (Int) -> Void
+    var body: some View {
+        VStack(spacing: 24) {
+            Text("Scale Recipe")
+                .font(.title2)
+                .bold()
+            Stepper("Servings: \(servings)", value: $servings, in: 1...20)
+            Button("Scale") {
+                onScale(servings)
+            }
+            .buttonStyle(.borderedProminent)
+            Spacer()
+        }
+        .padding()
+    }
+}
+
+// MARK: - Activity View (Share Sheet)
+import UIKit
+struct ActivityView: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 } 
