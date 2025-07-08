@@ -39,8 +39,20 @@ class ChatbotEngine: ObservableObject {
     
     // MARK: - Message Processing
     private func processMessage(_ content: String) async -> ChatMessage {
-        let intent = intentRecognizer.recognizeIntent(from: content)
-        switch intent {
+        let intentResult = intentRecognizer.recognizeIntent(from: content)
+        let primaryIntent = intentResult.primaryIntent
+        let confidence = intentResult.confidence
+        
+        let actionButtons = [
+            ChatActionButton(title: "Add to List", action: .addToList, icon: "plus.circle"),
+            ChatActionButton(title: "Show Aisle", action: .showAisle, icon: "location"),
+            ChatActionButton(title: "Scale Recipe", action: .scaleRecipe, icon: "arrow.up.arrow.down"),
+            ChatActionButton(title: "Find Alternatives", action: .findAlternatives, icon: "arrow.triangle.2.circlepath"),
+            ChatActionButton(title: "Add to Favorites", action: .addToFavorites, icon: "heart"),
+            ChatActionButton(title: "Check Pantry", action: .pantryCheck, icon: "cabinet")
+        ]
+        
+        switch primaryIntent {
         case .recipe:
             return await handleRecipeRequest(content)
         case .productSearch:
@@ -582,9 +594,9 @@ class ChatbotEngine: ObservableObject {
     }
 }
 
-// MARK: - Intent Recognition
+// MARK: - Advanced Intent Recognition
 class IntentRecognizer {
-    enum Intent {
+    enum Intent: CaseIterable {
         case recipe
         case productSearch
         case dealSearch
@@ -598,99 +610,755 @@ class IntentRecognizer {
         case budgetOptimization
         case smartSuggestions
         case general
+        
+        var displayName: String {
+            switch self {
+            case .recipe: return "Recipe"
+            case .productSearch: return "Product Search"
+            case .dealSearch: return "Deal Search"
+            case .listManagement: return "List Management"
+            case .mealPlanning: return "Meal Planning"
+            case .storeInfo: return "Store Information"
+            case .dietaryFilter: return "Dietary Filter"
+            case .inventoryCheck: return "Inventory Check"
+            case .pantryManagement: return "Pantry Management"
+            case .sharedList: return "Shared List"
+            case .budgetOptimization: return "Budget Optimization"
+            case .smartSuggestions: return "Smart Suggestions"
+            case .general: return "General"
+            }
+        }
     }
     
-    func recognizeIntent(from query: String) -> Intent {
-        let lowercased = query.lowercased()
+    struct IntentResult: Equatable {
+        let primaryIntent: Intent
+        let confidence: Double
+        let secondaryIntents: [(Intent, Double)]
+        let entities: [Entity]
+        let context: QueryContext
         
-        // Recipe-related keywords
-        if lowercased.contains("recipe") || lowercased.contains("cook") || lowercased.contains("make") || 
-           lowercased.contains("dish") || lowercased.contains("meal") || lowercased.contains("dinner") ||
-           lowercased.contains("lunch") || lowercased.contains("breakfast") || lowercased.contains("ingredient") {
-            return .recipe
+        static func == (lhs: IntentResult, rhs: IntentResult) -> Bool {
+            lhs.primaryIntent == rhs.primaryIntent &&
+            abs(lhs.confidence - rhs.confidence) < 0.0001 &&
+            lhs.secondaryIntents.map { $0.0 } == rhs.secondaryIntents.map { $0.0 } &&
+            lhs.entities == rhs.entities
+        }
+    }
+    
+    struct Entity: Equatable {
+        let type: EntityType
+        let value: String
+        let confidence: Double
+        let position: Range<String.Index>
+        
+        static func == (lhs: Entity, rhs: Entity) -> Bool {
+            lhs.type == rhs.type && lhs.value == rhs.value
+        }
+    }
+    
+    enum EntityType {
+        case product
+        case brand
+        case category
+        case aisle
+        case price
+        case quantity
+        case dietary
+        case meal
+        case time
+        case location
+    }
+    
+    struct QueryContext {
+        let isQuestion: Bool
+        let urgency: Urgency
+        let complexity: Complexity
+        let previousIntents: [Intent]
+    }
+    
+    enum Urgency {
+        case low, medium, high
+    }
+    
+    enum Complexity {
+        case simple, moderate, complex
+    }
+    
+    // MARK: - Pattern Matchers
+    private let recipePatterns: [(pattern: String, weight: Double)] = [
+        ("recipe", 10.0),
+        ("cook", 8.0),
+        ("make", 7.0),
+        ("dish", 6.0),
+        ("meal", 5.0),
+        ("dinner", 4.0),
+        ("lunch", 4.0),
+        ("breakfast", 4.0),
+        ("ingredient", 6.0),
+        ("how to", 3.0),
+        ("instructions", 3.0),
+        ("preparation", 3.0),
+        ("cooking", 3.0),
+        ("baking", 3.0),
+        ("chef", 2.0),
+        ("cuisine", 2.0),
+        ("food", 4.0),
+        ("dish", 5.0),
+        ("meal prep", 6.0),
+        ("cookbook", 3.0),
+        ("kitchen", 2.0),
+        ("homemade", 4.0),
+        ("from scratch", 5.0),
+        ("cooking time", 3.0),
+        ("serving size", 3.0),
+        ("nutritional info", 2.0)
+    ]
+    
+    private let productSearchPatterns: [(pattern: String, weight: Double)] = [
+        ("find", 8.0),
+        ("where", 7.0),
+        ("location", 6.0),
+        ("aisle", 8.0),
+        ("shelf", 6.0),
+        ("product", 5.0),
+        ("item", 5.0),
+        ("brand", 4.0),
+        ("look for", 3.0),
+        ("search", 3.0),
+        ("locate", 3.0),
+        ("position", 2.0),
+        ("section", 2.0),
+        ("grocery", 6.0),
+        ("food", 4.0),
+        ("produce", 7.0),
+        ("dairy", 7.0),
+        ("meat", 7.0),
+        ("bakery", 7.0),
+        ("frozen", 7.0),
+        ("pantry", 6.0),
+        ("beverages", 6.0),
+        ("snacks", 6.0),
+        ("organic", 5.0),
+        ("fresh", 5.0),
+        ("canned", 5.0),
+        ("frozen food", 6.0),
+        ("deli", 6.0),
+        ("seafood", 6.0),
+        ("condiments", 5.0),
+        ("spices", 5.0),
+        ("cereal", 5.0),
+        ("bread", 5.0),
+        ("milk", 5.0),
+        ("eggs", 5.0),
+        ("cheese", 5.0),
+        ("vegetables", 6.0),
+        ("fruits", 6.0),
+        ("meat department", 7.0),
+        ("produce section", 7.0)
+    ]
+    
+    private let dealSearchPatterns: [(pattern: String, weight: Double)] = [
+        ("deal", 10.0),
+        ("coupon", 9.0),
+        ("discount", 8.0),
+        ("sale", 7.0),
+        ("offer", 6.0),
+        ("save", 5.0),
+        ("price", 4.0),
+        ("cheap", 3.0),
+        ("budget", 3.0),
+        ("on sale", 8.0),
+        ("clearance", 7.0),
+        ("promotion", 6.0),
+        ("special", 5.0),
+        ("reduced", 4.0),
+        ("markdown", 4.0),
+        ("bogo", 8.0),
+        ("buy one get one", 9.0),
+        ("2 for 1", 8.0),
+        ("buy 2 get 1", 8.0),
+        ("half price", 7.0),
+        ("50% off", 8.0),
+        ("percent off", 6.0),
+        ("dollar off", 6.0),
+        ("cents off", 5.0),
+        ("rebate", 6.0),
+        ("cashback", 6.0),
+        ("loyalty", 5.0),
+        ("rewards", 5.0),
+        ("points", 4.0),
+        ("member price", 6.0),
+        ("club price", 6.0),
+        ("bulk discount", 6.0),
+        ("case discount", 6.0),
+        ("family pack", 5.0),
+        ("value pack", 5.0),
+        ("economy size", 5.0),
+        ("jumbo", 4.0),
+        ("large size", 4.0),
+        ("store brand", 5.0),
+        ("generic", 4.0),
+        ("private label", 5.0),
+        ("weekly specials", 7.0),
+        ("daily deals", 7.0),
+        ("flash sale", 7.0),
+        ("limited time", 6.0),
+        ("while supplies last", 5.0),
+        ("expiring soon", 5.0),
+        ("closeout", 6.0),
+        ("discontinued", 5.0),
+        ("manager special", 6.0),
+        ("reduced for quick sale", 6.0),
+        ("damaged", 4.0),
+        ("expired", 4.0),
+        ("last chance", 5.0),
+        ("final sale", 5.0)
+    ]
+    
+    private let listManagementPatterns: [(pattern: String, weight: Double)] = [
+        ("list", 8.0),
+        ("add", 7.0),
+        ("remove", 6.0),
+        ("shopping list", 10.0),
+        ("grocery list", 9.0),
+        ("clear", 5.0),
+        ("delete", 4.0),
+        ("update", 3.0),
+        ("modify", 3.0),
+        ("check off", 4.0),
+        ("complete", 3.0),
+        ("mark done", 3.0),
+        ("add to list", 8.0),
+        ("remove from list", 7.0),
+        ("check off list", 6.0),
+        ("shopping cart", 8.0),
+        ("cart", 7.0),
+        ("basket", 6.0),
+        ("buy", 5.0),
+        ("purchase", 5.0),
+        ("get", 4.0),
+        ("pick up", 4.0),
+        ("grab", 4.0),
+        ("need", 4.0),
+        ("want", 3.0),
+        ("forgot", 4.0),
+        ("remember", 3.0),
+        ("essential", 4.0),
+        ("staple", 4.0),
+        ("ingredient", 5.0),
+        ("supplies", 4.0),
+        ("household", 4.0),
+        ("personal care", 4.0),
+        ("cleaning", 4.0),
+        ("paper goods", 4.0),
+        ("frozen foods", 5.0),
+        ("fresh produce", 5.0),
+        ("dairy products", 5.0),
+        ("meat products", 5.0),
+        ("bakery items", 5.0),
+        ("beverages", 4.0),
+        ("snacks", 4.0),
+        ("condiments", 4.0),
+        ("spices", 4.0),
+        ("canned goods", 4.0),
+        ("dry goods", 4.0),
+        ("pantry items", 4.0)
+    ]
+    
+    private let mealPlanningPatterns: [(pattern: String, weight: Double)] = [
+        ("plan", 8.0),
+        ("meal plan", 10.0),
+        ("weekly", 6.0),
+        ("menu", 7.0),
+        ("prep", 5.0),
+        ("organize", 4.0),
+        ("build", 3.0),
+        ("bbq", 4.0),
+        ("party", 4.0),
+        ("surprise", 3.0),
+        ("pantry", 3.0),
+        ("meal prep", 8.0),
+        ("weekly menu", 9.0),
+        ("dinner plan", 7.0),
+        ("lunch plan", 7.0),
+        ("breakfast plan", 7.0),
+        ("meal planning", 9.0),
+        ("weekly meals", 8.0),
+        ("food prep", 7.0),
+        ("cooking plan", 7.0),
+        ("grocery planning", 8.0),
+        ("shopping plan", 7.0),
+        ("meal ideas", 6.0),
+        ("dinner ideas", 6.0),
+        ("lunch ideas", 6.0),
+        ("breakfast ideas", 6.0),
+        ("family meals", 6.0),
+        ("kid friendly", 5.0),
+        ("quick meals", 6.0),
+        ("easy recipes", 6.0),
+        ("healthy meals", 7.0),
+        ("budget meals", 6.0),
+        ("leftovers", 5.0),
+        ("meal rotation", 5.0),
+        ("seasonal meals", 6.0),
+        ("special occasion", 5.0),
+        ("holiday meals", 6.0),
+        ("weekend cooking", 5.0),
+        ("batch cooking", 6.0),
+        ("freezer meals", 6.0),
+        ("slow cooker", 5.0),
+        ("instant pot", 5.0),
+        ("one pot meals", 5.0),
+        ("30 minute meals", 5.0)
+    ]
+    
+    private let storeInfoPatterns: [(pattern: String, weight: Double)] = [
+        ("store", 8.0),
+        ("hours", 9.0),
+        ("open", 7.0),
+        ("close", 7.0),
+        ("address", 8.0),
+        ("phone", 6.0),
+        ("location", 5.0),
+        ("near", 4.0),
+        ("directions", 5.0),
+        ("contact", 4.0),
+        ("information", 3.0),
+        ("details", 3.0)
+    ]
+    
+    private let dietaryFilterPatterns: [(pattern: String, weight: Double)] = [
+        ("diet", 8.0),
+        ("vegetarian", 9.0),
+        ("vegan", 9.0),
+        ("gluten", 8.0),
+        ("allergy", 7.0),
+        ("healthy", 6.0),
+        ("organic", 7.0),
+        ("nut", 5.0),
+        ("dairy", 5.0),
+        ("free", 4.0),
+        ("intolerance", 6.0),
+        ("restriction", 5.0),
+        ("keto", 8.0),
+        ("paleo", 8.0),
+        ("low carb", 7.0),
+        ("sugar free", 6.0),
+        ("gluten-free", 9.0),
+        ("dairy-free", 8.0),
+        ("nut-free", 8.0),
+        ("soy-free", 7.0),
+        ("egg-free", 7.0),
+        ("wheat-free", 8.0),
+        ("lactose-free", 8.0),
+        ("non-gmo", 7.0),
+        ("gmo-free", 7.0),
+        ("fair trade", 6.0),
+        ("local", 6.0),
+        ("seasonal", 6.0),
+        ("whole grain", 6.0),
+        ("low sodium", 7.0),
+        ("low fat", 6.0),
+        ("fat free", 6.0),
+        ("low calorie", 6.0),
+        ("high protein", 6.0),
+        ("high fiber", 6.0),
+        ("natural", 5.0),
+        ("artificial", 4.0),
+        ("preservative", 4.0),
+        ("additive", 4.0),
+        ("hormone free", 7.0),
+        ("antibiotic free", 7.0),
+        ("grass fed", 6.0),
+        ("cage free", 6.0),
+        ("free range", 6.0),
+        ("wild caught", 6.0),
+        ("farm raised", 5.0),
+        ("sustainably sourced", 6.0),
+        ("ethically sourced", 6.0)
+    ]
+    
+    private let inventoryCheckPatterns: [(pattern: String, weight: Double)] = [
+        ("inventory", 9.0),
+        ("stock", 8.0),
+        ("low", 6.0),
+        ("out of stock", 10.0),
+        ("on order", 8.0),
+        ("discontinued", 9.0),
+        ("availability", 7.0),
+        ("in stock", 8.0),
+        ("available", 6.0),
+        ("supply", 5.0),
+        ("quantity", 4.0),
+        ("restock", 5.0)
+    ]
+    
+    private let pantryManagementPatterns: [(pattern: String, weight: Double)] = [
+        ("pantry", 8.0),
+        ("expiring", 7.0),
+        ("expired", 7.0),
+        ("scan barcode", 9.0),
+        ("remove expired", 8.0),
+        ("add to pantry", 7.0),
+        ("cabinet", 5.0),
+        ("essentials", 6.0),
+        ("missing", 5.0),
+        ("expiration", 6.0),
+        ("shelf life", 5.0),
+        ("freshness", 4.0)
+    ]
+    
+    private let sharedListPatterns: [(pattern: String, weight: Double)] = [
+        ("shared list", 10.0),
+        ("family", 7.0),
+        ("sync", 6.0),
+        ("view lists", 5.0),
+        ("add item", 4.0),
+        ("urgent", 5.0),
+        ("collaborative", 6.0),
+        ("family members", 7.0),
+        ("real time", 5.0),
+        ("share", 4.0),
+        ("collaborate", 4.0),
+        ("team", 3.0)
+    ]
+    
+    private let budgetOptimizationPatterns: [(pattern: String, weight: Double)] = [
+        ("budget", 8.0),
+        ("optimize", 7.0),
+        ("savings", 6.0),
+        ("original cost", 8.0),
+        ("discounted cost", 8.0),
+        ("category", 4.0),
+        ("deals", 5.0),
+        ("cost estimation", 7.0),
+        ("efficiency", 5.0),
+        ("total cost", 6.0),
+        ("spending", 5.0),
+        ("money", 4.0),
+        ("expensive", 4.0),
+        ("cheaper", 4.0),
+        ("affordable", 4.0)
+    ]
+    
+    private let smartSuggestionsPatterns: [(pattern: String, weight: Double)] = [
+        ("smart suggestions", 10.0),
+        ("seasonal", 7.0),
+        ("frequent", 6.0),
+        ("weather", 5.0),
+        ("holiday", 6.0),
+        ("add all", 4.0),
+        ("suggestions", 5.0),
+        ("recommendations", 5.0),
+        ("trending", 6.0),
+        ("time based", 5.0),
+        ("what can i make", 8.0),
+        ("recommend", 4.0),
+        ("suggest", 4.0),
+        ("popular", 4.0),
+        ("best", 3.0)
+    ]
+    
+    // MARK: - Entity Patterns
+    private let entityPatterns: [(type: EntityType, patterns: [String])] = [
+        (.product, ["organic", "fresh", "frozen", "canned", "dried", "whole grain", "low fat", "sugar free"]),
+        (.brand, ["kellogg", "kraft", "nestle", "coca cola", "pepsi", "heinz", "campbell", "general mills"]),
+        (.category, ["produce", "dairy", "meat", "bakery", "frozen", "pantry", "beverages", "snacks"]),
+        (.aisle, ["aisle", "section", "area", "department"]),
+        (.price, ["dollar", "cent", "price", "cost", "expensive", "cheap", "budget"]),
+        (.quantity, ["pound", "ounce", "gram", "kilogram", "piece", "pack", "bottle", "can"]),
+        (.dietary, ["vegetarian", "vegan", "gluten-free", "dairy-free", "nut-free", "organic", "non-gmo"]),
+        (.meal, ["breakfast", "lunch", "dinner", "snack", "dessert", "appetizer", "main course"]),
+        (.time, ["today", "tomorrow", "week", "month", "morning", "afternoon", "evening", "night"]),
+        (.location, ["store", "market", "supermarket", "grocery", "shop", "mall", "plaza"])
+    ]
+    
+    // MARK: - Context Analysis
+    private var conversationHistory: [Intent] = []
+    private let maxHistorySize = 5
+    
+    func recognizeIntent(from query: String) -> IntentResult {
+        let normalizedQuery = normalizeQuery(query)
+        let context = analyzeContext(query)
+        let entities = extractEntities(from: normalizedQuery)
+        
+        // Calculate confidence scores for each intent
+        var intentScores: [(Intent, Double)] = []
+        
+        for intent in Intent.allCases {
+            let score = calculateIntentScore(for: intent, query: normalizedQuery, context: context)
+            intentScores.append((intent, score))
         }
         
-        // Product search keywords
-        if lowercased.contains("find") || lowercased.contains("where") || lowercased.contains("location") ||
-           lowercased.contains("aisle") || lowercased.contains("shelf") || lowercased.contains("product") ||
-           lowercased.contains("item") || lowercased.contains("brand") {
-            return .productSearch
+        // Sort by confidence score
+        intentScores.sort { $0.1 > $1.1 }
+        
+        let primaryIntent = intentScores.first?.0 ?? .general
+        let primaryConfidence = intentScores.first?.1 ?? 0.0
+        
+        // Get secondary intents with confidence > 0.3
+        let secondaryIntents = intentScores.dropFirst().filter { $0.1 > 0.3 }
+        
+        // Update conversation history
+        updateConversationHistory(with: primaryIntent)
+        
+        return IntentResult(
+            primaryIntent: primaryIntent,
+            confidence: primaryConfidence,
+            secondaryIntents: secondaryIntents,
+            entities: entities,
+            context: context
+        )
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func normalizeQuery(_ query: String) -> String {
+        return query.lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "  ", with: " ")
+    }
+    
+    private func calculateIntentScore(for intent: Intent, query: String, context: QueryContext) -> Double {
+        let patterns = getPatterns(for: intent)
+        var totalScore = 0.0
+        var maxPossibleScore = 0.0
+        
+        for (pattern, weight) in patterns {
+            maxPossibleScore += weight
+            
+            // Exact match
+            if query.contains(pattern) {
+                totalScore += weight
+            }
+            // Fuzzy match (for typos and variations)
+            else if fuzzyMatch(query: query, pattern: pattern) {
+                totalScore += weight * 0.8
+            }
+            // Partial match
+            else if query.contains(pattern.prefix(max(3, pattern.count / 2))) {
+                totalScore += weight * 0.6
+            }
         }
         
-        // Deal and coupon keywords
-        if lowercased.contains("deal") || lowercased.contains("coupon") || lowercased.contains("discount") ||
-           lowercased.contains("sale") || lowercased.contains("offer") || lowercased.contains("save") ||
-           lowercased.contains("price") || lowercased.contains("cheap") || lowercased.contains("budget") {
-            return .dealSearch
+        // Normalize score
+        let baseScore = maxPossibleScore > 0 ? totalScore / maxPossibleScore : 0.0
+        
+        // Apply context modifiers
+        let contextModifier = calculateContextModifier(intent: intent, context: context)
+        
+        return min(1.0, baseScore * contextModifier)
+    }
+    
+    private func getPatterns(for intent: Intent) -> [(pattern: String, weight: Double)] {
+        switch intent {
+        case .recipe: return recipePatterns
+        case .productSearch: return productSearchPatterns
+        case .dealSearch: return dealSearchPatterns
+        case .listManagement: return listManagementPatterns
+        case .mealPlanning: return mealPlanningPatterns
+        case .storeInfo: return storeInfoPatterns
+        case .dietaryFilter: return dietaryFilterPatterns
+        case .inventoryCheck: return inventoryCheckPatterns
+        case .pantryManagement: return pantryManagementPatterns
+        case .sharedList: return sharedListPatterns
+        case .budgetOptimization: return budgetOptimizationPatterns
+        case .smartSuggestions: return smartSuggestionsPatterns
+        case .general: return []
+        }
+    }
+    
+    private func fuzzyMatch(query: String, pattern: String) -> Bool {
+        // Simple Levenshtein distance approximation
+        let queryWords = query.components(separatedBy: .whitespaces)
+        let patternWords = pattern.components(separatedBy: .whitespaces)
+        
+        for queryWord in queryWords {
+            for patternWord in patternWords {
+                if queryWord.count >= 3 && patternWord.count >= 3 {
+                    let similarity = calculateSimilarity(queryWord, patternWord)
+                    if similarity > 0.8 {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+    
+    private func calculateSimilarity(_ str1: String, _ str2: String) -> Double {
+        let longer = str1.count > str2.count ? str1 : str2
+        let shorter = str1.count > str2.count ? str2 : str1
+        
+        if longer.count == 0 {
+            return 1.0
         }
         
-        // List management keywords
-        if lowercased.contains("list") || lowercased.contains("add") || lowercased.contains("remove") ||
-           lowercased.contains("shopping list") || lowercased.contains("grocery list") || lowercased.contains("clear") {
-            return .listManagement
+        let distance = levenshteinDistance(longer, shorter)
+        return Double(longer.count - distance) / Double(longer.count)
+    }
+    
+    private func levenshteinDistance(_ str1: String, _ str2: String) -> Int {
+        let len1 = str1.count
+        let len2 = str2.count
+        
+        var matrix = Array(repeating: Array(repeating: 0, count: len2 + 1), count: len1 + 1)
+        
+        for i in 0...len1 {
+            matrix[i][0] = i
         }
         
-        // Meal planning keywords
-        if lowercased.contains("plan") || lowercased.contains("meal plan") || lowercased.contains("weekly") ||
-           lowercased.contains("menu") || lowercased.contains("prep") || lowercased.contains("organize") ||
-           lowercased.contains("build") || lowercased.contains("dinner") || lowercased.contains("lunch") ||
-           lowercased.contains("breakfast") || lowercased.contains("bbq") || lowercased.contains("party") ||
-           lowercased.contains("surprise") || lowercased.contains("pantry") {
-            return .mealPlanning
+        for j in 0...len2 {
+            matrix[0][j] = j
         }
         
-        // Store information keywords
-        if lowercased.contains("store") || lowercased.contains("hours") || lowercased.contains("open") ||
-           lowercased.contains("close") || lowercased.contains("address") || lowercased.contains("phone") ||
-           lowercased.contains("location") || lowercased.contains("near") {
-            return .storeInfo
+        for i in 1...len1 {
+            for j in 1...len2 {
+                let cost = str1[str1.index(str1.startIndex, offsetBy: i - 1)] == 
+                          str2[str2.index(str2.startIndex, offsetBy: j - 1)] ? 0 : 1
+                matrix[i][j] = min(
+                    matrix[i - 1][j] + 1,      // deletion
+                    matrix[i][j - 1] + 1,      // insertion
+                    matrix[i - 1][j - 1] + cost // substitution
+                )
+            }
         }
         
-        // Dietary and health keywords
-        if lowercased.contains("diet") || lowercased.contains("vegetarian") || lowercased.contains("vegan") ||
-           lowercased.contains("gluten") || lowercased.contains("allergy") || lowercased.contains("healthy") ||
-           lowercased.contains("organic") || lowercased.contains("nut") || lowercased.contains("dairy") {
-            return .dietaryFilter
+        return matrix[len1][len2]
+    }
+    
+    private func extractEntities(from query: String) -> [Entity] {
+        var entities: [Entity] = []
+        
+        for (type, patterns) in entityPatterns {
+            for pattern in patterns {
+                if let range = query.range(of: pattern) {
+                    let confidence = calculateEntityConfidence(pattern: pattern, context: query)
+                    entities.append(Entity(
+                        type: type,
+                        value: String(query[range]),
+                        confidence: confidence,
+                        position: range
+                    ))
+                }
+            }
         }
         
-        // Inventory check keywords
-        if lowercased.contains("inventory") || lowercased.contains("stock") || lowercased.contains("low") ||
-           lowercased.contains("out of stock") || lowercased.contains("on order") || lowercased.contains("discontinued") ||
-           lowercased.contains("availability") || lowercased.contains("in stock") {
-            return .inventoryCheck
+        return entities.sorted { $0.confidence > $1.confidence }
+    }
+    
+    private func calculateEntityConfidence(pattern: String, context: String) -> Double {
+        // Base confidence based on pattern length and specificity
+        var confidence = Double(pattern.count) / 20.0
+        
+        // Boost confidence for longer, more specific patterns
+        if pattern.count > 5 {
+            confidence += 0.2
         }
         
-        // Pantry management keywords
-        if lowercased.contains("pantry") || lowercased.contains("expiring") || lowercased.contains("expired") ||
-           lowercased.contains("scan barcode") || lowercased.contains("remove expired") || lowercased.contains("add to pantry") ||
-           lowercased.contains("cabinet") || lowercased.contains("essentials") || lowercased.contains("missing") {
-            return .pantryManagement
+        // Reduce confidence if pattern is part of a larger word
+        if context.contains(pattern + " ") || context.contains(" " + pattern) {
+            confidence += 0.1
         }
         
-        // Shared list keywords
-        if lowercased.contains("shared list") || lowercased.contains("family") || lowercased.contains("sync") ||
-           lowercased.contains("view lists") || lowercased.contains("add item") || lowercased.contains("urgent") ||
-           lowercased.contains("collaborative") || lowercased.contains("family members") || lowercased.contains("real time") {
-            return .sharedList
+        return min(1.0, confidence)
+    }
+    
+    private func analyzeContext(_ query: String) -> QueryContext {
+        let isQuestion = query.contains("?") || 
+                        query.hasPrefix("what") || 
+                        query.hasPrefix("where") || 
+                        query.hasPrefix("when") || 
+                        query.hasPrefix("how") || 
+                        query.hasPrefix("why") ||
+                        query.hasPrefix("can you") ||
+                        query.hasPrefix("could you")
+        
+        let urgency: Urgency = query.contains("urgent") || query.contains("asap") || query.contains("now") ? .high :
+                              query.contains("soon") || query.contains("today") ? .medium : .low
+        
+        let wordCount = query.components(separatedBy: .whitespaces).count
+        let complexity: Complexity = wordCount > 10 ? .complex :
+                                   wordCount > 5 ? .moderate : .simple
+        
+        return QueryContext(
+            isQuestion: isQuestion,
+            urgency: urgency,
+            complexity: complexity,
+            previousIntents: conversationHistory
+        )
+    }
+    
+    private func calculateContextModifier(intent: Intent, context: QueryContext) -> Double {
+        var modifier = 1.0
+        
+        // Boost score for questions if intent is information-seeking
+        if context.isQuestion && (intent == .productSearch || intent == .storeInfo || intent == .inventoryCheck) {
+            modifier += 0.2
         }
         
-        // Budget optimization keywords
-        if lowercased.contains("budget") || lowercased.contains("optimize") || lowercased.contains("savings") ||
-           lowercased.contains("original cost") || lowercased.contains("discounted cost") || lowercased.contains("category") ||
-           lowercased.contains("deals") || lowercased.contains("cost estimation") || lowercased.contains("efficiency") ||
-           lowercased.contains("total cost") || lowercased.contains("spending") {
-            return .budgetOptimization
+        // Boost score for urgent queries
+        if context.urgency == .high {
+            modifier += 0.1
         }
         
-        // Smart suggestions keywords
-        if lowercased.contains("smart suggestions") || lowercased.contains("seasonal") || lowercased.contains("frequent") ||
-           lowercased.contains("weather") || lowercased.contains("holiday") || lowercased.contains("add all") ||
-           lowercased.contains("suggestions") || lowercased.contains("recommendations") || lowercased.contains("trending") ||
-           lowercased.contains("time based") || lowercased.contains("what can i make") {
-            return .smartSuggestions
+        // Boost score based on conversation history
+        if let lastIntent = context.previousIntents.last {
+            if lastIntent == intent {
+                modifier += 0.15 // Continuation of same topic
+            } else if areRelatedIntents(lastIntent, intent) {
+                modifier += 0.1 // Related topic
+            }
         }
         
-        return .general
+        return modifier
+    }
+    
+    private func areRelatedIntents(_ intent1: Intent, _ intent2: Intent) -> Bool {
+        let relatedGroups: [[Intent]] = [
+            [.recipe, .mealPlanning, .dietaryFilter],
+            [.productSearch, .dealSearch, .inventoryCheck],
+            [.listManagement, .sharedList, .pantryManagement],
+            [.budgetOptimization, .dealSearch, .smartSuggestions]
+        ]
+        
+        for group in relatedGroups {
+            if group.contains(intent1) && group.contains(intent2) {
+                return true
+            }
+        }
+        return false
+    }
+    
+    private func updateConversationHistory(with intent: Intent) {
+        conversationHistory.append(intent)
+        if conversationHistory.count > maxHistorySize {
+            conversationHistory.removeFirst()
+        }
+    }
+    
+    // MARK: - Public Helper Methods
+    
+    func getIntentConfidence(for intent: Intent, from query: String) -> Double {
+        let result = recognizeIntent(from: query)
+        if result.primaryIntent == intent {
+            return result.confidence
+        }
+        return result.secondaryIntents.first { $0.0 == intent }?.1 ?? 0.0
+    }
+    
+    func hasMultipleIntents(in query: String) -> Bool {
+        let result = recognizeIntent(from: query)
+        return result.secondaryIntents.count > 0 && result.confidence < 0.8
+    }
+    
+    func getDetectedEntities(from query: String) -> [Entity] {
+        let result = recognizeIntent(from: query)
+        return result.entities
+    }
+    
+    func clearConversationHistory() {
+        conversationHistory.removeAll()
     }
 }
 
