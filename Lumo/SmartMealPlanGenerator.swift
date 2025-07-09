@@ -7,6 +7,83 @@
 
 import Foundation
 
+// MARK: - AutoFill Input Types
+struct AutoFillInputs {
+    let numberOfPeople: Int
+    let mealsPerDay: Int
+    let timeConstraint: TimeConstraint
+    let budgetRange: BudgetRange
+    let dietaryPreferences: Set<DietaryPreference>
+    let cuisinePreferences: Set<CuisineType>
+    let skillLevel: CookingSkillLevel
+    let equipmentAvailable: Set<CookingEquipment>
+    let allergies: Set<Allergen>
+    let seasonalPreferences: Bool
+    let leftoversPreference: Bool
+}
+
+struct TimeConstraint {
+    let maxMinutes: Int
+    let preferredTimeRange: ClosedRange<Int>?
+}
+
+struct BudgetRange {
+    let maxWeeklyBudget: Double
+    let preferredRange: ClosedRange<Double>?
+}
+
+enum DietaryPreference: String, CaseIterable {
+    case vegetarian = "vegetarian"
+    case vegan = "vegan"
+    case glutenFree = "gluten_free"
+    case dairyFree = "dairy_free"
+    case lowCarb = "low_carb"
+    case highProtein = "high_protein"
+    case keto = "keto"
+    case paleo = "paleo"
+}
+
+enum CuisineType: String, CaseIterable {
+    case italian = "italian"
+    case mexican = "mexican"
+    case asian = "asian"
+    case mediterranean = "mediterranean"
+    case american = "american"
+    case indian = "indian"
+    case french = "french"
+    case thai = "thai"
+}
+
+enum CookingSkillLevel: String, CaseIterable {
+    case beginner = "beginner"
+    case intermediate = "intermediate"
+    case advanced = "advanced"
+}
+
+enum CookingEquipment: String, CaseIterable {
+    case oven = "oven"
+    case stovetop = "stovetop"
+    case microwave = "microwave"
+    case slowCooker = "slow_cooker"
+    case airFryer = "air_fryer"
+    case blender = "blender"
+    case foodProcessor = "food_processor"
+}
+
+enum Allergen: String, CaseIterable {
+    case peanuts = "peanuts"
+    case treeNuts = "tree_nuts"
+    case milk = "milk"
+    case eggs = "eggs"
+    case soy = "soy"
+    case wheat = "wheat"
+    case fish = "fish"
+    case shellfish = "shellfish"
+}
+
+// MARK: - Meal Plan Types
+// Using existing MealPlan from AppState.swift
+
 class SmartMealPlanGenerator {
     
     // MARK: - Main Generation Method

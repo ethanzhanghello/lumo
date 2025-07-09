@@ -461,28 +461,31 @@ struct ChatbotView: View {
         case .mealPlan:
             // Add recipe to today's meal plan as dinner
             if let recipe = message.recipe {
-                let today = Calendar.current.startOfDay(for: Date())
-                let meal = MealPlan.Meal(
+                let meal = Meal(
+                    date: Date(),
                     type: .dinner,
+                    recipeName: recipe.name,
+                    ingredients: recipe.ingredients.map { $0.name },
                     recipe: recipe,
-                    customMeal: nil,
-                    ingredients: recipe.ingredients.map { ing in
-                        GroceryItem(
-                            name: ing.name,
-                            description: ing.notes ?? "",
-                            price: ing.estimatedPrice,
-                            category: "Produce",
-                            aisle: ing.aisle,
-                            brand: ""
-                        )
-                    }
+                    servings: recipe.servings
                 )
-                if let idx = appState.mealPlans.firstIndex(where: { Calendar.current.isDate($0.date, inSameDayAs: today) }) {
-                    appState.mealPlans[idx].meals.append(meal)
-                } else {
-                    appState.mealPlans.append(MealPlan(date: today, meals: [meal], notes: nil))
-                }
+                MealPlanManager.shared.addMeal(meal)
                 showConfirmationToast("Added \(recipe.name) to your meal plan for today!")
+            }
+        case .addToMealPlan:
+            // Add recipe to meal plan with specific date and meal type
+            if let recipe = message.recipe {
+                // For now, add to today's dinner, but this could be enhanced with date/meal type selection
+                let meal = Meal(
+                    date: Date(),
+                    type: .dinner,
+                    recipeName: recipe.name,
+                    ingredients: recipe.ingredients.map { $0.name },
+                    recipe: recipe,
+                    servings: recipe.servings
+                )
+                MealPlanManager.shared.addMeal(meal)
+                showConfirmationToast("Added \(recipe.name) to your meal plan!")
             }
         case .showAisle:
             if let recipe = message.recipe {

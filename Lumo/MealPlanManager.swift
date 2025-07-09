@@ -6,314 +6,396 @@
 //
 
 import Foundation
+import SwiftUI
+import Combine
 
-class MealPlanManager: ObservableObject {
-    static func sampleMealPlans() -> [MealPlan] {
-        let recipes = RecipeDatabase.recipes
-        
-        return [
-            MealPlan(
-                date: Date(),
-                meals: [
-                    MealPlan.Meal(
-                        type: .breakfast,
-                        recipe: recipes.first,
-                        customMeal: nil,
-                        ingredients: sampleGroceryItems.prefix(3).map { $0 }
-                    ),
-                    MealPlan.Meal(
-                        type: .lunch,
-                        recipe: recipes.dropFirst().first,
-                        customMeal: nil,
-                        ingredients: sampleGroceryItems.dropFirst(3).prefix(4).map { $0 }
-                    ),
-                    MealPlan.Meal(
-                        type: .dinner,
-                        recipe: recipes.dropFirst(2).first,
-                        customMeal: nil,
-                        ingredients: sampleGroceryItems.dropFirst(7).prefix(5).map { $0 }
-                    )
-                ],
-                notes: "Healthy week ahead! Focus on protein and vegetables."
-            ),
-            MealPlan(
-                date: Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date(),
-                meals: [
-                    MealPlan.Meal(
-                        type: .breakfast,
-                        recipe: nil,
-                        customMeal: "Oatmeal with berries and nuts",
-                        ingredients: sampleGroceryItems.filter { $0.name.contains("Oat") || $0.name.contains("Berry") }.prefix(3).map { $0 }
-                    ),
-                    MealPlan.Meal(
-                        type: .lunch,
-                        recipe: nil,
-                        customMeal: "Grilled chicken salad",
-                        ingredients: sampleGroceryItems.filter { $0.name.contains("Chicken") || $0.name.contains("Lettuce") }.prefix(4).map { $0 }
-                    ),
-                    MealPlan.Meal(
-                        type: .dinner,
-                        recipe: recipes.dropFirst(3).first,
-                        customMeal: nil,
-                        ingredients: sampleGroceryItems.dropFirst(12).prefix(6).map { $0 }
-                    )
-                ],
-                notes: "Quick and easy meals for busy day."
-            )
-        ]
+// MARK: - Core Data Structures
+enum MealType: String, CaseIterable, Codable, Identifiable {
+    case breakfast = "Breakfast"
+    case lunch = "Lunch"
+    case dinner = "Dinner"
+    case snack = "Snack"
+    
+    var id: String { self.rawValue }
+    
+    var icon: String {
+        switch self {
+        case .breakfast: return "sunrise"
+        case .lunch: return "sun.max"
+        case .dinner: return "moon"
+        case .snack: return "leaf"
+        }
     }
     
-    static func generateShoppingList(from mealPlan: MealPlan) -> [GroceryItem] {
-        var allIngredients: [GroceryItem] = []
+    var color: Color {
+        switch self {
+        case .breakfast: return .orange
+        case .lunch: return .green
+        case .dinner: return .purple
+        case .snack: return .blue
+        }
+    }
+    
+    var emoji: String {
+        switch self {
+        case .breakfast: return "🍳"
+        case .lunch: return "🥪"
+        case .dinner: return "🍝"
+        case .snack: return "🍎"
+        }
+    }
+}
+
+struct Meal: Identifiable, Codable, Equatable {
+    var id = UUID()
+    var date: Date
+    var type: MealType
+    var recipeName: String
+    var ingredients: [String]
+    var recipe: Recipe?
+    var customMeal: String?
+    var servings: Int
+    var notes: String?
+    var isCompleted: Bool
+    
+    init(date: Date, type: MealType, recipeName: String, ingredients: [String], recipe: Recipe? = nil, customMeal: String? = nil, servings: Int = 1, notes: String? = nil, isCompleted: Bool = false) {
+        self.date = date
+        self.type = type
+        self.recipeName = recipeName
+        self.ingredients = ingredients
+        self.recipe = recipe
+        self.customMeal = customMeal
+        self.servings = servings
+        self.notes = notes
+        self.isCompleted = isCompleted
+    }
+    
+    static func == (lhs: Meal, rhs: Meal) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
+struct NutritionData: Codable {
+    var calories: Int
+    var protein: Double
+    var carbs: Double
+    var fat: Double
+    var fiber: Double?
+    var sugar: Double?
+    var sodium: Int?
+    
+    init(calories: Int = 0, protein: Double = 0, carbs: Double = 0, fat: Double = 0, fiber: Double? = nil, sugar: Double? = nil, sodium: Int? = nil) {
+        self.calories = calories
+        self.protein = protein
+        self.carbs = carbs
+        self.fat = fat
+        self.fiber = fiber
+        self.sugar = sugar
+        self.sodium = sodium
+    }
+}
+
+struct AutoFillPreferences: Codable {
+    var dietaryRestrictions: [String]
+    var maxCookingTime: Int // minutes
+    var budgetPerMeal: Double
+    var preferredCuisines: [String]
+    var servingsPerMeal: Int
+    
+    init(dietaryRestrictions: [String] = [], maxCookingTime: Int = 60, budgetPerMeal: Double = 15.0, preferredCuisines: [String] = [], servingsPerMeal: Int = 2) {
+        self.dietaryRestrictions = dietaryRestrictions
+        self.maxCookingTime = maxCookingTime
+        self.budgetPerMeal = budgetPerMeal
+        self.preferredCuisines = preferredCuisines
+        self.servingsPerMeal = servingsPerMeal
+    }
+}
+
+// MARK: - Meal Plan Manager
+@MainActor
+class MealPlanManager: ObservableObject {
+    static let shared = MealPlanManager()
+    
+    @Published var mealPlan: [Date: [Meal]] = [:]
+    @Published var selectedDate = Date()
+    @Published var autoFillPreferences = AutoFillPreferences()
+    @Published var nutritionGoals = NutritionData(calories: 2000, protein: 150, carbs: 250, fat: 65)
+    
+    private let userDefaultsKey = "mealPlanData"
+    private var cancellables = Set<AnyCancellable>()
+    
+    init() {
+        loadFromUserDefaults()
+        setupObservers()
+    }
+    
+    // MARK: - Core Functions
+    func addMeal(_ meal: Meal) {
+        let cleanDate = Calendar.current.startOfDay(for: meal.date)
+        if mealPlan[cleanDate] != nil {
+            mealPlan[cleanDate]?.append(meal)
+        } else {
+            mealPlan[cleanDate] = [meal]
+        }
+        saveToUserDefaults()
+    }
+    
+    func removeMeal(_ meal: Meal) {
+        let cleanDate = Calendar.current.startOfDay(for: meal.date)
+        mealPlan[cleanDate]?.removeAll { $0.id == meal.id }
+        if mealPlan[cleanDate]?.isEmpty == true {
+            mealPlan.removeValue(forKey: cleanDate)
+        }
+        saveToUserDefaults()
+    }
+    
+    func updateMeal(_ meal: Meal) {
+        removeMeal(meal)
+        addMeal(meal)
+    }
+    
+    func meals(for date: Date) -> [Meal] {
+        let cleanDate = Calendar.current.startOfDay(for: date)
+        return mealPlan[cleanDate] ?? []
+    }
+    
+    func mealsForWeek(starting date: Date) -> [Meal] {
+        var weekMeals: [Meal] = []
+        for dayOffset in 0..<7 {
+            if let dayDate = Calendar.current.date(byAdding: .day, value: dayOffset, to: date) {
+                weekMeals.append(contentsOf: meals(for: dayDate))
+            }
+        }
+        return weekMeals
+    }
+    
+    func mealCount(for date: Date) -> Int {
+        return meals(for: date).count
+    }
+    
+    func hasMeal(for date: Date, type: MealType) -> Bool {
+        return meals(for: date).contains { $0.type == type }
+    }
+    
+    // MARK: - Auto-Fill Functions
+    func generateAutoFillPlan(for weekStart: Date, preferences: AutoFillPreferences) -> [Meal] {
+        var generatedMeals: [Meal] = []
+        let availableRecipes = RecipeDatabase.recipes
         
-        for meal in mealPlan.meals {
+        for dayOffset in 0..<7 {
+            guard let dayDate = Calendar.current.date(byAdding: .day, value: dayOffset, to: weekStart) else { continue }
+            
+            for mealType in MealType.allCases {
+                if !hasMeal(for: dayDate, type: mealType) {
+                    if let recipe = findSuitableRecipe(for: mealType, preferences: preferences, availableRecipes: availableRecipes) {
+                        let meal = Meal(
+                            date: dayDate,
+                            type: mealType,
+                            recipeName: recipe.name,
+                            ingredients: recipe.ingredients.map { $0.name },
+                            recipe: recipe,
+                            servings: preferences.servingsPerMeal
+                        )
+                        generatedMeals.append(meal)
+                    }
+                }
+            }
+        }
+        
+        return generatedMeals
+    }
+    
+    private func findSuitableRecipe(for mealType: MealType, preferences: AutoFillPreferences, availableRecipes: [Recipe]) -> Recipe? {
+        let filteredRecipes = availableRecipes.filter { recipe in
+            // Filter by cooking time
+            guard recipe.totalTime <= preferences.maxCookingTime else { return false }
+            
+            // Filter by budget
+            guard recipe.estimatedCost <= preferences.budgetPerMeal else { return false }
+            
+            // Filter by dietary restrictions
+            if !preferences.dietaryRestrictions.isEmpty {
+                let recipeTags = recipe.dietaryInfo.dietaryTags
+                let hasMatchingRestriction = preferences.dietaryRestrictions.contains { restriction in
+                    recipeTags.contains { $0.lowercased().contains(restriction.lowercased()) }
+                }
+                guard hasMatchingRestriction else { return false }
+            }
+            
+            // Filter by cuisine preference
+            if !preferences.preferredCuisines.isEmpty {
+                let hasPreferredCuisine = preferences.preferredCuisines.contains { cuisine in
+                    recipe.cuisine.lowercased().contains(cuisine.lowercased())
+                }
+                guard hasPreferredCuisine else { return false }
+            }
+            
+            return true
+        }
+        
+        return filteredRecipes.randomElement()
+    }
+    
+    // MARK: - Nutrition Analysis
+    func calculateNutritionForWeek(starting date: Date) -> [Date: NutritionData] {
+        var weeklyNutrition: [Date: NutritionData] = [:]
+        
+        for dayOffset in 0..<7 {
+            guard let dayDate = Calendar.current.date(byAdding: .day, value: dayOffset, to: date) else { continue }
+            let dayMeals = meals(for: dayDate)
+            weeklyNutrition[dayDate] = calculateNutritionForMeals(dayMeals)
+        }
+        
+        return weeklyNutrition
+    }
+    
+    private func calculateNutritionForMeals(_ meals: [Meal]) -> NutritionData {
+        var totalNutrition = NutritionData()
+        
+        for meal in meals {
+            if let recipe = meal.recipe {
+                let scaleFactor = Double(meal.servings) / Double(recipe.servings)
+                totalNutrition.calories += Int(Double(recipe.nutritionInfo.calories) * scaleFactor)
+                totalNutrition.protein += recipe.nutritionInfo.protein * scaleFactor
+                totalNutrition.carbs += recipe.nutritionInfo.carbs * scaleFactor
+                totalNutrition.fat += recipe.nutritionInfo.fat * scaleFactor
+                if let fiber = recipe.nutritionInfo.fiber {
+                    totalNutrition.fiber = (totalNutrition.fiber ?? 0) + fiber * scaleFactor
+                }
+                if let sugar = recipe.nutritionInfo.sugar {
+                    totalNutrition.sugar = (totalNutrition.sugar ?? 0) + sugar * scaleFactor
+                }
+                if let sodium = recipe.nutritionInfo.sodium {
+                    totalNutrition.sodium = (totalNutrition.sodium ?? 0) + Int(Double(sodium) * scaleFactor)
+                }
+            }
+        }
+        
+        return totalNutrition
+    }
+    
+    // MARK: - Grocery List Generation
+    func generateGroceryList(for weekStart: Date) -> [String: [String]] {
+        let weekMeals = mealsForWeek(starting: weekStart)
+        var allIngredients: [String] = []
+        
+        for meal in weekMeals {
             allIngredients.append(contentsOf: meal.ingredients)
         }
         
-        // Remove duplicates and group by item
-        let groupedIngredients = Dictionary(grouping: allIngredients) { $0.name }
-        return groupedIngredients.map { _, items in
-            let firstItem = items.first!
-            return GroceryItem(
-                name: firstItem.name,
-                description: firstItem.description,
-                price: firstItem.price,
-                category: firstItem.category,
-                aisle: firstItem.aisle,
-                brand: firstItem.brand
-            )
-        }
-    }
-    
-    static func scaleRecipe(_ recipe: Recipe, by factor: Double) -> Recipe {
-        var scaledRecipe = recipe
-        scaledRecipe.ingredients = recipe.ingredients.map { ingredient in
-            var scaledIngredient = ingredient
-            // Scale the amount property, not quantity
-            scaledIngredient = RecipeIngredient(
-                id: ingredient.id,
-                name: ingredient.name,
-                amount: ingredient.amount * factor,
-                unit: ingredient.unit,
-                aisle: ingredient.aisle,
-                estimatedPrice: ingredient.estimatedPrice * factor,
-                notes: ingredient.notes
-            )
-            return scaledIngredient
-        }
-        scaledRecipe.servings = Int(Double(recipe.servings) * factor)
-        return scaledRecipe
-    }
-    
-    static func suggestLeftoverRecipes(for ingredients: [GroceryItem]) -> [Recipe] {
-        let recipes = RecipeDatabase.recipes
+        // Deduplicate ingredients
+        let uniqueIngredients = Array(Set(allIngredients))
         
-        // Simple matching based on ingredient names
-        return recipes.filter { recipe in
-            let recipeIngredients = recipe.ingredients.map { $0.name.lowercased() }
-            let availableIngredients = ingredients.map { $0.name.lowercased() }
-            
-            // Check if at least 60% of recipe ingredients are available
-            let matchingIngredients = recipeIngredients.filter { recipeIngredient in
-                availableIngredients.contains { availableIngredient in
-                    availableIngredient.contains(recipeIngredient) || recipeIngredient.contains(availableIngredient)
-                }
-            }
-            
-            return Double(matchingIngredients.count) / Double(recipeIngredients.count) >= 0.6
-        }
-    }
-}
-
-// MARK: - Shopping History Manager
-class ShoppingHistoryManager {
-    static func sampleHistory() -> [ShoppingHistory] {
-        return [
-            ShoppingHistory(
-                date: Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date(),
-                items: sampleGroceryItems.prefix(8).map { $0 },
-                totalSpent: 45.67,
-                store: "Whole Foods Market",
-                category: "Weekly Groceries"
-            ),
-            ShoppingHistory(
-                date: Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date(),
-                items: sampleGroceryItems.dropFirst(8).prefix(12).map { $0 },
-                totalSpent: 78.92,
-                store: "Trader Joe's",
-                category: "Weekly Groceries"
-            ),
-            ShoppingHistory(
-                date: Calendar.current.date(byAdding: .day, value: -14, to: Date()) ?? Date(),
-                items: sampleGroceryItems.dropFirst(20).prefix(6).map { $0 },
-                totalSpent: 23.45,
-                store: "Safeway",
-                category: "Quick Trip"
-            )
-        ]
-    }
-}
-
-// MARK: - Dietary Goal Manager
-class DietaryGoalManager {
-    static func sampleGoals() -> [DietaryGoal] {
-        return [
-            DietaryGoal(
-                type: .calories,
-                target: 2000,
-                current: 1850,
-                unit: "cal",
-                isActive: true
-            ),
-            DietaryGoal(
-                type: .protein,
-                target: 150,
-                current: 120,
-                unit: "g",
-                isActive: true
-            ),
-            DietaryGoal(
-                type: .fiber,
-                target: 25,
-                current: 18,
-                unit: "g",
-                isActive: true
-            ),
-            DietaryGoal(
-                type: .sugar,
-                target: 50,
-                current: 65,
-                unit: "g",
-                isActive: true
-            )
-        ]
-    }
-}
-
-// MARK: - Store Info Manager
-class StoreInfoManager {
-    static func sampleStoreInfo() -> [StoreInfo] {
-        return [
-            StoreInfo(
-                name: "Whole Foods Market",
-                address: "123 Main St, Los Angeles, CA 90210",
-                hours: "7:00 AM - 10:00 PM",
-                phone: "(310) 555-0123",
-                rating: 4.5,
-                reviews: [
-                    StoreInfo.StoreReview(
-                        rating: 5,
-                        comment: "Great selection of organic products!",
-                        date: Date(),
-                        author: "Sarah M."
-                    ),
-                    StoreInfo.StoreReview(
-                        rating: 4,
-                        comment: "A bit pricey but quality is excellent",
-                        date: Calendar.current.date(byAdding: .day, value: -2, to: Date()) ?? Date(),
-                        author: "Mike R."
-                    )
-                ],
-                parkingInfo: "Free parking in attached garage",
-                accessibility: ["Wheelchair accessible", "Assistance available", "Wide aisles"]
-            ),
-            StoreInfo(
-                name: "Trader Joe's",
-                address: "456 Oak Ave, Los Angeles, CA 90211",
-                hours: "8:00 AM - 9:00 PM",
-                phone: "(310) 555-0456",
-                rating: 4.8,
-                reviews: [
-                    StoreInfo.StoreReview(
-                        rating: 5,
-                        comment: "Love their unique products and friendly staff!",
-                        date: Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date(),
-                        author: "Jennifer L."
-                    )
-                ],
-                parkingInfo: "Street parking and small lot",
-                accessibility: ["Wheelchair accessible", "Narrow aisles"]
-            )
-        ]
-    }
-}
-
-// MARK: - Notification Manager
-class NotificationManager {
-    static func sampleNotifications() -> [SmartNotification] {
-        return [
-            SmartNotification(
-                type: .priceDrop,
-                title: "Price Drop Alert!",
-                message: "Organic Bananas are now 20% off at Whole Foods",
-                date: Date(),
-                isRead: false,
-                action: .viewDeal
-            ),
-            SmartNotification(
-                type: .dietaryGoal,
-                title: "Goal Progress",
-                message: "You're 80% to your daily protein goal. Consider adding chicken to your list.",
-                date: Calendar.current.date(byAdding: .hour, value: -2, to: Date()) ?? Date(),
-                isRead: false,
-                action: .addToList
-            ),
-            SmartNotification(
-                type: .mealReminder,
-                title: "Meal Planning",
-                message: "Time to plan your meals for next week!",
-                date: Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date(),
-                isRead: true
-            )
-        ]
-    }
-}
-
-// MARK: - Shopping Insights
-struct ShoppingInsights {
-    let title: String
-    let message: String
-    let type: String
-    
-    static func generateInsights(from history: [ShoppingHistory]) -> [ShoppingInsights] {
-        var insights: [ShoppingInsights] = []
+        // Group by category (simplified - in real app would use ingredient database)
+        var categorizedIngredients: [String: [String]] = [:]
         
-        // Analyze spending patterns
-        let totalSpent = history.reduce(0) { $0 + $1.totalSpent }
-        let averageSpent = totalSpent / Double(max(history.count, 1))
-        
-        if averageSpent > 60 {
-            insights.append(ShoppingInsights(
-                title: "High Spending Alert",
-                message: "Your average shopping trip is $\(String(format: "%.2f", averageSpent)). Consider meal planning to reduce costs.",
-                type: "Budget"
-            ))
-        }
-        
-        // Analyze store preferences
-        let storeCounts = Dictionary(grouping: history) { $0.store }.mapValues { $0.count }
-        if let favoriteStore = storeCounts.max(by: { $0.value < $1.value }) {
-            insights.append(ShoppingInsights(
-                title: "Store Preference",
-                message: "You shop most frequently at \(favoriteStore.key). Consider checking other stores for better deals.",
-                type: "Savings"
-            ))
-        }
-        
-        // Analyze shopping frequency
-        if history.count >= 2 {
-            let sortedHistory = history.sorted { $0.date > $1.date }
-            let daysBetween = Calendar.current.dateComponents([.day], from: sortedHistory[1].date, to: sortedHistory[0].date).day ?? 0
-            
-            if daysBetween > 10 {
-                insights.append(ShoppingInsights(
-                    title: "Shopping Reminder",
-                    message: "It's been \(daysBetween) days since your last shopping trip. Time to restock?",
-                    type: "Reminder"
-                ))
+        for ingredient in uniqueIngredients {
+            let category = categorizeIngredient(ingredient)
+            if categorizedIngredients[category] != nil {
+                categorizedIngredients[category]?.append(ingredient)
+            } else {
+                categorizedIngredients[category] = [ingredient]
             }
         }
         
-        return insights
+        return categorizedIngredients
+    }
+    
+    private func categorizeIngredient(_ ingredient: String) -> String {
+        let lowercased = ingredient.lowercased()
+        
+        if lowercased.contains("milk") || lowercased.contains("cheese") || lowercased.contains("yogurt") || lowercased.contains("cream") {
+            return "Dairy"
+        } else if lowercased.contains("apple") || lowercased.contains("banana") || lowercased.contains("tomato") || lowercased.contains("lettuce") || lowercased.contains("carrot") {
+            return "Produce"
+        } else if lowercased.contains("chicken") || lowercased.contains("beef") || lowercased.contains("pork") || lowercased.contains("fish") {
+            return "Meat"
+        } else if lowercased.contains("bread") || lowercased.contains("pasta") || lowercased.contains("rice") {
+            return "Grains"
+        } else if lowercased.contains("oil") || lowercased.contains("butter") || lowercased.contains("sauce") {
+            return "Pantry"
+        } else {
+            return "Other"
+        }
+    }
+    
+    // MARK: - Persistence
+    private func saveToUserDefaults() {
+        if let encoded = try? JSONEncoder().encode(mealPlan) {
+            UserDefaults.standard.set(encoded, forKey: userDefaultsKey)
+        }
+    }
+    
+    private func loadFromUserDefaults() {
+        if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+           let decoded = try? JSONDecoder().decode([Date: [Meal]].self, from: data) {
+            mealPlan = decoded
+        }
+    }
+    
+    private func setupObservers() {
+        $mealPlan
+            .debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.saveToUserDefaults()
+            }
+            .store(in: &cancellables)
+    }
+    
+    // MARK: - Sample Data
+    @MainActor
+    static func sampleMealPlans() -> [MealPlan] {
+        let today = Date()
+        let calendar = Calendar.current
+        
+        var samplePlans: [MealPlan] = []
+        
+        // Create sample meal plans for the next 7 days
+        for dayOffset in 0..<7 {
+            guard let date = calendar.date(byAdding: .day, value: dayOffset, to: today) else { continue }
+            
+            let meals: [MealPlan.Meal] = [
+                MealPlan.Meal(
+                    type: .breakfast,
+                    recipe: RecipeDatabase.recipes.first,
+                    customMeal: "Healthy Breakfast Bowl",
+                    ingredients: [
+                        GroceryItem(name: "Eggs", description: "Fresh eggs", price: 2.99, category: "Dairy", aisle: 5, brand: ""),
+                        GroceryItem(name: "Avocado", description: "Ripe avocado", price: 1.99, category: "Produce", aisle: 1, brand: ""),
+                        GroceryItem(name: "Whole Grain Toast", description: "Healthy bread", price: 3.49, category: "Bakery", aisle: 3, brand: "")
+                    ]
+                ),
+                MealPlan.Meal(
+                    type: .lunch,
+                    recipe: RecipeDatabase.recipes.first(where: { $0.category == .salad }),
+                    customMeal: "Fresh Salad with Protein",
+                    ingredients: [
+                        GroceryItem(name: "Mixed Greens", description: "Fresh salad greens", price: 2.99, category: "Produce", aisle: 1, brand: ""),
+                        GroceryItem(name: "Chicken Breast", description: "Lean protein", price: 8.97, category: "Meat", aisle: 4, brand: ""),
+                        GroceryItem(name: "Cherry Tomatoes", description: "Fresh tomatoes", price: 3.99, category: "Produce", aisle: 1, brand: "")
+                    ]
+                ),
+                MealPlan.Meal(
+                    type: .dinner,
+                    recipe: RecipeDatabase.recipes.first(where: { $0.category == .dinner }),
+                    customMeal: "Balanced Dinner Plate",
+                    ingredients: [
+                        GroceryItem(name: "Salmon Fillet", description: "Fresh fish", price: 12.99, category: "Seafood", aisle: 4, brand: ""),
+                        GroceryItem(name: "Brown Rice", description: "Whole grain", price: 2.99, category: "Pantry", aisle: 3, brand: ""),
+                        GroceryItem(name: "Broccoli", description: "Fresh vegetables", price: 2.99, category: "Produce", aisle: 1, brand: "")
+                    ]
+                )
+            ]
+            
+            let mealPlan = MealPlan(
+                date: date,
+                meals: meals,
+                notes: "Sample meal plan for \(date.formatted(date: .abbreviated, time: .omitted))"
+            )
+            
+            samplePlans.append(mealPlan)
+        }
+        
+        return samplePlans
     }
 } 

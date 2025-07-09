@@ -8,7 +8,7 @@
 import Foundation
 
 struct ChatMessage: Identifiable, Codable {
-    let id = UUID()
+    var id = UUID()
     let content: String
     let isUser: Bool
     let timestamp: Date
@@ -29,7 +29,7 @@ struct ChatMessage: Identifiable, Codable {
 }
 
 struct ChatActionButton: Identifiable, Codable {
-    let id = UUID()
+    var id = UUID()
     let title: String
     let action: ChatAction
     let icon: String
@@ -59,6 +59,7 @@ enum ChatAction: String, Codable, CaseIterable {
     case findInStore = "find_in_store"
     case comparePrices = "compare_prices"
     case mealPlan = "meal_plan"
+    case addToMealPlan = "add_to_meal_plan"
     case pantryCheck = "pantry_check"
     case budgetFilter = "budget_filter"
     case timeFilter = "time_filter"

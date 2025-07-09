@@ -9,6 +9,255 @@ import Foundation
 import Combine
 import SwiftUI
 
+// MARK: - Manager Classes
+class ShoppingHistoryManager {
+    static func sampleHistory() -> [ShoppingHistory] {
+        let today = Date()
+        let calendar = Calendar.current
+        
+        return [
+            ShoppingHistory(
+                date: calendar.date(byAdding: .day, value: -1, to: today) ?? today,
+                items: sampleGroceryItems.prefix(5).map { $0 },
+                totalSpent: 45.67,
+                store: "FreshMart",
+                category: "Groceries"
+            ),
+            ShoppingHistory(
+                date: calendar.date(byAdding: .day, value: -3, to: today) ?? today,
+                items: sampleGroceryItems.prefix(8).map { $0 },
+                totalSpent: 78.92,
+                store: "FreshMart",
+                category: "Groceries"
+            ),
+            ShoppingHistory(
+                date: calendar.date(byAdding: .day, value: -7, to: today) ?? today,
+                items: sampleGroceryItems.prefix(12).map { $0 },
+                totalSpent: 120.45,
+                store: "FreshMart",
+                category: "Groceries"
+            )
+        ]
+    }
+}
+
+class DietaryGoalManager {
+    static func sampleGoals() -> [DietaryGoal] {
+        return [
+            DietaryGoal(
+                type: .calories,
+                target: 2000,
+                current: 1850,
+                unit: "kcal",
+                isActive: true
+            ),
+            DietaryGoal(
+                type: .protein,
+                target: 150,
+                current: 120,
+                unit: "g",
+                isActive: true
+            ),
+            DietaryGoal(
+                type: .carbs,
+                target: 250,
+                current: 220,
+                unit: "g",
+                isActive: true
+            ),
+            DietaryGoal(
+                type: .fat,
+                target: 65,
+                current: 55,
+                unit: "g",
+                isActive: true
+            ),
+            DietaryGoal(
+                type: .fiber,
+                target: 25,
+                current: 18,
+                unit: "g",
+                isActive: true
+            )
+        ]
+    }
+}
+
+class StoreInfoManager {
+    static func sampleStoreInfo() -> [StoreInfo] {
+        return [
+            StoreInfo(
+                name: "FreshMart Downtown",
+                address: "123 Main St, Downtown",
+                hours: "7:00 AM - 10:00 PM",
+                phone: "(555) 123-4567",
+                rating: 4.5,
+                reviews: [
+                    StoreInfo.StoreReview(
+                        rating: 5,
+                        comment: "Great selection of organic produce!",
+                        date: Date(),
+                        author: "Sarah M."
+                    ),
+                    StoreInfo.StoreReview(
+                        rating: 4,
+                        comment: "Clean store with friendly staff",
+                        date: Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date(),
+                        author: "Mike R."
+                    )
+                ],
+                parkingInfo: "Free parking available",
+                accessibility: ["Wheelchair accessible", "Assistance available"]
+            ),
+            StoreInfo(
+                name: "FreshMart Westside",
+                address: "456 Oak Ave, Westside",
+                hours: "6:00 AM - 11:00 PM",
+                phone: "(555) 987-6543",
+                rating: 4.2,
+                reviews: [
+                    StoreInfo.StoreReview(
+                        rating: 4,
+                        comment: "Convenient location",
+                        date: Calendar.current.date(byAdding: .day, value: -2, to: Date()) ?? Date(),
+                        author: "Lisa K."
+                    )
+                ],
+                parkingInfo: "Street parking available",
+                accessibility: ["Wheelchair accessible"]
+            )
+        ]
+    }
+}
+
+class NotificationManager {
+    static func sampleNotifications() -> [SmartNotification] {
+        let today = Date()
+        let calendar = Calendar.current
+        
+        return [
+            SmartNotification(
+                type: .priceDrop,
+                title: "Price Drop Alert",
+                message: "Organic bananas are now 20% off!",
+                date: calendar.date(byAdding: .hour, value: -2, to: today) ?? today,
+                isRead: false,
+                action: .viewDeal
+            ),
+            SmartNotification(
+                type: .dietaryGoal,
+                title: "Dietary Goal Update",
+                message: "You're 85% to your protein goal for today",
+                date: calendar.date(byAdding: .hour, value: -4, to: today) ?? today,
+                isRead: true,
+                action: nil
+            ),
+            SmartNotification(
+                type: .mealReminder,
+                title: "Meal Planning Reminder",
+                message: "Don't forget to plan your meals for next week",
+                date: calendar.date(byAdding: .day, value: -1, to: today) ?? today,
+                isRead: false,
+                action: .viewRecipe
+            ),
+            SmartNotification(
+                type: .dealAlert,
+                title: "New Deals Available",
+                message: "Check out this week's fresh deals on produce",
+                date: calendar.date(byAdding: .day, value: -2, to: today) ?? today,
+                isRead: true,
+                action: .viewDeal
+            )
+        ]
+    }
+}
+
+// MARK: - Shopping Insights
+struct ShoppingInsights: Identifiable, Codable {
+    let id = UUID()
+    let type: String
+    let title: String
+    let message: String
+    let value: Double
+    let unit: String
+    let trend: String
+    let confidence: Double
+    
+    enum InsightType: String, Codable, CaseIterable {
+        case spending = "Spending"
+        case frequency = "Frequency"
+        case category = "Category"
+        case savings = "Savings"
+        case timing = "Timing"
+        case budget = "Budget"
+        case reminder = "Reminder"
+    }
+    
+    enum TrendDirection: String, Codable {
+        case up = "Up"
+        case down = "Down"
+        case stable = "Stable"
+    }
+    
+    static func generateInsights(from history: [ShoppingHistory]) -> [ShoppingInsights] {
+        guard !history.isEmpty else { return [] }
+        
+        var insights: [ShoppingInsights] = []
+        
+        // Average spending insight
+        let avgSpending = history.map { $0.totalSpent }.reduce(0, +) / Double(history.count)
+        insights.append(ShoppingInsights(
+            type: "Budget",
+            title: "Average Spending",
+            message: "Your average shopping trip costs $\(String(format: "%.2f", avgSpending))",
+            value: avgSpending,
+            unit: "$",
+            trend: "Stable",
+            confidence: 0.9
+        ))
+        
+        // Shopping frequency insight
+        let frequency = calculateShoppingFrequency(history)
+        insights.append(ShoppingInsights(
+            type: "Reminder",
+            title: "Shopping Frequency",
+            message: "You shop every \(String(format: "%.1f", frequency)) days on average",
+            value: frequency,
+            unit: "days",
+            trend: "Stable",
+            confidence: 0.8
+        ))
+        
+        // Savings insight
+        let totalSavings = history.compactMap { $0.items.filter { $0.hasDeal }.map { $0.price * 0.2 } }.flatMap { $0 }.reduce(0, +)
+        insights.append(ShoppingInsights(
+            type: "Savings",
+            title: "Total Savings",
+            message: "You've saved $\(String(format: "%.2f", totalSavings)) on deals this month",
+            value: totalSavings,
+            unit: "$",
+            trend: "Up",
+            confidence: 0.7
+        ))
+        
+        return insights
+    }
+    
+    private static func calculateShoppingFrequency(_ history: [ShoppingHistory]) -> Double {
+        guard history.count > 1 else { return 7.0 }
+        
+        let sortedHistory = history.sorted { $0.date < $1.date }
+        var totalDays = 0
+        
+        for i in 1..<sortedHistory.count {
+            let days = Calendar.current.dateComponents([.day], from: sortedHistory[i-1].date, to: sortedHistory[i].date).day ?? 0
+            totalDays += days
+        }
+        
+        return Double(totalDays) / Double(sortedHistory.count - 1)
+    }
+}
+
 // MARK: - New Data Models
 struct MealPlan: Identifiable, Codable {
     let id = UUID()
@@ -222,7 +471,9 @@ class AppState: ObservableObject {
     // MARK: - Sample Data Loading
     private func loadSampleData() {
         // Load sample meal plans
-        mealPlans = MealPlanManager.sampleMealPlans()
+        Task { @MainActor in
+            mealPlans = MealPlanManager.sampleMealPlans()
+        }
         
         // Load sample shopping history
         shoppingHistory = ShoppingHistoryManager.sampleHistory()

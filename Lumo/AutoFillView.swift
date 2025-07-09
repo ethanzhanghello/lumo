@@ -7,41 +7,36 @@
 
 import SwiftUI
 
-// MARK: - Auto Fill View
 struct AutoFillView: View {
-    let onComplete: ([MealPlan]) -> Void
     @Environment(\.dismiss) private var dismiss
-    @State private var currentStep: AutoFillStep = .inputs
-    @State private var userInputs = AutoFillInputs()
-    @State private var generatedMealPlan: [MealPlan] = []
-    @State private var showingConfirmation = false
-    
-    enum AutoFillStep {
-        case inputs
-        case review
-    }
+    @StateObject private var mealManager = MealPlanManager.shared
+    @State private var preferences = AutoFillPreferences()
+    @State private var showingPreview = false
+    @State private var generatedMeals: [Meal] = []
+    @State private var weekStartDate = Date()
     
     var body: some View {
         NavigationView {
             ZStack {
                 Color.black.ignoresSafeArea()
                 
-                VStack(spacing: 20) {
-                    // Progress Indicator
-                    progressIndicator
-                    
-                    // Content based on current step
-                    if currentStep == .inputs {
-                        inputsView
-                    } else {
-                        reviewView
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Header
+                        headerSection
+                        
+                        // Preferences
+                        preferencesSection
+                        
+                        // Generate Button
+                        generateButton
+                        
+                        Spacer(minLength: 100)
                     }
-                    
-                    Spacer()
+                    .padding()
                 }
-                .padding()
             }
-            .navigationTitle("Auto-Fill My Week")
+            .navigationTitle("Auto-Fill Week")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -50,550 +45,456 @@ struct AutoFillView: View {
                     }
                     .foregroundColor(.gray)
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if currentStep == .inputs {
-                        Button("Generate") {
-                            generateMealPlan()
-                        }
-                        .foregroundColor(.lumoGreen)
-                        .disabled(!userInputs.isValid)
-                    } else {
-                        Button("Apply") {
-                            showingConfirmation = true
-                        }
-                        .foregroundColor(.lumoGreen)
-                    }
-                }
             }
         }
-        .confirmationDialog(
-            "Replace Current Plan",
-            isPresented: $showingConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Replace", role: .destructive) {
-                onComplete(generatedMealPlan)
-                dismiss()
+        .sheet(isPresented: $showingPreview) {
+            AutoFillPreviewView(meals: generatedMeals, weekStart: weekStartDate) {
+                applyAutoFill()
             }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("This will replace your current meal plan. Continue?")
         }
     }
     
-    private var progressIndicator: some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(currentStep == .inputs ? Color.lumoGreen : Color.gray)
-                .frame(width: 12, height: 12)
+    // MARK: - Header Section
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Smart Meal Planning")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
             
-            Rectangle()
-                .fill(Color.gray.opacity(0.3))
-                .frame(height: 2)
-            
-            Circle()
-                .fill(currentStep == .review ? Color.lumoGreen : Color.gray)
-                .frame(width: 12, height: 12)
-        }
-        .padding(.horizontal)
-    }
-    
-    private var inputsView: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Header
-                VStack(spacing: 8) {
-                    Text("Let's Plan Your Week!")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    Text("Tell us about your preferences and we'll create a balanced meal plan")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .multilineTextAlignment(.center)
-                }
-                
-                // Number of People
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Number of People")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    HStack {
-                        Button(action: {
-                            if userInputs.numberOfPeople > 1 {
-                                userInputs.numberOfPeople -= 1
-                            }
-                        }) {
-                            Image(systemName: "minus.circle.fill")
-                                .foregroundColor(.lumoGreen)
-                                .font(.title2)
-                        }
-                        .disabled(userInputs.numberOfPeople <= 1)
-                        
-                        Spacer()
-                        
-                        VStack(spacing: 4) {
-                            Text("\(userInputs.numberOfPeople)")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                            
-                            Text("people")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            userInputs.numberOfPeople += 1
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.lumoGreen)
-                                .font(.title2)
-                        }
-                    }
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
-                }
-                
-                // Meals per Day
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Meals per Day")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 8) {
-                        ForEach([2, 3, 4], id: \.self) { mealCount in
-                            MealCountChip(
-                                count: mealCount,
-                                isSelected: userInputs.mealsPerDay == mealCount,
-                                onSelect: {
-                                    userInputs.mealsPerDay = mealCount
-                                }
-                            )
-                        }
-                    }
-                }
-                
-                // Time Constraints
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Time per Meal")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 8) {
-                        ForEach(TimeConstraint.allCases, id: \.self) { constraint in
-                            TimeConstraintChip(
-                                constraint: constraint,
-                                isSelected: userInputs.timeConstraint == constraint,
-                                onSelect: {
-                                    userInputs.timeConstraint = constraint
-                                }
-                            )
-                        }
-                    }
-                }
-                
-                // Budget
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Weekly Budget")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 8) {
-                        ForEach(BudgetRange.allCases, id: \.self) { budget in
-                            BudgetChip(
-                                budget: budget,
-                                isSelected: userInputs.budgetRange == budget,
-                                onSelect: {
-                                    userInputs.budgetRange = budget
-                                }
-                            )
-                        }
-                    }
-                }
-                
-                // Dietary Preferences
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Dietary Preferences")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 8) {
-                        ForEach(DietaryPreference.allCases, id: \.self) { preference in
-                            DietaryChip(
-                                preference: preference,
-                                isSelected: userInputs.dietaryPreferences.contains(preference),
-                                onToggle: { isSelected in
-                                    if isSelected {
-                                        userInputs.dietaryPreferences.insert(preference)
-                                    } else {
-                                        userInputs.dietaryPreferences.remove(preference)
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-            }
+            Text("Let AI create a balanced week of meals based on your preferences and dietary goals.")
+                .font(.subheadline)
+                .foregroundColor(.gray)
         }
     }
     
-    private var reviewView: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                // Header
-                VStack(spacing: 8) {
-                    Text("Your Generated Meal Plan")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    Text("Review your personalized meal plan for the week")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                }
-                
-                // Weekly Overview
-                LazyVStack(spacing: 16) {
-                    ForEach(Array(generatedMealPlan.enumerated()), id: \.offset) { index, plan in
-                        DayMealPlanCard(
-                            dayOffset: index,
-                            mealPlan: plan,
-                            onRegenerate: {
-                                regenerateDay(index)
-                            }
-                        )
-                    }
-                }
-                
-                // Summary
-                VStack(spacing: 12) {
-                    Text("Plan Summary")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    HStack {
-                        VStack {
-                            Text("\(totalMeals)")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.lumoGreen)
-                            Text("Total Meals")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        
-                        Spacer()
-                        
-                        VStack {
-                            Text("$\(estimatedTotalCost, specifier: "%.0f")")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.lumoGreen)
-                            Text("Estimated Cost")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        
-                        Spacer()
-                        
-                        VStack {
-                            Text("\(averagePrepTime)")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.lumoGreen)
-                            Text("Avg Prep (min)")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
-                }
-            }
-        }
-    }
-    
-    private var totalMeals: Int {
-        generatedMealPlan.reduce(0) { $0 + $1.meals.count }
-    }
-    
-    private var estimatedTotalCost: Double {
-        generatedMealPlan.reduce(0) { total, plan in
-            total + plan.meals.reduce(0) { mealTotal, meal in
-                mealTotal + meal.ingredients.reduce(0) { $0 + $1.price }
-            }
-        }
-    }
-    
-    private var averagePrepTime: Int {
-        let totalTime = generatedMealPlan.reduce(0) { total, plan in
-            total + plan.meals.reduce(0) { mealTotal, meal in
-                mealTotal + (meal.recipe?.totalTime ?? 30)
-            }
-        }
-        return totalTime / max(totalMeals, 1)
-    }
-    
-    private func generateMealPlan() {
-        let generator = SmartMealPlanGenerator()
-        generatedMealPlan = generator.generateMealPlan(for: userInputs)
-        currentStep = .review
-    }
-    
-    private func regenerateDay(_ dayIndex: Int) {
-        let generator = SmartMealPlanGenerator()
-        let newDayPlan = generator.generateDayPlan(for: userInputs, dayOffset: dayIndex)
-        generatedMealPlan[dayIndex] = newDayPlan
-    }
-}
-
-// MARK: - Auto Fill Inputs
-struct AutoFillInputs {
-    var numberOfPeople: Int = 2
-    var mealsPerDay: Int = 3
-    var timeConstraint: TimeConstraint = .under30
-    var budgetRange: BudgetRange = .medium
-    var dietaryPreferences: Set<DietaryPreference> = []
-    
-    var isValid: Bool {
-        numberOfPeople > 0 && mealsPerDay > 0
-    }
-}
-
-// MARK: - Enums
-enum TimeConstraint: String, CaseIterable {
-    case under15 = "Under 15 min"
-    case under30 = "Under 30 min"
-    case under45 = "Under 45 min"
-    case anyTime = "Any time"
-    
-    var maxMinutes: Int {
-        switch self {
-        case .under15: return 15
-        case .under30: return 30
-        case .under45: return 45
-        case .anyTime: return 999
-        }
-    }
-}
-
-enum BudgetRange: String, CaseIterable {
-    case low = "Low"
-    case medium = "Medium"
-    case high = "High"
-    
-    var maxWeeklyBudget: Double {
-        switch self {
-        case .low: return 50.0
-        case .medium: return 100.0
-        case .high: return 200.0
-        }
-    }
-}
-
-enum DietaryPreference: String, CaseIterable {
-    case vegetarian = "Vegetarian"
-    case vegan = "Vegan"
-    case glutenFree = "Gluten-Free"
-    case dairyFree = "Dairy-Free"
-    case lowCarb = "Low Carb"
-    case highProtein = "High Protein"
-    case keto = "Keto"
-    case paleo = "Paleo"
-}
-
-// MARK: - Chip Views
-struct MealCountChip: View {
-    let count: Int
-    let isSelected: Bool
-    let onSelect: () -> Void
-    
-    var body: some View {
-        Button(action: onSelect) {
-            Text("\(count)")
+    // MARK: - Preferences Section
+    private var preferencesSection: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text("Your Preferences")
                 .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            // Dietary Restrictions
+            dietaryRestrictionsSection
+            
+            // Cooking Time
+            cookingTimeSection
+            
+            // Budget
+            budgetSection
+            
+            // Cuisine Preferences
+            cuisinePreferencesSection
+            
+            // Servings
+            servingsSection
+        }
+    }
+    
+    private var dietaryRestrictionsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Dietary Restrictions")
+                .font(.subheadline)
                 .fontWeight(.semibold)
-                .foregroundColor(isSelected ? .white : .gray)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(isSelected ? Color.lumoGreen : Color.gray.opacity(0.2))
-                .cornerRadius(12)
+                .foregroundColor(.white)
+            
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 8) {
+                ForEach(dietaryOptions, id: \.self) { option in
+                    DietaryChip(
+                        title: option,
+                        isSelected: preferences.dietaryRestrictions.contains(option)
+                    ) {
+                        if preferences.dietaryRestrictions.contains(option) {
+                            preferences.dietaryRestrictions.removeAll { $0 == option }
+                        } else {
+                            preferences.dietaryRestrictions.append(option)
+                        }
+                    }
+                }
+            }
         }
     }
-}
-
-struct TimeConstraintChip: View {
-    let constraint: TimeConstraint
-    let isSelected: Bool
-    let onSelect: () -> Void
     
-    var body: some View {
-        Button(action: onSelect) {
-            VStack(spacing: 4) {
-                Image(systemName: "clock")
-                    .foregroundColor(isSelected ? .white : .gray)
-                    .font(.title3)
+    private var cookingTimeSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Max Cooking Time")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+            
+            HStack {
+                Text("\(preferences.maxCookingTime) minutes")
+                    .font(.headline)
+                    .foregroundColor(.lumoGreen)
                 
-                Text(constraint.rawValue)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(isSelected ? .white : .gray)
-                    .multilineTextAlignment(.center)
+                Spacer()
+                
+                Slider(value: Binding(
+                    get: { Double(preferences.maxCookingTime) },
+                    set: { preferences.maxCookingTime = Int($0) }
+                ), in: 15...120, step: 15)
+                .accentColor(.lumoGreen)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(isSelected ? Color.lumoGreen : Color.gray.opacity(0.2))
+        }
+    }
+    
+    private var budgetSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Budget per Meal")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+            
+            HStack {
+                Text("$\(String(format: "%.2f", preferences.budgetPerMeal))")
+                    .font(.headline)
+                    .foregroundColor(.lumoGreen)
+                
+                Spacer()
+                
+                Slider(value: $preferences.budgetPerMeal, in: 5...30, step: 1)
+                    .accentColor(.lumoGreen)
+            }
+        }
+    }
+    
+    private var cuisinePreferencesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Preferred Cuisines")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+            
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 8) {
+                ForEach(cuisineOptions, id: \.self) { cuisine in
+                    CuisineChip(
+                        title: cuisine,
+                        isSelected: preferences.preferredCuisines.contains(cuisine)
+                    ) {
+                        if preferences.preferredCuisines.contains(cuisine) {
+                            preferences.preferredCuisines.removeAll { $0 == cuisine }
+                        } else {
+                            preferences.preferredCuisines.append(cuisine)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private var servingsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Servings per Meal")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+            
+            HStack {
+                Button(action: {
+                    if preferences.servingsPerMeal > 1 {
+                        preferences.servingsPerMeal -= 1
+                    }
+                }) {
+                    Image(systemName: "minus.circle.fill")
+                        .foregroundColor(.lumoGreen)
+                        .font(.title2)
+                }
+                .disabled(preferences.servingsPerMeal <= 1)
+                
+                Spacer()
+                
+                VStack(spacing: 4) {
+                    Text("\(preferences.servingsPerMeal)")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    
+                    Text("servings")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    preferences.servingsPerMeal += 1
+                }) {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(.lumoGreen)
+                        .font(.title2)
+                }
+            }
+            .padding()
+            .background(Color.gray.opacity(0.1))
             .cornerRadius(12)
         }
     }
-}
-
-struct BudgetChip: View {
-    let budget: BudgetRange
-    let isSelected: Bool
-    let onSelect: () -> Void
     
-    var body: some View {
-        Button(action: onSelect) {
-            VStack(spacing: 4) {
-                Image(systemName: "dollarsign.circle")
-                    .foregroundColor(isSelected ? .white : .gray)
-                    .font(.title3)
+    private var generateButton: some View {
+        Button(action: generateMealPlan) {
+            HStack {
+                Image(systemName: "wand.and.stars")
+                    .font(.title2)
                 
-                Text(budget.rawValue)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(isSelected ? .white : .gray)
+                Text("Generate Meal Plan")
+                    .font(.headline)
+                    .fontWeight(.semibold)
             }
+            .foregroundColor(.white)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(isSelected ? Color.lumoGreen : Color.gray.opacity(0.2))
-            .cornerRadius(12)
+            .padding()
+            .background(
+                LinearGradient(
+                    colors: [.purple, .blue],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .cornerRadius(16)
         }
     }
+    
+    // MARK: - Helper Functions
+    private func generateMealPlan() {
+        // Calculate week start (Monday)
+        let calendar = Calendar.current
+        let today = Date()
+        let weekday = calendar.component(.weekday, from: today)
+        let daysToSubtract = weekday == 1 ? 0 : weekday - 2 // Monday is 2, so subtract 1
+        weekStartDate = calendar.date(byAdding: .day, value: -daysToSubtract, to: today) ?? today
+        
+        generatedMeals = mealManager.generateAutoFillPlan(for: weekStartDate, preferences: preferences)
+        showingPreview = true
+    }
+    
+    private func applyAutoFill() {
+        for meal in generatedMeals {
+            mealManager.addMeal(meal)
+        }
+        dismiss()
+    }
+    
+    // MARK: - Data
+    private let dietaryOptions = [
+        "Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free",
+        "Low-Carb", "Keto", "Paleo", "Nut-Free"
+    ]
+    
+    private let cuisineOptions = [
+        "Italian", "Mexican", "Asian", "Mediterranean",
+        "American", "Indian", "French", "Thai"
+    ]
 }
 
+// MARK: - Dietary Chip
 struct DietaryChip: View {
-    let preference: DietaryPreference
+    let title: String
     let isSelected: Bool
-    let onToggle: (Bool) -> Void
+    let onTap: () -> Void
     
     var body: some View {
-        Button(action: {
-            onToggle(!isSelected)
-        }) {
-            Text(preference.rawValue)
+        Button(action: onTap) {
+            Text(title)
                 .font(.caption)
                 .fontWeight(.medium)
                 .foregroundColor(isSelected ? .white : .gray)
                 .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                .padding(.vertical, 6)
                 .background(isSelected ? Color.lumoGreen : Color.gray.opacity(0.2))
                 .cornerRadius(16)
         }
     }
 }
 
-// MARK: - Day Meal Plan Card
-struct DayMealPlanCard: View {
-    let dayOffset: Int
-    let mealPlan: MealPlan
-    let onRegenerate: () -> Void
+// MARK: - Cuisine Chip
+struct CuisineChip: View {
+    let title: String
+    let isSelected: Bool
+    let onTap: () -> Void
     
-    private var dayName: String {
-        let date = Calendar.current.date(byAdding: .day, value: dayOffset, to: Date()) ?? Date()
+    var body: some View {
+        Button(action: onTap) {
+            Text(title)
+                .font(.caption)
+                .fontWeight(.medium)
+                .foregroundColor(isSelected ? .white : .gray)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(isSelected ? Color.orange : Color.gray.opacity(0.2))
+                .cornerRadius(16)
+        }
+    }
+}
+
+// MARK: - Auto-Fill Preview View
+struct AutoFillPreviewView: View {
+    let meals: [Meal]
+    let weekStart: Date
+    let onApply: () -> Void
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Header
+                        VStack(spacing: 8) {
+                            Text("Generated Meal Plan")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            
+                            Text("\(meals.count) meals for the week")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                        
+                        // Weekly Overview
+                        weeklyOverview
+                        
+                        // Meal Details
+                        mealDetails
+                        
+                        Spacer(minLength: 100)
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Preview")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Back") {
+                        dismiss()
+                    }
+                    .foregroundColor(.gray)
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Apply") {
+                        onApply()
+                        dismiss()
+                    }
+                    .foregroundColor(.lumoGreen)
+                }
+            }
+        }
+    }
+    
+    private var weeklyOverview: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("This Week")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible()),
+                GridItem(.flexible()),
+                GridItem(.flexible()),
+                GridItem(.flexible()),
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 8) {
+                ForEach(0..<7) { dayOffset in
+                    let date = Calendar.current.date(byAdding: .day, value: dayOffset, to: weekStart) ?? Date()
+                    let dayMeals = meals.filter { Calendar.current.isDate($0.date, inSameDayAs: date) }
+                    
+                    VStack(spacing: 4) {
+                        Text(dayOfWeek(for: date))
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                        
+                        Text("\(Calendar.current.component(.day, from: date))")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        
+                        if !dayMeals.isEmpty {
+                            HStack(spacing: 2) {
+                                ForEach(dayMeals.prefix(3), id: \.id) { meal in
+                                    Text(meal.type.emoji)
+                                        .font(.caption2)
+                                }
+                            }
+                        }
+                    }
+                    .frame(height: 60)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(8)
+                }
+            }
+        }
+    }
+    
+    private var mealDetails: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Meal Details")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            LazyVStack(spacing: 12) {
+                ForEach(meals.sorted { $0.date < $1.date }, id: \.id) { meal in
+                    PreviewMealCard(meal: meal)
+                }
+            }
+        }
+    }
+    
+    private func dayOfWeek(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEE"
         return formatter.string(from: date)
     }
-    
-    private var dayNumber: Int {
-        let date = Calendar.current.date(byAdding: .day, value: dayOffset, to: Date()) ?? Date()
-        return Calendar.current.component(.day, from: date)
-    }
+}
+
+// MARK: - Preview Meal Card
+struct PreviewMealCard: View {
+    let meal: Meal
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(dayName)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    Text("\(dayNumber)")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                }
+        HStack(spacing: 12) {
+            // Meal Type Icon
+            ZStack {
+                Circle()
+                    .fill(meal.type.color.opacity(0.2))
+                    .frame(width: 40, height: 40)
                 
-                Spacer()
-                
-                Button("Regenerate") {
-                    onRegenerate()
-                }
-                .font(.caption)
-                .foregroundColor(.lumoGreen)
+                Text(meal.type.emoji)
+                    .font(.title3)
             }
             
-            LazyVStack(spacing: 8) {
-                ForEach(mealPlan.meals, id: \.id) { meal in
-                    HStack {
-                        Text(meal.type.rawValue)
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                            .frame(width: 60, alignment: .leading)
-                        
-                        if let recipe = meal.recipe {
-                            Text(recipe.name)
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                                .lineLimit(1)
-                        } else if let customMeal = meal.customMeal {
-                            Text(customMeal)
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                                .lineLimit(1)
-                        }
-                        
-                        Spacer()
-                        
-                        if let recipe = meal.recipe {
-                            Text("\(recipe.totalTime) min")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    .padding(.vertical, 4)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(meal.recipeName)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                
+                Text("\(meal.type.rawValue) • \(meal.date.formatted(date: .abbreviated, time: .omitted))")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                
+                if let recipe = meal.recipe {
+                    Text("\(recipe.totalTime) min • \(meal.servings) servings")
+                        .font(.caption)
+                        .foregroundColor(.gray)
                 }
             }
+            
+            Spacer()
         }
         .padding()
         .background(Color.gray.opacity(0.1))
