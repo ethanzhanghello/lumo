@@ -118,19 +118,19 @@ struct DealsView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         if selectedFilter != .all {
-                            FilterChip(text: selectedFilter.displayName, isActive: true) {
+                            DealFilterChip(text: selectedFilter.displayName, isActive: true) {
                                 selectedFilter = .all
                             }
                         }
                         
                         if selectedSort != .relevance {
-                            FilterChip(text: selectedSort.displayName, isActive: true) {
+                            DealFilterChip(text: selectedSort.displayName, isActive: true) {
                                 selectedSort = .relevance
                             }
                         }
                         
                         if let store = selectedStore {
-                            FilterChip(text: sampleLAStores.first(where: { $0.zip == store })?.name ?? "Store", isActive: true) {
+                            DealFilterChip(text: sampleLAStores.first(where: { $0.zip == store })?.name ?? "Store", isActive: true) {
                                 selectedStore = nil
                             }
                         }
@@ -413,7 +413,7 @@ enum DealSort: String, CaseIterable {
 }
 
 // MARK: - Filter Chip Component
-struct FilterChip: View {
+struct DealFilterChip: View {
     let text: String
     let isActive: Bool
     let onTap: () -> Void

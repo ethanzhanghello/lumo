@@ -114,6 +114,27 @@ struct SmartNotification: Identifiable, Codable {
     }
 }
 
+struct MealPlanTemplate: Identifiable, Codable {
+    let id = UUID()
+    var name: String
+    var description: String
+    var tags: [String]
+    var meals: [MealPlan.Meal]
+    var notes: String?
+    var createdAt: Date
+    var thumbnail: String // Base64 encoded image or icon name
+    
+    init(name: String, description: String, tags: [String], meals: [MealPlan.Meal], notes: String? = nil) {
+        self.name = name
+        self.description = description
+        self.tags = tags
+        self.meals = meals
+        self.notes = notes
+        self.createdAt = Date()
+        self.thumbnail = "fork.knife" // Default icon
+    }
+}
+
 class AppState: ObservableObject {
     // MARK: - Published Properties
     @Published var selectedStore: Store?
@@ -129,6 +150,7 @@ class AppState: ObservableObject {
     @Published var userPreferences: UserPreferences
     @Published var favoriteRecipes: [Recipe] = []
     @Published var favoriteProducts: [Product] = []
+    @Published var mealPlanTemplates: [MealPlanTemplate] = []
     
     // MARK: - New Manager Properties
     // @Published var inventoryManager: InventoryManager
