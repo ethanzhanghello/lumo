@@ -57,6 +57,7 @@ class GroceryList: ObservableObject {
     
     // MARK: - Public Methods
     func addItem(_ item: GroceryItem, quantity: Int = 1) {
+        print("addItem called for \(item.name), quantity: \(quantity)")
         if let existingIndex = groceryItems.firstIndex(where: { $0.item.id == item.id }) {
             // Item already exists, update quantity
             groceryItems[existingIndex].quantity += quantity

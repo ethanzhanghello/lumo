@@ -79,7 +79,7 @@ struct ChatbotView: View {
                             }
                             .padding(.horizontal, 20)
                             .padding(.top, 20)
-                            .padding(.bottom, 100)
+                            .padding(.bottom, 12)
                         }
 
                         .onChange(of: chatbotEngine.messages.count) { _, _ in
@@ -95,13 +95,11 @@ struct ChatbotView: View {
                             }
                         }
                     }
-                }
-                
-                // Modern Input Bar
-                VStack {
-                    Spacer()
+
+                    // Modern Input Bar
                     modernInputBar
                 }
+
                 if showConfirmation {
                     VStack {
                         Spacer()
@@ -426,6 +424,9 @@ struct ChatbotView: View {
     }
     
     private func handleAction(_ action: ChatAction, for message: ChatMessage) {
+        // Debug print to see if action is received
+        print("Action received: \(action) for message: \(message.content)")
+        
         // Haptic feedback
         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
         impactFeedback.impactOccurred()
@@ -434,29 +435,115 @@ struct ChatbotView: View {
         case .addToList, .addToCart:
             // Add all recipe or product ingredients to grocery list
             if let recipe = message.recipe {
+                var missingIngredients: [String] = []
+                var addedIngredients: [String] = []
+                
                 for ingredient in recipe.ingredients {
-                    let groceryItem = GroceryItem(
-                        name: ingredient.name,
-                        description: ingredient.notes ?? "",
-                        price: ingredient.estimatedPrice,
-                        category: "Produce",
-                        aisle: ingredient.aisle,
-                        brand: ""
-                    )
-                    appState.groceryList.addItem(groceryItem)
+                    print("Processing ingredient: \(ingredient.name)")
+                    
+                    // Try exact match first
+                    if let matchedItem = sampleGroceryItems.first(where: { $0.name.lowercased() == ingredient.name.lowercased() }) {
+                        print("Exact match found: \(matchedItem.name)")
+                        appState.quickAddToGroceryList(matchedItem)
+                        addedIngredients.append(matchedItem.name)
+                    } else {
+                        // Try partial match (e.g., "chicken breast" matches "Chicken Breast")
+                        let ingredientWords = ingredient.name.lowercased().split(separator: " ")
+                        if let matchedItem = sampleGroceryItems.first(where: { item in
+                            let itemWords = item.name.lowercased().split(separator: " ")
+                            return ingredientWords.allSatisfy { word in
+                                itemWords.contains(word)
+                            }
+                        }) {
+                            print("Partial match found: \(matchedItem.name) for \(ingredient.name)")
+                            appState.quickAddToGroceryList(matchedItem)
+                            addedIngredients.append(matchedItem.name)
+                        } else {
+                            print("No match for ingredient: \(ingredient.name)")
+                            missingIngredients.append(ingredient.name)
+                        }
+                    }
                 }
-                showConfirmationToast("Added all ingredients to your grocery list!")
+                
+                print("Added ingredients: \(addedIngredients)")
+                print("Missing ingredients: \(missingIngredients)")
+                
+                if missingIngredients.isEmpty {
+                    showConfirmationToast("Added all ingredients to your grocery list!")
+                } else if !addedIngredients.isEmpty {
+                    showConfirmationToast("Added \(addedIngredients.joined(separator: ", ")) to your list. Some items not found: \(missingIngredients.joined(separator: ", "))")
+                } else {
+                    showConfirmationToast("Could not add any ingredients to your grocery list.")
+                }
             } else if let product = message.product {
-                let groceryItem = GroceryItem(
-                    name: product.name,
-                    description: product.description,
-                    price: product.price,
-                    category: product.category,
-                    aisle: product.aisle,
-                    brand: product.brand
-                )
-                appState.groceryList.addItem(groceryItem)
-                showConfirmationToast("Added \(product.name) to your grocery list!")
+                print("Processing product: \(product.name)")
+                if let matchedItem = sampleGroceryItems.first(where: { $0.name.lowercased() == product.name.lowercased() }) {
+                    print("Matched sampleGroceryItem: \(matchedItem.name)")
+                    appState.quickAddToGroceryList(matchedItem)
+                    showConfirmationToast("Added \(product.name) to your grocery list!")
+                } else {
+                    print("No match for product: \(product.name)")
+                    showConfirmationToast("Could not add \(product.name) to your grocery list.")
+                }
+            } else {
+                // Parse ingredients from message content (for meal overviews)
+                print("No recipe or product found, parsing message content for ingredients")
+                let ingredients = extractIngredientsFromMessage(message.content)
+                print("Extracted ingredients from message: \(ingredients)")
+                
+                var missingIngredients: [String] = []
+                var addedIngredients: [String] = []
+                
+                for ingredient in ingredients {
+                    print("Processing extracted ingredient: \(ingredient)")
+                    
+                    // Try exact match first
+                    if let matchedItem = sampleGroceryItems.first(where: { $0.name.lowercased() == ingredient.lowercased() }) {
+                        print("Exact match found: \(matchedItem.name)")
+                        appState.quickAddToGroceryList(matchedItem)
+                        addedIngredients.append(matchedItem.name)
+                    } else {
+                        // Try partial match with more flexible logic
+                        let ingredientWords = ingredient.lowercased().split(separator: " ")
+                        if let matchedItem = sampleGroceryItems.first(where: { item in
+                            let itemWords = item.name.lowercased().split(separator: " ")
+                            // Check if all ingredient words are found in item words
+                            return ingredientWords.allSatisfy { word in
+                                itemWords.contains(word) || itemWords.contains { $0.contains(word) }
+                            }
+                        }) {
+                            print("Partial match found: \(matchedItem.name) for \(ingredient)")
+                            appState.quickAddToGroceryList(matchedItem)
+                            addedIngredients.append(matchedItem.name)
+                        } else {
+                            // Try reverse matching (item words in ingredient)
+                            if let matchedItem = sampleGroceryItems.first(where: { item in
+                                let itemWords = item.name.lowercased().split(separator: " ")
+                                return itemWords.allSatisfy { word in
+                                    ingredientWords.contains(word) || ingredientWords.contains { $0.contains(word) }
+                                }
+                            }) {
+                                print("Reverse match found: \(matchedItem.name) for \(ingredient)")
+                                appState.quickAddToGroceryList(matchedItem)
+                                addedIngredients.append(matchedItem.name)
+                            } else {
+                                print("No match for extracted ingredient: \(ingredient)")
+                                missingIngredients.append(ingredient)
+                            }
+                        }
+                    }
+                }
+                
+                print("Added ingredients: \(addedIngredients)")
+                print("Missing ingredients: \(missingIngredients)")
+                
+                if missingIngredients.isEmpty && !addedIngredients.isEmpty {
+                    showConfirmationToast("Added all ingredients to your grocery list!")
+                } else if !addedIngredients.isEmpty {
+                    showConfirmationToast("Added \(addedIngredients.joined(separator: ", ")) to your list. Some items not found: \(missingIngredients.joined(separator: ", "))")
+                } else {
+                    showConfirmationToast("Could not add any ingredients to your grocery list.")
+                }
             }
         case .mealPlan:
             // Add recipe to today's meal plan as dinner
@@ -733,6 +820,183 @@ struct ChatbotView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             showConfirmation = false
         }
+    }
+    
+    private func extractIngredientsFromMessage(_ content: String) -> [String] {
+        var ingredients: [String] = []
+        
+        // Common ingredient keywords to look for
+        let ingredientKeywords = [
+            "chicken", "beef", "pork", "salmon", "shrimp", "fish",
+            "rice", "pasta", "bread", "flour", "sugar", "salt", "pepper",
+            "onion", "garlic", "tomato", "lettuce", "spinach", "carrot",
+            "potato", "broccoli", "bell pepper", "mushroom", "zucchini",
+            "milk", "cheese", "yogurt", "butter", "cream", "egg",
+            "olive oil", "vegetable oil", "vinegar", "lemon", "lime",
+            "herb", "spice", "sauce", "stock", "broth", "wine",
+            "nut", "seed", "bean", "lentil", "quinoa", "oat",
+            "banana", "apple", "orange", "berry", "grape", "avocado",
+            "bbq sauce", "bell peppers", "red onion", "asparagus", "quinoa",
+            "black beans", "corn", "lemon", "herbs", "vegetables"
+        ]
+        
+        let lines = content.components(separatedBy: .newlines)
+        for line in lines {
+            let lowercasedLine = line.lowercased()
+            
+            // Look for lines that contain ingredient keywords
+            for keyword in ingredientKeywords {
+                if lowercasedLine.contains(keyword) {
+                    // Extract the ingredient name from the line
+                    if let ingredient = extractIngredientFromLine(line, keyword: keyword) {
+                        // Clean up the ingredient name
+                        let cleanedIngredient = cleanIngredientName(ingredient)
+                        if !cleanedIngredient.isEmpty {
+                            ingredients.append(cleanedIngredient)
+                        }
+                    }
+                }
+            }
+        }
+        
+        // If no ingredients found, try to infer common ingredients based on dish names
+        if ingredients.isEmpty {
+            ingredients = inferIngredientsFromDishNames(content)
+        }
+        
+        // Remove duplicates and return
+        return Array(Set(ingredients))
+    }
+    
+    private func extractIngredientFromLine(_ line: String, keyword: String) -> String? {
+        // Look for patterns like "• chicken breast", "- chicken breast", "chicken breast"
+        let patterns = [
+            "•\\s*([^\\n]+)",  // • ingredient
+            "-\\s*([^\\n]+)",  // - ingredient
+            "\\*\\s*([^\\n]+)", // * ingredient
+        ]
+        
+        for pattern in patterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+               let match = regex.firstMatch(in: line, options: [], range: NSRange(line.startIndex..., in: line)) {
+                let range = match.range(at: 1)
+                if let swiftRange = Range(range, in: line) {
+                    let ingredient = String(line[swiftRange]).trimmingCharacters(in: .whitespaces)
+                    if ingredient.lowercased().contains(keyword) {
+                        return ingredient
+                    }
+                }
+            }
+        }
+        
+        // If no pattern match, try to extract the keyword with surrounding context
+        let words = line.components(separatedBy: .whitespaces)
+        for (index, word) in words.enumerated() {
+            if word.lowercased().contains(keyword) {
+                // Try to get 2-3 words around the keyword
+                let start = max(0, index - 1)
+                let end = min(words.count, index + 2)
+                let ingredientWords = Array(words[start..<end])
+                return ingredientWords.joined(separator: " ").trimmingCharacters(in: .whitespaces)
+            }
+        }
+        
+        return nil
+    }
+    
+    private func cleanIngredientName(_ ingredient: String) -> String {
+        var cleaned = ingredient
+        
+        // Remove common prefixes and suffixes
+        let prefixesToRemove = ["**", "*", "-", "•", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+        let suffixesToRemove = ["**", "*", ":", "|", "Easy", "Medium", "Hard", "minutes", "min", "serving", "servings"]
+        
+        for prefix in prefixesToRemove {
+            if cleaned.hasPrefix(prefix) {
+                cleaned = String(cleaned.dropFirst(prefix.count)).trimmingCharacters(in: .whitespaces)
+            }
+        }
+        
+        for suffix in suffixesToRemove {
+            if cleaned.hasSuffix(suffix) {
+                cleaned = String(cleaned.dropLast(suffix.count)).trimmingCharacters(in: .whitespaces)
+            }
+        }
+        
+        // Remove quantities and measurements
+        let quantityPatterns = [
+            "\\d+\\s*(lbs?|oz|g|kg|ml|l|cup|cups|tbsp|tsp|slice|slices|clove|cloves|whole|medium|large|small)",
+            "\\d+\\s*",
+            "\\d+"
+        ]
+        
+        for pattern in quantityPatterns {
+            cleaned = cleaned.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+        }
+        
+        // Clean up extra whitespace and punctuation
+        cleaned = cleaned.trimmingCharacters(in: .whitespaces)
+        cleaned = cleaned.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        
+        // Remove if it's too short or contains obvious non-ingredient text
+        if cleaned.count < 2 || cleaned.contains("**") || cleaned.contains("Description") || cleaned.contains("Prep Time") {
+            return ""
+        }
+        
+        return cleaned
+    }
+    
+    private func inferIngredientsFromDishNames(_ content: String) -> [String] {
+        var inferredIngredients: [String] = []
+        let lowercasedContent = content.lowercased()
+        
+        // Common dish-to-ingredient mappings
+        let dishIngredientMappings: [String: [String]] = [
+            "chicken": ["chicken breast", "olive oil", "lemon", "herbs", "salt", "pepper"],
+            "salmon": ["salmon", "olive oil", "lemon", "salt", "pepper"],
+            "quinoa": ["quinoa", "bell peppers", "black beans", "corn", "olive oil"],
+            "bell peppers": ["bell peppers", "quinoa", "black beans", "corn", "olive oil"],
+            "asparagus": ["asparagus", "olive oil", "salt", "pepper"],
+            "vegetables": ["bell peppers", "carrots", "broccoli", "olive oil"],
+            "grilled": ["olive oil", "salt", "pepper"],
+            "roasted": ["olive oil", "salt", "pepper"],
+            "herb": ["herbs", "olive oil", "salt", "pepper"],
+            "lemon": ["lemon", "olive oil", "salt", "pepper"]
+        ]
+        
+        // Check for dish keywords and add corresponding ingredients
+        for (dishKeyword, ingredients) in dishIngredientMappings {
+            if lowercasedContent.contains(dishKeyword) {
+                inferredIngredients.append(contentsOf: ingredients)
+            }
+        }
+        
+        // Add common cooking ingredients that are likely needed
+        if lowercasedContent.contains("grilled") || lowercasedContent.contains("roasted") {
+            inferredIngredients.append(contentsOf: ["olive oil", "salt", "pepper"])
+        }
+        
+        if lowercasedContent.contains("chicken") {
+            inferredIngredients.append("chicken breast")
+        }
+        
+        if lowercasedContent.contains("salmon") {
+            inferredIngredients.append("salmon")
+        }
+        
+        if lowercasedContent.contains("quinoa") {
+            inferredIngredients.append("quinoa")
+        }
+        
+        if lowercasedContent.contains("bell peppers") {
+            inferredIngredients.append("bell peppers")
+        }
+        
+        if lowercasedContent.contains("asparagus") {
+            inferredIngredients.append("asparagus")
+        }
+        
+        return Array(Set(inferredIngredients))
     }
 }
 

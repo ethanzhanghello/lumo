@@ -605,6 +605,7 @@ struct ModernActionButtonsView: View {
             }
         }
         .onAppear {
+            print("ModernActionButtonsView buttons: \(buttons.map { $0.title })")
             withAnimation(.easeOut(duration: 0.5).delay(0.3)) {
                 showButtons = true
             }
@@ -620,16 +621,12 @@ struct ModernActionButton: View {
     
     var body: some View {
         Button(action: {
-            // Haptic feedback
-            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-            impactFeedback.impactOccurred()
-            
+            print("Button tapped: \(button.title) with action: \(button.action)")
             action()
         }) {
             HStack(spacing: 8) {
                 Image(systemName: button.icon)
                     .font(.system(size: 14, weight: .semibold))
-                
                 Text(button.title)
                     .font(.system(size: 13, weight: .semibold))
                     .lineLimit(1)
@@ -657,6 +654,7 @@ struct ModernActionButton: View {
             .scaleEffect(isPressed ? 0.95 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: isPressed)
         }
+        .disabled(false) // Force enabled
         .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
             isPressed = pressing
         }, perform: {})

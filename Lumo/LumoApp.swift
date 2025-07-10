@@ -34,7 +34,7 @@ struct LumoApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            RootView()
                 .environmentObject(appState)
         }
     }
