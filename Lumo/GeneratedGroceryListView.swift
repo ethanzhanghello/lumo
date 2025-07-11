@@ -10,7 +10,7 @@ import SwiftUI
 struct GeneratedGroceryListView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var mealManager = MealPlanManager.shared
-    @StateObject private var groceryList = GroceryList()
+    @StateObject private var groceryList = GeneratedGroceryList()
     
     @State private var weekStartDate = Date()
     @State private var showingAddToGroceryList = false
@@ -122,7 +122,7 @@ struct GeneratedGroceryListView: View {
         }
     }
     
-    private var groupedItems: [String: [GroceryItem]] {
+    private var groupedItems: [String: [GeneratedGroceryItem]] {
         Dictionary(grouping: groceryList.items) { $0.category }
     }
     
@@ -134,7 +134,7 @@ struct GeneratedGroceryListView: View {
         
         for (category, ingredients) in groceryListData {
             for ingredient in ingredients {
-                let item = GroceryItem(name: ingredient, quantity: 1, category: category)
+                let item = GeneratedGroceryItem(name: ingredient, quantity: 1, category: category)
                 groceryList.addItem(item)
             }
         }
@@ -144,7 +144,7 @@ struct GeneratedGroceryListView: View {
 // MARK: - Category Section
 struct CategorySection: View {
     let category: String
-    let items: [GroceryItem]
+    let items: [GeneratedGroceryItem]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -167,7 +167,7 @@ struct CategorySection: View {
 
 // MARK: - Grocery Item Row
 struct GroceryItemRow: View {
-    let item: GroceryItem
+    let item: GeneratedGroceryItem
     @State private var isCompleted = false
     
     var body: some View {
@@ -207,7 +207,7 @@ struct GroceryItemRow: View {
 }
 
 // MARK: - Grocery Item Model
-struct GroceryItem: Identifiable {
+struct GeneratedGroceryItem: Identifiable {
     let id = UUID()
     let name: String
     let quantity: Int
@@ -215,14 +215,14 @@ struct GroceryItem: Identifiable {
 }
 
 // MARK: - Grocery List Model
-class GroceryList: ObservableObject {
-    @Published var items: [GroceryItem] = []
+class GeneratedGroceryList: ObservableObject {
+    @Published var items: [GeneratedGroceryItem] = []
     
-    func addItem(_ item: GroceryItem) {
+    func addItem(_ item: GeneratedGroceryItem) {
         items.append(item)
     }
     
-    func removeItem(_ item: GroceryItem) {
+    func removeItem(_ item: GeneratedGroceryItem) {
         items.removeAll { $0.id == item.id }
     }
 }

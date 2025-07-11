@@ -45,7 +45,8 @@ struct MealPlanningView: View {
             .navigationBarTitleDisplayMode(.large)
         }
         .sheet(isPresented: $showingAddMeal) {
-            AddMealView(selectedDate: mealManager.selectedDate, selectedMealType: selectedMealType)
+            Text("Add Meal View - Coming Soon")
+                .foregroundColor(.white)
         }
         .sheet(isPresented: $showingAutoFill) {
             AutoFillView()
@@ -76,7 +77,8 @@ struct MealPlanningView: View {
             ])
         }
         .sheet(isPresented: $showingGroceryList) {
-            GeneratedGroceryListView()
+            Text("Generated Grocery List View - Coming Soon")
+                .foregroundColor(.white)
         }
     }
     
