@@ -45,8 +45,7 @@ struct MealPlanningView: View {
             .navigationBarTitleDisplayMode(.large)
         }
         .sheet(isPresented: $showingAddMeal) {
-            Text("Add Meal View - Coming Soon")
-                .foregroundColor(.white)
+            AddMealView(selectedDate: mealManager.selectedDate, selectedMealType: selectedMealType)
         }
         .sheet(isPresented: $showingAutoFill) {
             AutoFillView()
@@ -77,8 +76,7 @@ struct MealPlanningView: View {
             ])
         }
         .sheet(isPresented: $showingGroceryList) {
-            Text("Generated Grocery List View - Coming Soon")
-                .foregroundColor(.white)
+            GeneratedGroceryListView()
         }
     }
     
@@ -167,7 +165,12 @@ struct MealPlanningView: View {
                         MealCard(meal: meal) {
                             // Edit meal
                         } onDelete: {
+                            print("Deleting meal: \(meal.recipeName)")
                             mealManager.removeMeal(meal)
+                            // Force UI update
+                            DispatchQueue.main.async {
+                                mealManager.objectWillChange.send()
+                            }
                         }
                     }
                 }

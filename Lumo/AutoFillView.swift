@@ -276,9 +276,17 @@ struct AutoFillView: View {
     }
     
     private func applyAutoFill() {
+        print("Applying \(generatedMeals.count) meals to meal plan")
         for meal in generatedMeals {
+            print("Adding meal: \(meal.recipeName) for \(meal.date.formatted(date: .abbreviated, time: .omitted))")
             mealManager.addMeal(meal)
         }
+        
+        // Force UI update
+        DispatchQueue.main.async {
+            mealManager.objectWillChange.send()
+        }
+        
         dismiss()
     }
     

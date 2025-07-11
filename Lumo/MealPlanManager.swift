@@ -127,6 +127,11 @@ class MealPlanManager: ObservableObject {
     init() {
         loadFromUserDefaults()
         setupObservers()
+        
+        // Add sample meals if no meals exist
+        if mealPlan.isEmpty {
+            addSampleMeals()
+        }
     }
     
     // MARK: - Core Functions
@@ -206,31 +211,56 @@ class MealPlanManager: ObservableObject {
     }
     
     private func findSuitableRecipe(for mealType: MealType, preferences: AutoFillPreferences, availableRecipes: [Recipe]) -> Recipe? {
-        let filteredRecipes = availableRecipes.filter { recipe in
-            // Filter by cooking time
-            guard recipe.totalTime <= preferences.maxCookingTime else { return false }
-            
-            // Filter by budget
-            guard recipe.estimatedCost <= preferences.budgetPerMeal else { return false }
-            
-            // Filter by dietary restrictions
-            if !preferences.dietaryRestrictions.isEmpty {
+        print("Finding recipe for \(mealType.rawValue) with \(availableRecipes.count) available recipes")
+        
+        var filteredRecipes = availableRecipes
+        
+        // Filter by cooking time
+        filteredRecipes = filteredRecipes.filter { recipe in
+            let totalTime = recipe.prepTime + recipe.cookTime
+            let meetsTimeRequirement = totalTime <= preferences.maxCookingTime
+            print("Recipe \(recipe.name): total time \(totalTime) <= \(preferences.maxCookingTime) = \(meetsTimeRequirement)")
+            return meetsTimeRequirement
+        }
+        
+        // Filter by budget (if budget is reasonable)
+        if preferences.budgetPerMeal > 5 {
+            filteredRecipes = filteredRecipes.filter { recipe in
+                let meetsBudget = recipe.estimatedCost <= preferences.budgetPerMeal
+                print("Recipe \(recipe.name): cost \(recipe.estimatedCost) <= \(preferences.budgetPerMeal) = \(meetsBudget)")
+                return meetsBudget
+            }
+        }
+        
+        // Filter by dietary restrictions (only if specified)
+        if !preferences.dietaryRestrictions.isEmpty {
+            filteredRecipes = filteredRecipes.filter { recipe in
                 let recipeTags = recipe.dietaryInfo.dietaryTags
                 let hasMatchingRestriction = preferences.dietaryRestrictions.contains { restriction in
                     recipeTags.contains { $0.lowercased().contains(restriction.lowercased()) }
                 }
-                guard hasMatchingRestriction else { return false }
+                print("Recipe \(recipe.name): dietary match = \(hasMatchingRestriction)")
+                return hasMatchingRestriction
             }
-            
-            // Filter by cuisine preference
-            if !preferences.preferredCuisines.isEmpty {
+        }
+        
+        // Filter by cuisine preference (only if specified)
+        if !preferences.preferredCuisines.isEmpty {
+            filteredRecipes = filteredRecipes.filter { recipe in
                 let hasPreferredCuisine = preferences.preferredCuisines.contains { cuisine in
                     recipe.cuisine.lowercased().contains(cuisine.lowercased())
                 }
-                guard hasPreferredCuisine else { return false }
+                print("Recipe \(recipe.name): cuisine match = \(hasPreferredCuisine)")
+                return hasPreferredCuisine
             }
-            
-            return true
+        }
+        
+        print("Final filtered recipes for \(mealType.rawValue): \(filteredRecipes.count)")
+        
+        // If no recipes match strict criteria, return any recipe
+        if filteredRecipes.isEmpty {
+            print("No recipes match criteria, returning any recipe")
+            return availableRecipes.randomElement()
         }
         
         return filteredRecipes.randomElement()
@@ -343,6 +373,48 @@ class MealPlanManager: ObservableObject {
     }
     
     // MARK: - Sample Data
+    private func addSampleMeals() {
+        let today = Date()
+        let calendar = Calendar.current
+        
+        // Add sample meals for today and tomorrow
+        for dayOffset in 0..<2 {
+            guard let date = calendar.date(byAdding: .day, value: dayOffset, to: today) else { continue }
+            
+            // Breakfast
+            let breakfast = Meal(
+                date: date,
+                type: .breakfast,
+                recipeName: "Avocado Toast with Eggs",
+                ingredients: ["Bread", "Avocado", "Eggs", "Salt", "Pepper"],
+                servings: 2
+            )
+            addMeal(breakfast)
+            
+            // Lunch
+            let lunch = Meal(
+                date: date,
+                type: .lunch,
+                recipeName: "Chicken Caesar Salad",
+                ingredients: ["Chicken Breast", "Lettuce", "Parmesan", "Croutons", "Caesar Dressing"],
+                servings: 1
+            )
+            addMeal(lunch)
+            
+            // Dinner
+            let dinner = Meal(
+                date: date,
+                type: .dinner,
+                recipeName: "Grilled Salmon with Vegetables",
+                ingredients: ["Salmon", "Broccoli", "Carrots", "Olive Oil", "Lemon"],
+                servings: 2
+            )
+            addMeal(dinner)
+        }
+        
+        print("Added sample meals to meal plan")
+    }
+    
     @MainActor
     static func sampleMealPlans() -> [MealPlan] {
         let today = Date()
