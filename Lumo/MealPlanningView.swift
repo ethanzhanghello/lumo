@@ -168,7 +168,10 @@ struct MealPlanningView: View {
                             // Edit meal
                         } onDelete: {
                             print("Deleting meal: \(meal.recipeName)")
+                            let beforeCount = mealManager.meals(for: mealManager.selectedDate).count
                             mealManager.removeMeal(meal)
+                            let afterCount = mealManager.meals(for: mealManager.selectedDate).count
+                            print("Meal deletion: \(beforeCount) -> \(afterCount) meals")
                             // Force UI update
                             DispatchQueue.main.async {
                                 mealManager.objectWillChange.send()

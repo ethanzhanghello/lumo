@@ -2,7 +2,7 @@
 //  GeneratedGroceryListView.swift
 //  Lumo
 //
-//  Created by Ethan on 7/4/25.
+//  Created by Ethan on 7/11/25.
 //
 
 import SwiftUI
@@ -10,10 +10,8 @@ import SwiftUI
 struct GeneratedGroceryListView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var mealManager = MealPlanManager.shared
-    @StateObject private var groceryList = GeneratedGroceryList()
-    
     @State private var weekStartDate = Date()
-    @State private var showingAddToGroceryList = false
+    @State private var groceryListData: [String: [String]] = [:]
     
     var body: some View {
         NavigationView {
@@ -22,13 +20,14 @@ struct GeneratedGroceryListView: View {
                 
                 ScrollView {
                     VStack(spacing: 24) {
+                        // Header
                         headerSection
                         
-                        if groceryList.items.isEmpty {
-                            emptyStateView
-                        } else {
-                            groceryListSection
-                        }
+                        // Week Selector
+                        weekSelectorSection
+                        
+                        // Grocery List
+                        groceryListSection
                         
                         Spacer(minLength: 100)
                     }
@@ -61,29 +60,92 @@ struct GeneratedGroceryListView: View {
     // MARK: - Header Section
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Generated Shopping List")
+            Text("Shopping List")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
             
-            Text("Based on your meal plan for this week")
+            Text("Automatically generated from your meal plan for the week.")
                 .font(.subheadline)
                 .foregroundColor(.gray)
         }
     }
     
-    // MARK: - Empty State View
+    // MARK: - Week Selector Section
+    private var weekSelectorSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Select Week")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            HStack {
+                Button("Previous") {
+                    weekStartDate = Calendar.current.date(byAdding: .day, value: -7, to: weekStartDate) ?? weekStartDate
+                    generateGroceryList()
+                }
+                .foregroundColor(.lumoGreen)
+                .font(.caption)
+                
+                Spacer()
+                
+                Text(weekRangeText)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Button("Next") {
+                    weekStartDate = Calendar.current.date(byAdding: .day, value: 7, to: weekStartDate) ?? weekStartDate
+                    generateGroceryList()
+                }
+                .foregroundColor(.lumoGreen)
+                .font(.caption)
+            }
+        }
+    }
+    
+    private var weekRangeText: String {
+        let endDate = Calendar.current.date(byAdding: .day, value: 6, to: weekStartDate) ?? weekStartDate
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return "\(formatter.string(from: weekStartDate)) - \(formatter.string(from: endDate))"
+    }
+    
+    // MARK: - Grocery List Section
+    private var groceryListSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Shopping List")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            if groceryListData.isEmpty {
+                emptyStateView
+            } else {
+                LazyVStack(spacing: 16) {
+                    ForEach(Array(groceryListData.keys.sorted()), id: \.self) { category in
+                        if let ingredients = groceryListData[category] {
+                            CategorySection(category: category, items: ingredients)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     private var emptyStateView: some View {
         VStack(spacing: 16) {
             Image(systemName: "cart")
                 .font(.system(size: 48))
                 .foregroundColor(.gray)
             
-            Text("No items in shopping list")
+            Text("No meals planned for this week")
                 .font(.headline)
                 .foregroundColor(.white)
             
-            Text("Generate a shopping list from your meal plan")
+            Text("Add meals to your meal plan to generate a shopping list")
                 .font(.subheadline)
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
@@ -94,67 +156,27 @@ struct GeneratedGroceryListView: View {
         .cornerRadius(16)
     }
     
-    // MARK: - Grocery List Section
-    private var groceryListSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("Shopping List")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                
-                Spacer()
-                
-                Button("Add to Grocery List") {
-                    showingAddToGroceryList = true
-                }
-                .font(.caption)
-                .foregroundColor(.lumoGreen)
-            }
-            
-            LazyVStack(spacing: 12) {
-                ForEach(groupedItems.keys.sorted(), id: \.self) { category in
-                    if let items = groupedItems[category] {
-                        CategorySection(category: category, items: items)
-                    }
-                }
-            }
-        }
-    }
-    
-    private var groupedItems: [String: [GeneratedGroceryItem]] {
-        Dictionary(grouping: groceryList.items) { $0.category }
-    }
-    
+    // MARK: - Helper Functions
     private func generateGroceryList() {
-        groceryList.items.removeAll()
-        
-        let weekStart = Calendar.current.dateInterval(of: .weekOfYear, for: weekStartDate)?.start ?? weekStartDate
-        let groceryListData = mealManager.generateGroceryList(for: weekStart)
-        
-        for (category, ingredients) in groceryListData {
-            for ingredient in ingredients {
-                let item = GeneratedGroceryItem(name: ingredient, quantity: 1, category: category)
-                groceryList.addItem(item)
-            }
-        }
+        groceryListData = mealManager.generateGroceryList(for: weekStartDate)
+        print("Generated grocery list with \(groceryListData.values.flatMap { $0 }.count) items")
     }
 }
 
 // MARK: - Category Section
 struct CategorySection: View {
     let category: String
-    let items: [GeneratedGroceryItem]
+    let items: [String]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(category)
                 .font(.headline)
-                .fontWeight(.semibold)
-                .foregroundColor(.white)
+                .fontWeight(.bold)
+                .foregroundColor(.lumoGreen)
             
             LazyVStack(spacing: 8) {
-                ForEach(items, id: \.id) { item in
+                ForEach(items, id: \.self) { item in
                     GroceryItemRow(item: item)
                 }
             }
@@ -167,66 +189,30 @@ struct CategorySection: View {
 
 // MARK: - Grocery Item Row
 struct GroceryItemRow: View {
-    let item: GeneratedGroceryItem
-    @State private var isCompleted = false
+    let item: String
+    @State private var isChecked = false
     
     var body: some View {
         HStack {
             Button(action: {
-                isCompleted.toggle()
+                isChecked.toggle()
             }) {
-                Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(isCompleted ? .lumoGreen : .gray)
+                Image(systemName: isChecked ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(isChecked ? .lumoGreen : .gray)
                     .font(.title3)
             }
             
-            VStack(alignment: .leading, spacing: 2) {
-                Text(item.name)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.white)
-                    .strikethrough(isCompleted)
-                
-                Text("\(item.quantity) item\(item.quantity == 1 ? "" : "s")")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
+            Text(item)
+                .font(.subheadline)
+                .foregroundColor(.white)
+                .strikethrough(isChecked)
+                .opacity(isChecked ? 0.6 : 1.0)
             
             Spacer()
-            
-            Text(item.category)
-                .font(.caption)
-                .foregroundColor(.gray)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(8)
         }
+        .padding(.horizontal, 8)
         .padding(.vertical, 4)
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(8)
     }
-}
-
-// MARK: - Grocery Item Model
-struct GeneratedGroceryItem: Identifiable {
-    let id = UUID()
-    let name: String
-    let quantity: Int
-    let category: String
-}
-
-// MARK: - Grocery List Model
-class GeneratedGroceryList: ObservableObject {
-    @Published var items: [GeneratedGroceryItem] = []
-    
-    func addItem(_ item: GeneratedGroceryItem) {
-        items.append(item)
-    }
-    
-    func removeItem(_ item: GeneratedGroceryItem) {
-        items.removeAll { $0.id == item.id }
-    }
-}
-
-#Preview {
-    GeneratedGroceryListView()
 } 

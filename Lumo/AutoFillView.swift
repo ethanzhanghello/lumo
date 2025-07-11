@@ -287,6 +287,7 @@ struct AutoFillView: View {
             mealManager.objectWillChange.send()
         }
         
+        print("Auto-fill applied successfully. Total meals in plan: \(mealManager.mealPlan.values.flatMap { $0 }.count)")
         dismiss()
     }
     
