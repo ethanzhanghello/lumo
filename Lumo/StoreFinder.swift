@@ -51,8 +51,8 @@ struct StoreFinderView: View {
                 // Buttons
                 VStack(spacing: 16) {
                     Button(action: {
-                        // Use location action
-                        print("Use My Location tapped")
+                        // Navigate to StoreLocationView
+                        navigationPath.append("StoreLocationView")
                     }) {
                         Text("Use My Location")
                             .font(.headline)

@@ -15,18 +15,31 @@ import Foundation
 
 import SwiftUI
 import MapKit // Required for CLLocationCoordinate2D for sample data if not globally available
+
 struct RootView: View {
     @EnvironmentObject var appState: AppState
     @State private var navigationPath = NavigationPath() // Controls the NavigationStack
-
+    
     var body: some View {
         NavigationStack(path: $navigationPath) {
             // The very first view in our navigation flow
             LumoWelcomeView(navigationPath: $navigationPath) // Pass NavigationPath down
                 .navigationDestination(for: String.self) { destination in
                     // Define how to present different views based on String identifiers
-                    if destination == "StoreFinder" {
+                    if destination == "Login" {
+                        LoginView(navigationPath: $navigationPath)
+                            .navigationTitle("")
+                            .toolbar(.hidden, for: .navigationBar)
+                    } else if destination == "CreateAccount" {
+                        CreateAccountView(navigationPath: $navigationPath)
+                            .navigationTitle("")
+                            .toolbar(.hidden, for: .navigationBar)
+                    } else if destination == "StoreFinder" {
                         StoreFinderView(navigationPath: $navigationPath) // Pass NavigationPath down
+                            .navigationTitle("")
+                            .toolbar(.hidden, for: .navigationBar)
+                    } else if destination == "StoreLocationView" {
+                        StoreLocationView(allStores: sampleLAStores)
                             .navigationTitle("")
                             .toolbar(.hidden, for: .navigationBar)
                     } else if destination == "StoreSelection" {

@@ -33,6 +33,13 @@ struct MainTabView: View {
                     Text("Deals")
                 }
             
+            // MEAL PLANNING TAB
+            MealPlanningView()
+                .tabItem {
+                    Image(systemName: "calendar")
+                    Text("Meal Plan")
+                }
+            
             // GROCERY LIST TAB: GroceryListView
             if appState.groceryList.totalItems > 0 {
                 GroceryListView()
@@ -54,6 +61,13 @@ struct MainTabView: View {
                 .tabItem {
                     Image(systemName: "map")
                     Text("Map")
+                }
+            
+            // AI ASSISTANT TAB
+            ChatbotView()
+                .tabItem {
+                    Image(systemName: "brain.head.profile")
+                    Text("AI Assistant")
                 }
             
             // PROFILE TAB
