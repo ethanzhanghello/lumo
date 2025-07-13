@@ -6,13 +6,7 @@
 
 import SwiftUI
 
-// MARK: - SmartSuggestion Model (Existing)
-struct SmartSuggestion: Identifiable, Codable, Hashable {
-    var id: String { title } // Use title as stable identifier
-    let title: String
-    let description: String
-    // No explicit icon property for now, assuming emoji or system icons if needed
-}
+// Remove the duplicate SmartSuggestion struct - it's already defined in GroceryItems.swift
 
 // Remove the GroceryItemCard struct definition from this file entirely.
 // Replace usages of GroceryItemCard(item: item, customOutlineColor: ...) with BrowseItemCard(item: item)
@@ -281,88 +275,12 @@ struct BrowseView: View {
         isLoadingSuggestions = true
         suggestionError = nil
 
-        let prompt: String
-        if isRefresh && !chatHistory.isEmpty {
-            // Modified prompt for refresh to ask for a list of ingredients
-            prompt = "Give me 3 *different and new* smart suggestions for grocery items or meal ideas, distinct from what you've suggested before. For each suggestion, provide the 'description' as a **bulleted list of the minimum necessary key ingredients or components needed**, without any introductory or concluding sentences. Focus on practical, common grocery needs. Ensure the response is in JSON format matching the provided schema, with 'title' and 'description' for each suggestion."
-        } else {
-            // Modified prompt for initial fetch to ask for a list of ingredients
-            prompt = "Generate 3 smart, creative, and practical suggestions for grocery items or meal ideas. For each suggestion, provide the 'description' as a **bulleted list of the necessary key ingredients or components needed**, without any introductory or concluding sentences. Provide the response as a JSON array of objects, where each object has 'title' (String) and 'description' (String) properties. For example: [{\"title\": \"Taco Night\", \"description\": \"- Tortillas\\n- Ground beef\\n- Salsa\\n- Shredded cheese\\n- Lettuce\\n- Jalapeños\"}]"
-        }
-
-        // Add the new user prompt to chat history
-        chatHistory.append(["role": "user", "parts": [["text": prompt]]])
-
-        do {
-            let payload: [String: Any] = [
-                "contents": chatHistory,
-                "generationConfig": [
-                    "responseMimeType": "application/json",
-                    "responseSchema": [
-                        "type": "ARRAY",
-                        "items": [
-                            "type": "OBJECT",
-                            "properties": [
-                                "title": ["type": "STRING"],
-                                "description": ["type": "STRING"] // Description is still a String
-                            ],
-                            "required": ["title", "description"]
-                        ]
-                    ]
-                ]
-            ]
-
-            guard let apiKey = APIKeyManager.shared.geminiAPIKey else {
-                throw NSError(domain: "BrowseView", code: 3, userInfo: [NSLocalizedDescriptionKey: "Gemini API Key is not configured."])
-            }
-
-            guard let url = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)") else {
-                throw URLError(.badURL)
-            }
-
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
-
-            let (data, response) = try await URLSession.shared.data(for: request)
-
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                let responseString = String(data: data, encoding: .utf8) ?? "Unknown response"
-                throw URLError(.badServerResponse, userInfo: ["response": responseString])
-            }
-
-            let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-
-            if let candidates = jsonResponse?["candidates"] as? [[String: Any]],
-               let firstCandidate = candidates.first,
-               let content = firstCandidate["content"] as? [String: Any],
-               let parts = content["parts"] as? [[String: Any]],
-               let firstPart = parts.first,
-               let text = firstPart["text"] as? String {
-
-                guard let jsonData = text.data(using: .utf8) else {
-                    throw NSError(domain: "BrowseView", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to convert string to data."])
-                }
-                let newSuggestions = try JSONDecoder().decode([SmartSuggestion].self, from: jsonData)
-
-                // Update chat history with the model's response for future context
-                chatHistory.append(["role": "model", "parts": [["text": text]]])
-
-                DispatchQueue.main.async {
-                    self.smartSuggestions = newSuggestions
-                }
-            } else {
-                throw NSError(domain: "BrowseView", code: 2, userInfo: [NSLocalizedDescriptionKey: "Unexpected API response structure."])
-            }
-
-        } catch {
-            print("Failed to fetch smart suggestions: \(error)")
-            DispatchQueue.main.async {
-                self.suggestionError = error.localizedDescription
-            }
-        }
+        // For now, let's use the suggestion engine from AppState instead of the API
+        // This will be more reliable and consistent with the rest of the app
+        let suggestions = appState.getSmartSuggestions()
+        
         DispatchQueue.main.async {
+            self.smartSuggestions = suggestions
             self.isLoadingSuggestions = false
         }
     }
@@ -403,7 +321,7 @@ struct QuickButton: View {
     }
 }
 
-// MARK: - SmartSuggestionCard Helper View (Existing - no changes needed)
+// MARK: - SmartSuggestionCard Helper View (Updated to work with GroceryItems.swift SmartSuggestion)
 struct SmartSuggestionCard: View {
     let suggestion: SmartSuggestion
     let customOutlineColor: Color
@@ -411,10 +329,10 @@ struct SmartSuggestionCard: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text(suggestion.title)
+                Text(suggestion.item.name)
                     .font(.headline)
                     .foregroundColor(.white)
-                Text(suggestion.description)
+                Text(suggestion.reason)
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.7))
             }

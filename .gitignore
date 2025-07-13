@@ -1,2 +1,5 @@
 # OpenAI API key (local only)
-openai.key 
+openai.key
+
+# Spoonacular API key (local only)
+spoonacular.key 

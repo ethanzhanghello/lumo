@@ -179,6 +179,155 @@ struct ModernRecipeCard: View {
     }
 }
 
+// MARK: - Modern Meal Suggestion Card
+struct ModernMealSuggestionCard: View {
+    let recipe: Recipe
+    let suggestedDate: Date
+    let suggestedMealType: MealType
+    let onAddToMealPlan: () -> Void
+    let onAddToGroceryList: () -> Void
+    let onViewRecipe: () -> Void
+    @State private var showContent = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Recipe Header
+            HStack(spacing: 12) {
+                // Recipe Image Placeholder
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(
+                        LinearGradient(
+                            colors: [.orange.opacity(0.3), .red.opacity(0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 60, height: 60)
+                    .overlay(
+                        Image(systemName: "fork.knife")
+                            .foregroundColor(.white.opacity(0.6))
+                    )
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(recipe.name)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                    
+                    Text(recipe.description)
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                        .lineLimit(2)
+                    
+                    HStack(spacing: 8) {
+                        Label("\(recipe.servings) servings", systemImage: "person.2")
+                        Label("\(recipe.totalTime) min", systemImage: "clock")
+                    }
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+                }
+                
+                Spacer()
+            }
+            
+            // Meal Plan Suggestion
+            HStack {
+                Image(systemName: "calendar.badge.plus")
+                    .foregroundColor(.lumoGreen)
+                    .font(.caption)
+                
+                Text("Suggested for \(suggestedMealType.rawValue) on \(suggestedDate.formatted(date: .abbreviated, time: .omitted))")
+                    .font(.caption)
+                    .foregroundColor(.lumoGreen)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.lumoGreen.opacity(0.1))
+            .cornerRadius(8)
+            
+            // Action Buttons
+            VStack(spacing: 8) {
+                Button(action: onAddToMealPlan) {
+                    HStack {
+                        Image(systemName: "calendar.badge.plus")
+                            .font(.caption)
+                        
+                        Text("Add to Meal Plan")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(Color.lumoGreen)
+                    .cornerRadius(8)
+                }
+                
+                HStack(spacing: 8) {
+                    Button(action: onAddToGroceryList) {
+                        HStack {
+                            Image(systemName: "cart.badge.plus")
+                                .font(.caption)
+                            
+                            Text("Add Ingredients")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.blue)
+                        .cornerRadius(8)
+                    }
+                    
+                    Button(action: onViewRecipe) {
+                        HStack {
+                            Image(systemName: "doc.text")
+                                .font(.caption)
+                            
+                            Text("View Recipe")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(8)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(0.08),
+                            Color.white.opacity(0.03)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                )
+        )
+        .opacity(showContent ? 1 : 0)
+        .offset(y: showContent ? 0 : 20)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.5).delay(0.2)) {
+                showContent = true
+            }
+        }
+    }
+}
+
 // MARK: - Modern Product Card
 struct ModernProductCard: View {
     let product: Product
@@ -456,6 +605,7 @@ struct ModernActionButtonsView: View {
             }
         }
         .onAppear {
+            print("ModernActionButtonsView buttons: \(buttons.map { $0.title })")
             withAnimation(.easeOut(duration: 0.5).delay(0.3)) {
                 showButtons = true
             }
@@ -471,16 +621,12 @@ struct ModernActionButton: View {
     
     var body: some View {
         Button(action: {
-            // Haptic feedback
-            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-            impactFeedback.impactOccurred()
-            
+            print("Button tapped: \(button.title) with action: \(button.action)")
             action()
         }) {
             HStack(spacing: 8) {
                 Image(systemName: button.icon)
                     .font(.system(size: 14, weight: .semibold))
-                
                 Text(button.title)
                     .font(.system(size: 13, weight: .semibold))
                     .lineLimit(1)
@@ -508,6 +654,7 @@ struct ModernActionButton: View {
             .scaleEffect(isPressed ? 0.95 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: isPressed)
         }
+        .disabled(false) // Force enabled
         .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
             isPressed = pressing
         }, perform: {})
