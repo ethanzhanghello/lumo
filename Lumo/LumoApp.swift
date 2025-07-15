@@ -46,9 +46,12 @@ struct LumoApp: App {
                 Group {
                     if showOnboarding {
                         OnboardingView(showOnboarding: $showOnboarding)
-                    } else {
-                        // Skip authentication and go directly to MainTabView
+                    } else if isLoggedIn {
                         MainTabView()
+                            .environmentObject(appState)
+                            .environmentObject(authViewModel)
+                    } else {
+                        RootView()
                             .environmentObject(appState)
                             .environmentObject(authViewModel)
                     }
@@ -76,8 +79,10 @@ struct LumoApp: App {
                 }
             }
             .task {
-                // Skip authentication check and set as logged in for development
-                isLoggedIn = true
+                // Async session check
+                if let session = try? await SupabaseManager.shared.client.auth.session, session != nil {
+                    isLoggedIn = true
+                }
                 
                 // Splash animation: Glow increases, then fades out, logo always visible
                 withAnimation(.easeInOut(duration: 1.1)) {
