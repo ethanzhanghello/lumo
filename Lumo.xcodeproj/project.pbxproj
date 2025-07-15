@@ -10,27 +10,12 @@
 		940BE0B92E1494F600DC7316 /* GroceryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D62E0372460036C7A9 /* GroceryListView.swift */; };
 		940BE0BA2E1494F900DC7316 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D42E0372460036C7A9 /* ExploreView.swift */; };
 		940BE0BB2E1494FD00DC7316 /* ExploreSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D82E0372460036C7A9 /* ExploreSections.swift */; };
-		9413B35F2E25B26C00403EE3 /* GeneratedGroceryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B35C2E25B26C00403EE3 /* GeneratedGroceryListView.swift */; };
-		9413B3602E25B26C00403EE3 /* NutritionAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B35E2E25B26C00403EE3 /* NutritionAnalysisView.swift */; };
-		9413B3612E25B26C00403EE3 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B3592E25B26C00403EE3 /* AuthViewModel.swift */; };
-		9413B3622E25B26C00403EE3 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B35D2E25B26C00403EE3 /* LoginView.swift */; };
-		9413B3632E25B26C00403EE3 /* AddMealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B3582E25B26C00403EE3 /* AddMealView.swift */; };
-		9413B3642E25B26C00403EE3 /* ChatbotMealSuggestionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B35A2E25B26C00403EE3 /* ChatbotMealSuggestionCard.swift */; };
-		9413B3652E25B26C00403EE3 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B35B2E25B26C00403EE3 /* CreateAccountView.swift */; };
 		944E8F092E1DB40C00BB97F5 /* InventoryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F032E1DB40C00BB97F5 /* InventoryData.swift */; };
 		944E8F0A2E1DB40C00BB97F5 /* SuggestionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F082E1DB40C00BB97F5 /* SuggestionEngine.swift */; };
 		944E8F0B2E1DB40C00BB97F5 /* SharedListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F072E1DB40C00BB97F5 /* SharedListManager.swift */; };
 		944E8F0C2E1DB40C00BB97F5 /* PantryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F042E1DB40C00BB97F5 /* PantryManager.swift */; };
 		944E8F0D2E1DB40C00BB97F5 /* BudgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F022E1DB40C00BB97F5 /* BudgetManager.swift */; };
 		944E8F0E2E1DB40C00BB97F5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 944E8F052E1DB40C00BB97F5 /* Preview Assets.xcassets */; };
-		94AC026A2E25B48C0067649A /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC02692E25B48C0067649A /* Auth */; };
-		94AC026C2E25B48C0067649A /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC026B2E25B48C0067649A /* Functions */; };
-		94AC026E2E25B48C0067649A /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC026D2E25B48C0067649A /* PostgREST */; };
-		94AC02702E25B48C0067649A /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC026F2E25B48C0067649A /* Realtime */; };
-		94AC02722E25B48C0067649A /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC02712E25B48C0067649A /* Storage */; };
-		94AC02752E25B5B60067649A /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC02742E25B5B60067649A /* Supabase */; };
-		94AC02782E25B6200067649A /* StoreLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94AC02762E25B6200067649A /* StoreLocationView.swift */; };
-		94AC02792E25B6200067649A /* SupbaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94AC02772E25B6200067649A /* SupbaseManager.swift */; };
 		94D66E372E1DF1A1004F3DDB /* ApiKeyManager.md in Resources */ = {isa = PBXBuildFile; fileRef = 94D66E302E1DF1A1004F3DDB /* ApiKeyManager.md */; };
 		94D66E382E1DF1A1004F3DDB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 94D66E312E1DF1A1004F3DDB /* Preview Assets.xcassets */; };
 		94D66E3B2E1DF1A1004F3DDB /* SpoonacularService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D66E362E1DF1A1004F3DDB /* SpoonacularService.swift */; };
@@ -43,6 +28,18 @@
 		94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */; };
 		94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */; };
 		94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916042E0372460036C7AA /* DietaryGoalsView.swift */; };
+		B041F25B2E262A810075EEE0 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = B041F25A2E262A810075EEE0 /* Auth */; };
+		B041F25D2E262A810075EEE0 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = B041F25C2E262A810075EEE0 /* Functions */; };
+		B041F25F2E262A810075EEE0 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = B041F25E2E262A810075EEE0 /* PostgREST */; };
+		B041F2612E262A810075EEE0 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = B041F2602E262A810075EEE0 /* Realtime */; };
+		B041F2632E262A810075EEE0 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = B041F2622E262A810075EEE0 /* Storage */; };
+		B041F2652E262A810075EEE0 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = B041F2642E262A810075EEE0 /* Supabase */; };
+		B041F2692E262BED0075EEE0 /* SupbaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F2682E262BED0075EEE0 /* SupbaseManager.swift */; };
+		B041F26B2E262C020075EEE0 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F26A2E262C020075EEE0 /* AuthViewModel.swift */; };
+		B041F26D2E262CE50075EEE0 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */; };
+		B041F26F2E262CF80075EEE0 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F26E2E262CF80075EEE0 /* LoginView.swift */; };
+		B041F2712E262D270075EEE0 /* StoreLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F2702E262D270075EEE0 /* StoreLocationView.swift */; };
+		B041F2732E263C890075EEE0 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F2722E263C890075EEE0 /* OnboardingView.swift */; };
 		B0D283712E03D7F200C28B2C /* GroceryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283702E03D7F200C28B2C /* GroceryList.swift */; };
 		B0D283752E03DAD100C28B2C /* ApiKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */; };
 		B0E915962E00AC7C0036C7A9 /* LumoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915952E00AC7C0036C7A9 /* LumoApp.swift */; };
@@ -100,27 +97,24 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		9413B3582E25B26C00403EE3 /* AddMealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMealView.swift; sourceTree = "<group>"; };
-		9413B3592E25B26C00403EE3 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
-		9413B35A2E25B26C00403EE3 /* ChatbotMealSuggestionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatbotMealSuggestionCard.swift; sourceTree = "<group>"; };
-		9413B35B2E25B26C00403EE3 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
-		9413B35C2E25B26C00403EE3 /* GeneratedGroceryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedGroceryListView.swift; sourceTree = "<group>"; };
-		9413B35D2E25B26C00403EE3 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
-		9413B35E2E25B26C00403EE3 /* NutritionAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionAnalysisView.swift; sourceTree = "<group>"; };
 		944E8F022E1DB40C00BB97F5 /* BudgetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetManager.swift; sourceTree = "<group>"; };
 		944E8F032E1DB40C00BB97F5 /* InventoryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryData.swift; sourceTree = "<group>"; };
 		944E8F042E1DB40C00BB97F5 /* PantryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PantryManager.swift; sourceTree = "<group>"; };
 		944E8F052E1DB40C00BB97F5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		944E8F072E1DB40C00BB97F5 /* SharedListManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedListManager.swift; sourceTree = "<group>"; };
 		944E8F082E1DB40C00BB97F5 /* SuggestionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionEngine.swift; sourceTree = "<group>"; };
-		94AC02762E25B6200067649A /* StoreLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreLocationView.swift; sourceTree = "<group>"; };
-		94AC02772E25B6200067649A /* SupbaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupbaseManager.swift; sourceTree = "<group>"; };
 		94D66E302E1DF1A1004F3DDB /* ApiKeyManager.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ApiKeyManager.md; sourceTree = "<group>"; };
 		94D66E312E1DF1A1004F3DDB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		94D66E352E1DF1A1004F3DDB /* SpoonacularRecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpoonacularRecipeView.swift; sourceTree = "<group>"; };
 		94D66E362E1DF1A1004F3DDB /* SpoonacularService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpoonacularService.swift; sourceTree = "<group>"; };
 		94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartAnimationManager.swift; sourceTree = "<group>"; };
 		94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartOverlay.swift; sourceTree = "<group>"; };
+		B041F2682E262BED0075EEE0 /* SupbaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupbaseManager.swift; sourceTree = "<group>"; };
+		B041F26A2E262C020075EEE0 /* AuthViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
+		B041F26E2E262CF80075EEE0 /* LoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		B041F2702E262D270075EEE0 /* StoreLocationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoreLocationView.swift; sourceTree = "<group>"; };
+		B041F2722E263C890075EEE0 /* OnboardingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		B0D283702E03D7F200C28B2C /* GroceryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryList.swift; sourceTree = "<group>"; };
 		B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeyManager.swift; sourceTree = "<group>"; };
 		B0E915922E00AC7C0036C7A9 /* Lumo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lumo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -178,12 +172,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				94AC026E2E25B48C0067649A /* PostgREST in Frameworks */,
-				94AC026C2E25B48C0067649A /* Functions in Frameworks */,
-				94AC02752E25B5B60067649A /* Supabase in Frameworks */,
-				94AC026A2E25B48C0067649A /* Auth in Frameworks */,
-				94AC02722E25B48C0067649A /* Storage in Frameworks */,
-				94AC02702E25B48C0067649A /* Realtime in Frameworks */,
+				B041F25F2E262A810075EEE0 /* PostgREST in Frameworks */,
+				B041F25D2E262A810075EEE0 /* Functions in Frameworks */,
+				B041F2652E262A810075EEE0 /* Supabase in Frameworks */,
+				B041F25B2E262A810075EEE0 /* Auth in Frameworks */,
+				B041F2632E262A810075EEE0 /* Storage in Frameworks */,
+				B041F2612E262A810075EEE0 /* Realtime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,13 +206,6 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		94AC02732E25B5B60067649A /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		94D66E322E1DF1A1004F3DDB /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
@@ -233,7 +220,6 @@
 				B0E915942E00AC7C0036C7A9 /* Lumo */,
 				B0E915A62E00AC7D0036C7A9 /* LumoTests */,
 				B0E915B02E00AC7D0036C7A9 /* LumoUITests */,
-				94AC02732E25B5B60067649A /* Frameworks */,
 				B0E915932E00AC7C0036C7A9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -251,15 +237,6 @@
 		B0E915942E00AC7C0036C7A9 /* Lumo */ = {
 			isa = PBXGroup;
 			children = (
-				94AC02762E25B6200067649A /* StoreLocationView.swift */,
-				94AC02772E25B6200067649A /* SupbaseManager.swift */,
-				9413B3582E25B26C00403EE3 /* AddMealView.swift */,
-				9413B3592E25B26C00403EE3 /* AuthViewModel.swift */,
-				9413B35A2E25B26C00403EE3 /* ChatbotMealSuggestionCard.swift */,
-				9413B35B2E25B26C00403EE3 /* CreateAccountView.swift */,
-				9413B35C2E25B26C00403EE3 /* GeneratedGroceryListView.swift */,
-				9413B35D2E25B26C00403EE3 /* LoginView.swift */,
-				9413B35E2E25B26C00403EE3 /* NutritionAnalysisView.swift */,
 				94D66E302E1DF1A1004F3DDB /* ApiKeyManager.md */,
 				94D66E322E1DF1A1004F3DDB /* Preview Content */,
 				94D66E352E1DF1A1004F3DDB /* SpoonacularRecipeView.swift */,
@@ -273,11 +250,17 @@
 				94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */,
 				94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */,
 				B0E915952E00AC7C0036C7A9 /* LumoApp.swift */,
+				B041F2682E262BED0075EEE0 /* SupbaseManager.swift */,
+				B041F26A2E262C020075EEE0 /* AuthViewModel.swift */,
 				B0E915972E00AC7C0036C7A9 /* ContentView.swift */,
 				B0E915C62E00C0440036C7A9 /* StoreData.swift */,
+				B041F2722E263C890075EEE0 /* OnboardingView.swift */,
 				B0E915CC2E0349A30036C7A9 /* AppState.swift */,
 				B0E915CE2E035F770036C7A9 /* Root.swift */,
 				B0E915C22E00B7F80036C7A9 /* StoreFinder.swift */,
+				B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */,
+				B041F26E2E262CF80075EEE0 /* LoginView.swift */,
+				B041F2702E262D270075EEE0 /* StoreLocationView.swift */,
 				B0E915D02E0369E50036C7A9 /* Browse.swift */,
 				B0D283702E03D7F200C28B2C /* GroceryList.swift */,
 				B0E915D62E0372460036C7A9 /* GroceryListView.swift */,
@@ -361,6 +344,14 @@
 			dependencies = (
 			);
 			name = Lumo;
+			packageProductDependencies = (
+				B041F25A2E262A810075EEE0 /* Auth */,
+				B041F25C2E262A810075EEE0 /* Functions */,
+				B041F25E2E262A810075EEE0 /* PostgREST */,
+				B041F2602E262A810075EEE0 /* Realtime */,
+				B041F2622E262A810075EEE0 /* Storage */,
+				B041F2642E262A810075EEE0 /* Supabase */,
+			);
 			productName = Lumo;
 			productReference = B0E915922E00AC7C0036C7A9 /* Lumo.app */;
 			productType = "com.apple.product-type.application";
@@ -434,7 +425,7 @@
 			);
 			mainGroup = B0E915892E00AC7C0036C7A9;
 			packageReferences = (
-				94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			productRefGroup = B0E915932E00AC7C0036C7A9 /* Products */;
 			projectDirPath = "";
@@ -491,6 +482,7 @@
 				B0E915CD2E0349A30036C7A9 /* AppState.swift in Sources */,
 				94F8C4492E18C9E3005A09D9 /* MealPlanningView.swift in Sources */,
 				B0E915962E00AC7C0036C7A9 /* LumoApp.swift in Sources */,
+				B041F26F2E262CF80075EEE0 /* LoginView.swift in Sources */,
 				B0E915CF2E035F770036C7A9 /* Root.swift in Sources */,
 				94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */,
 				B0D283712E03D7F200C28B2C /* GroceryList.swift in Sources */,
@@ -501,34 +493,30 @@
 				B0E915C92E00C0D60036C7A9 /* StoreSelection.swift in Sources */,
 				94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */,
 				94F8C4482E18C9AE005A09D9 /* MealPlanManager.swift in Sources */,
+				B041F26B2E262C020075EEE0 /* AuthViewModel.swift in Sources */,
+				B041F2692E262BED0075EEE0 /* SupbaseManager.swift in Sources */,
 				B0E915C32E00B7F80036C7A9 /* StoreFinder.swift in Sources */,
 				B0E915DA2E0372460036C7A9 /* ItemDetailView.swift in Sources */,
+				B041F2712E262D270075EEE0 /* StoreLocationView.swift in Sources */,
 				94F8C44A2E18C9E6005A09D9 /* SmartSubstitutionManager.swift in Sources */,
 				B0E915DB2E0372460036C7A9 /* ProfileView.swift in Sources */,
 				B0E915DD2E0372460036C7A9 /* DealsView.swift in Sources */,
 				B0E915DF2E0372460036C7A9 /* DealFiltersView.swift in Sources */,
 				B0E915E12E0372460036C7A9 /* DealDetailView.swift in Sources */,
 				B0E915E32E0372460036C7A9 /* CouponDetailView.swift in Sources */,
+				B041F26D2E262CE50075EEE0 /* CreateAccountView.swift in Sources */,
 				B0E915E52E0372460036C7A9 /* DealsData.swift in Sources */,
 				94F8C4452E18C8E2005A09D9 /* FlyToCartAnimationManager.swift in Sources */,
 				944E8F092E1DB40C00BB97F5 /* InventoryData.swift in Sources */,
 				944E8F0A2E1DB40C00BB97F5 /* SuggestionEngine.swift in Sources */,
 				944E8F0B2E1DB40C00BB97F5 /* SharedListManager.swift in Sources */,
 				94D66E3B2E1DF1A1004F3DDB /* SpoonacularService.swift in Sources */,
+				B041F2732E263C890075EEE0 /* OnboardingView.swift in Sources */,
 				94D66E3C2E1DF1A1004F3DDB /* SpoonacularRecipeView.swift in Sources */,
 				944E8F0C2E1DB40C00BB97F5 /* PantryManager.swift in Sources */,
 				944E8F0D2E1DB40C00BB97F5 /* BudgetManager.swift in Sources */,
 				B0E915E82E0372460036C7AA /* CategoryFilterButton.swift in Sources */,
 				94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */,
-				9413B35F2E25B26C00403EE3 /* GeneratedGroceryListView.swift in Sources */,
-				94AC02782E25B6200067649A /* StoreLocationView.swift in Sources */,
-				94AC02792E25B6200067649A /* SupbaseManager.swift in Sources */,
-				9413B3602E25B26C00403EE3 /* NutritionAnalysisView.swift in Sources */,
-				9413B3612E25B26C00403EE3 /* AuthViewModel.swift in Sources */,
-				9413B3622E25B26C00403EE3 /* LoginView.swift in Sources */,
-				9413B3632E25B26C00403EE3 /* AddMealView.swift in Sources */,
-				9413B3642E25B26C00403EE3 /* ChatbotMealSuggestionCard.swift in Sources */,
-				9413B3652E25B26C00403EE3 /* CreateAccountView.swift in Sources */,
 				B0E915E92E0372460036C7AA /* ChatbotView.swift in Sources */,
 				B0E915EB2E0372460036C7AA /* ChatMessage.swift in Sources */,
 				B0E915ED2E0372460036C7AA /* ChatbotEngine.swift in Sources */,
@@ -898,7 +886,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+		B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase/supabase-swift";
 			requirement = {
@@ -909,34 +897,34 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		94AC02692E25B48C0067649A /* Auth */ = {
+		B041F25A2E262A810075EEE0 /* Auth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Auth;
 		};
-		94AC026B2E25B48C0067649A /* Functions */ = {
+		B041F25C2E262A810075EEE0 /* Functions */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Functions;
 		};
-		94AC026D2E25B48C0067649A /* PostgREST */ = {
+		B041F25E2E262A810075EEE0 /* PostgREST */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = PostgREST;
 		};
-		94AC026F2E25B48C0067649A /* Realtime */ = {
+		B041F2602E262A810075EEE0 /* Realtime */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Realtime;
 		};
-		94AC02712E25B48C0067649A /* Storage */ = {
+		B041F2622E262A810075EEE0 /* Storage */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Storage;
 		};
-		94AC02742E25B5B60067649A /* Supabase */ = {
+		B041F2642E262A810075EEE0 /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
