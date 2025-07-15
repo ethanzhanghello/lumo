@@ -26,79 +26,78 @@ struct LumoApp: App {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor.black
-        // Set selected and unselected item color
-        let selectedColor = UIColor(red: 0/255, green: 240/255, blue: 192/255, alpha: 1)
-        let unselectedColor = UIColor(red: 0/255, green: 240/255, blue: 192/255, alpha: 0.4) // Lower opacity
-        appearance.stackedLayoutAppearance.selected.iconColor = selectedColor
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: selectedColor]
-        appearance.stackedLayoutAppearance.normal.iconColor = unselectedColor
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: unselectedColor]
+        appearance.stackedLayoutAppearance.normal.iconColor = UIColor.gray
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.gray]
+        appearance.stackedLayoutAppearance.selected.iconColor = UIColor.white
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+        
         UITabBar.appearance().standardAppearance = appearance
-        if #available(iOS 15.0, *) {
-            UITabBar.appearance().scrollEdgeAppearance = appearance
-        }
+        UITabBar.appearance().scrollEdgeAppearance = appearance
         #endif
     }
 
     var body: some Scene {
         WindowGroup {
             ZStack {
-                Group {
-                    if showOnboarding {
-                        OnboardingView(showOnboarding: $showOnboarding)
-                    } else if isLoggedIn {
-                        MainTabView()
-                            .environmentObject(appState)
-                            .environmentObject(authViewModel)
-                    } else {
-                        RootView()
-                            .environmentObject(appState)
-                            .environmentObject(authViewModel)
-                    }
-                }
-                // Splash overlay
-                if showSplash {
-                    ZStack {
-                        Color.black.ignoresSafeArea()
-                        // Animated Glow
-                        Circle()
-                            .fill(Color(red: 0/255, green: 240/255, blue: 192/255))
-                            .frame(width: 340, height: 340)
-                            .blur(radius: glowRadius)
-                            .opacity(glowOpacity)
-                            .animation(.easeInOut(duration: 1.1), value: glowOpacity)
-                            .animation(.easeInOut(duration: 1.1), value: glowRadius)
-                        Image("LumoLogo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 260, height: 260)
-                            // No opacity animation, always fully visible
-                    }
-                    .transition(.opacity)
-                    .zIndex(2)
-                }
-            }
-            .task {
-                // Async session check
-                if let session = try? await SupabaseManager.shared.client.auth.session, session != nil {
-                    isLoggedIn = true
-                }
+                Color.black.ignoresSafeArea()
                 
-                // Splash animation: Glow increases, then fades out, logo always visible
-                withAnimation(.easeInOut(duration: 1.1)) {
-                    glowOpacity = 0.8
-                    glowRadius = 90
+                // TEMPORARILY SKIP AUTHENTICATION - GO DIRECTLY TO MAIN APP
+                MainTabView()
+                    .environmentObject(appState)
+                    .environmentObject(authViewModel)
+                    .opacity(showSplash ? 0 : 1)
+                
+                // Splash screen
+                if showSplash {
+                    SplashScreenView(opacity: $splashOpacity, glowOpacity: $glowOpacity, glowRadius: $glowRadius)
+                        .onAppear {
+                            // Animate splash screen
+                            withAnimation(.easeInOut(duration: 1.5)) {
+                                glowOpacity = 0.3
+                                glowRadius = 40
+                            }
+                            
+                            // Hide splash screen after 2 seconds
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                withAnimation(.easeInOut(duration: 0.5)) {
+                                    showSplash = false
+                                }
+                            }
+                        }
                 }
-                try? await Task.sleep(nanoseconds: 1_100_000_000) // 1.1s glow up
-                withAnimation(.easeInOut(duration: 0.9)) {
-                    glowOpacity = 0.0
-                }
-                try? await Task.sleep(nanoseconds: 900_000_000) // 0.9s fade out
-                showSplash = false // Remove splash only after fade out
-            }
-            .onReceive(authViewModel.$isAuthenticated) { authenticated in
-                isLoggedIn = authenticated
             }
         }
+    }
+}
+
+struct SplashScreenView: View {
+    @Binding var opacity: Double
+    @Binding var glowOpacity: Double
+    @Binding var glowRadius: CGFloat
+    
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            VStack(spacing: 30) {
+                // Logo with glow effect
+                Image("LumoLogo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 120, height: 120)
+                    .shadow(color: Color.blue.opacity(glowOpacity), radius: glowRadius)
+                    .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: glowOpacity)
+                
+                Text("Lumo")
+                    .font(.system(size: 48, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .shadow(color: Color.blue.opacity(0.3), radius: 10)
+                
+                Text("Smart Grocery Shopping")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(.gray)
+            }
+        }
+        .opacity(opacity)
     }
 }
