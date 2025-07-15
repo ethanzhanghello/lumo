@@ -17,9 +17,10 @@ struct LumoApp: App {
     @State private var isLoggedIn: Bool = false
     @State private var showOnboarding: Bool = !UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
     @State private var showSplash: Bool = true
-    @State private var splashOpacity: Double = 1.0
-    @State private var glowOpacity: Double = 0.08 // Start with minimal glow
+    @State private var glowOpacity: Double = 0.08
     @State private var glowRadius: CGFloat = 20
+    @State private var logoOpacity: Double = 1.0
+    @State private var nextScreenOpacity: Double = 0.0 // New state for the next screen
 
     init() {
         #if canImport(UIKit)
@@ -46,33 +47,41 @@ struct LumoApp: App {
                 Group {
                     if showOnboarding {
                         OnboardingView(showOnboarding: $showOnboarding)
+                            .opacity(nextScreenOpacity) // Fade in the next screen
                     } else if isLoggedIn {
                         MainTabView()
                             .environmentObject(appState)
                             .environmentObject(authViewModel)
+                            .opacity(nextScreenOpacity) // Fade in the next screen
                     } else {
                         RootView()
                             .environmentObject(appState)
                             .environmentObject(authViewModel)
+                            .opacity(nextScreenOpacity) // Fade in the next screen
                     }
                 }
+                
                 // Splash overlay
                 if showSplash {
                     ZStack {
                         Color.black.ignoresSafeArea()
+                        
                         // Animated Glow
                         Circle()
                             .fill(Color(red: 0/255, green: 240/255, blue: 192/255))
                             .frame(width: 340, height: 340)
                             .blur(radius: glowRadius)
                             .opacity(glowOpacity)
-                            .animation(.easeInOut(duration: 1.1), value: glowOpacity)
-                            .animation(.easeInOut(duration: 1.1), value: glowRadius)
+                            .animation(.easeInOut(duration: 1.2), value: glowOpacity)
+                            .animation(.easeInOut(duration: 1.2), value: glowRadius)
+                        
+                        // Animated Logo
                         Image("LumoLogo")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 260, height: 260)
-                            // No opacity animation, always fully visible
+                            .opacity(logoOpacity) // Apply opacity to the logo
+                            .animation(.easeInOut(duration: 1.0), value: logoOpacity) // Animate opacity change
                     }
                     .transition(.opacity)
                     .zIndex(2)
@@ -83,16 +92,25 @@ struct LumoApp: App {
                 if let session = try? await SupabaseManager.shared.client.auth.session, session != nil {
                     isLoggedIn = true
                 }
-                // Splash animation: Glow increases, then fades out, logo always visible
-                withAnimation(.easeInOut(duration: 1.1)) {
+                
+                // Splash animation: Glow increases, then fades out
+                withAnimation(.easeInOut(duration: 1.2)) {
                     glowOpacity = 0.8
                     glowRadius = 90
+                    logoOpacity = 1.0 // Make logo visible
                 }
-                try? await Task.sleep(nanoseconds: 1_100_000_000) // 1.1s glow up
-                withAnimation(.easeInOut(duration: 0.9)) {
+                
+                try? await Task.sleep(nanoseconds: 1_200_000_000) // 1.2s glow up
+                
+                // Now start fading out the glow and logo, and fading in the next screen
+                withAnimation(.easeInOut(duration: 0.8)) {
                     glowOpacity = 0.0
+                    glowRadius = 30
+                    logoOpacity = 0.0 // Fade out the logo
+                    nextScreenOpacity = 1.0 // Fade in the next screen
                 }
-                try? await Task.sleep(nanoseconds: 900_000_000) // 0.9s fade out
+                
+                try? await Task.sleep(nanoseconds: 800_000_000) // 0.8s fade out
                 showSplash = false // Remove splash only after fade out
             }
             .onReceive(authViewModel.$isAuthenticated) { authenticated in
