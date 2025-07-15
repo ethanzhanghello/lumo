@@ -39,6 +39,7 @@
 		B041F26D2E262CE50075EEE0 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */; };
 		B041F26F2E262CF80075EEE0 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F26E2E262CF80075EEE0 /* LoginView.swift */; };
 		B041F2712E262D270075EEE0 /* StoreLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F2702E262D270075EEE0 /* StoreLocationView.swift */; };
+		B041F2732E263C890075EEE0 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F2722E263C890075EEE0 /* OnboardingView.swift */; };
 		B0D283712E03D7F200C28B2C /* GroceryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283702E03D7F200C28B2C /* GroceryList.swift */; };
 		B0D283752E03DAD100C28B2C /* ApiKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */; };
 		B0E915962E00AC7C0036C7A9 /* LumoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915952E00AC7C0036C7A9 /* LumoApp.swift */; };
@@ -113,6 +114,7 @@
 		B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		B041F26E2E262CF80075EEE0 /* LoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		B041F2702E262D270075EEE0 /* StoreLocationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoreLocationView.swift; sourceTree = "<group>"; };
+		B041F2722E263C890075EEE0 /* OnboardingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		B0D283702E03D7F200C28B2C /* GroceryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryList.swift; sourceTree = "<group>"; };
 		B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeyManager.swift; sourceTree = "<group>"; };
 		B0E915922E00AC7C0036C7A9 /* Lumo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lumo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -252,6 +254,7 @@
 				B041F26A2E262C020075EEE0 /* AuthViewModel.swift */,
 				B0E915972E00AC7C0036C7A9 /* ContentView.swift */,
 				B0E915C62E00C0440036C7A9 /* StoreData.swift */,
+				B041F2722E263C890075EEE0 /* OnboardingView.swift */,
 				B0E915CC2E0349A30036C7A9 /* AppState.swift */,
 				B0E915CE2E035F770036C7A9 /* Root.swift */,
 				B0E915C22E00B7F80036C7A9 /* StoreFinder.swift */,
@@ -508,6 +511,7 @@
 				944E8F0A2E1DB40C00BB97F5 /* SuggestionEngine.swift in Sources */,
 				944E8F0B2E1DB40C00BB97F5 /* SharedListManager.swift in Sources */,
 				94D66E3B2E1DF1A1004F3DDB /* SpoonacularService.swift in Sources */,
+				B041F2732E263C890075EEE0 /* OnboardingView.swift in Sources */,
 				94D66E3C2E1DF1A1004F3DDB /* SpoonacularRecipeView.swift in Sources */,
 				944E8F0C2E1DB40C00BB97F5 /* PantryManager.swift in Sources */,
 				944E8F0D2E1DB40C00BB97F5 /* BudgetManager.swift in Sources */,

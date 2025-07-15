@@ -15,6 +15,7 @@ struct LumoApp: App {
     @StateObject var appState = AppState()
     @StateObject var authViewModel = AuthViewModel()
     @State private var isLoggedIn: Bool = false
+    @State private var showOnboarding: Bool = !UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
 
     init() {
         #if canImport(UIKit)
@@ -38,7 +39,9 @@ struct LumoApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
-                if isLoggedIn {
+                if showOnboarding {
+                    OnboardingView(showOnboarding: $showOnboarding)
+                } else if isLoggedIn {
                     MainTabView()
                         .environmentObject(appState)
                         .environmentObject(authViewModel)
