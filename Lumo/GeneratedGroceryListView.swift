@@ -14,42 +14,40 @@ struct GeneratedGroceryListView: View {
     @State private var groceryListData: [String: [String]] = [:]
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.black.ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Header
-                        headerSection
-                        
-                        // Week Selector
-                        weekSelectorSection
-                        
-                        // Grocery List
-                        groceryListSection
-                        
-                        Spacer(minLength: 100)
-                    }
-                    .padding()
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Header
+                    headerSection
+                    
+                    // Week Selector
+                    weekSelectorSection
+                    
+                    // Grocery List
+                    groceryListSection
+                    
+                    Spacer(minLength: 100)
                 }
+                .padding()
             }
-            .navigationTitle("Shopping List")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .foregroundColor(.gray)
+        }
+        .navigationTitle("Shopping List")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Done") {
+                    dismiss()
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Generate") {
-                        generateGroceryList()
-                    }
-                    .foregroundColor(.lumoGreen)
+                .foregroundColor(.gray)
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Generate") {
+                    generateGroceryList()
                 }
+                .foregroundColor(.lumoGreen)
             }
         }
         .onAppear {

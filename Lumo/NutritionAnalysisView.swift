@@ -44,51 +44,49 @@ struct NutritionAnalysisView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.black.ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Header
-                        headerSection
-                        
-                        // Week Selector
-                        weekSelectorSection
-                        
-                        // Summary Cards
-                        summaryCardsSection
-                        
-                        // Daily Breakdown
-                        dailyBreakdownSection
-                        
-                        // Macro Distribution
-                        macroDistributionSection
-                        
-                        // Goals vs Actual
-                        goalsComparisonSection
-                        
-                        Spacer(minLength: 100)
-                    }
-                    .padding()
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Header
+                    headerSection
+                    
+                    // Week Selector
+                    weekSelectorSection
+                    
+                    // Summary Cards
+                    summaryCardsSection
+                    
+                    // Daily Breakdown
+                    dailyBreakdownSection
+                    
+                    // Macro Distribution
+                    macroDistributionSection
+                    
+                    // Goals vs Actual
+                    goalsComparisonSection
+                    
+                    Spacer(minLength: 100)
                 }
+                .padding()
             }
-            .navigationTitle("Nutrition Analysis")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .foregroundColor(.gray)
+        }
+        .navigationTitle("Nutrition Analysis")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Done") {
+                    dismiss()
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Goals") {
-                        showingGoals = true
-                    }
-                    .foregroundColor(.lumoGreen)
+                .foregroundColor(.gray)
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Goals") {
+                    showingGoals = true
                 }
+                .foregroundColor(.lumoGreen)
             }
         }
         .sheet(isPresented: $showingGoals) {
@@ -524,70 +522,68 @@ struct NutritionGoalsView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.black.ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 24) {
-                        Text("Set Your Goals")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    Text("Set Your Goals")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    
+                    VStack(spacing: 16) {
+                        NutritionGoalRow(
+                            title: "Daily Calories",
+                            value: Binding(
+                                get: { Double(goals.calories) },
+                                set: { goals.calories = Int($0) }
+                            ),
+                            unit: "kcal",
+                            range: 1200...3000
+                        )
                         
-                        VStack(spacing: 16) {
-                            NutritionGoalRow(
-                                title: "Daily Calories",
-                                value: Binding(
-                                    get: { Double(goals.calories) },
-                                    set: { goals.calories = Int($0) }
-                                ),
-                                unit: "kcal",
-                                range: 1200...3000
-                            )
-                            
-                            NutritionGoalRow(
-                                title: "Protein",
-                                value: $goals.protein,
-                                unit: "g",
-                                range: 50...200
-                            )
-                            
-                            NutritionGoalRow(
-                                title: "Carbs",
-                                value: $goals.carbs,
-                                unit: "g",
-                                range: 100...400
-                            )
-                            
-                            NutritionGoalRow(
-                                title: "Fat",
-                                value: $goals.fat,
-                                unit: "g",
-                                range: 30...100
-                            )
-                        }
+                        NutritionGoalRow(
+                            title: "Protein",
+                            value: $goals.protein,
+                            unit: "g",
+                            range: 50...200
+                        )
+                        
+                        NutritionGoalRow(
+                            title: "Carbs",
+                            value: $goals.carbs,
+                            unit: "g",
+                            range: 100...400
+                        )
+                        
+                        NutritionGoalRow(
+                            title: "Fat",
+                            value: $goals.fat,
+                            unit: "g",
+                            range: 30...100
+                        )
                     }
-                    .padding()
                 }
+                .padding()
             }
-            .navigationTitle("Nutrition Goals")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(.gray)
+        }
+        .navigationTitle("Nutrition Goals")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Cancel") {
+                    dismiss()
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        mealManager.nutritionGoals = goals
-                        dismiss()
-                    }
-                    .foregroundColor(.lumoGreen)
+                .foregroundColor(.gray)
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Save") {
+                    mealManager.nutritionGoals = goals
+                    dismiss()
                 }
+                .foregroundColor(.lumoGreen)
             }
         }
     }

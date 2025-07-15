@@ -530,9 +530,34 @@ struct EditMealView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.black.ignoresSafeArea()
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Custom Header
+                HStack {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundColor(.gray)
+                    
+                    Spacer()
+                    
+                    Text("Edit Meal")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                    
+                    Spacer()
+                    
+                    Button("Save") {
+                        saveMeal()
+                    }
+                    .fontWeight(.semibold)
+                    .foregroundColor(.lumoGreen)
+                }
+                .padding()
+                .background(Color.black)
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -551,16 +576,6 @@ struct EditMealView: View {
                     .padding()
                 }
             }
-            .navigationTitle("Edit Meal")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                leading: Button("Cancel") { dismiss() },
-                trailing: Button("Save") { 
-                    saveMeal()
-                }
-                .fontWeight(.semibold)
-                .foregroundColor(.lumoGreen)
-            )
         }
     }
     

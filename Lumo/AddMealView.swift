@@ -23,9 +23,34 @@ struct AddMealView: View {
     @State private var showingRecipePicker = false
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.black.ignoresSafeArea()
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Custom Header
+                HStack {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundColor(.gray)
+                    
+                    Spacer()
+                    
+                    Text("Add Meal")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                    
+                    Spacer()
+                    
+                    Button("Save") {
+                        saveMeal()
+                    }
+                    .foregroundColor(.lumoGreen)
+                    .disabled(recipeName.isEmpty)
+                }
+                .padding()
+                .background(Color.black)
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -50,24 +75,6 @@ struct AddMealView: View {
                         Spacer(minLength: 100)
                     }
                     .padding()
-                }
-            }
-            .navigationTitle("Add Meal")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(.gray)
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        saveMeal()
-                    }
-                    .foregroundColor(.lumoGreen)
-                    .disabled(recipeName.isEmpty)
                 }
             }
         }
