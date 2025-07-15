@@ -7,11 +7,23 @@
 
 import Foundation
 import Supabase
+import UIKit
 
 struct SupabaseProfile: Codable {
     let id: String
     var full_name: String
     var dietary_filter: Bool
+    var profile_picture_url: String?
+    var allergies: [String]?
+    var preferred_cuisines: [String]?
+    var dietary_restrictions: [String]?
+}
+
+struct UserStats: Codable {
+    let user_id: String
+    let meals_planned: Int
+    let shopping_lists_created: Int
+    let last_updated: String?
 }
 
 @MainActor
@@ -20,6 +32,11 @@ class AuthViewModel: ObservableObject {
     @Published var password = ""
     @Published var errorMessage: String?
     @Published var isAuthenticated = false
+    @Published var profilePictureURL: String?
+    @Published var allergies: [String] = []
+    @Published var preferredCuisines: [String] = []
+    @Published var dietaryRestrictions: [String] = []
+    @Published var userStats: UserStats?
 
     func signUp() async {
         errorMessage = nil // Clear previous errors
@@ -62,10 +79,18 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    func saveProfile(fullName: String, dietaryFilter: Bool = false) async {
+    func saveProfile(fullName: String, dietaryFilter: Bool = false, profilePictureURL: String? = nil, allergies: [String] = [], preferredCuisines: [String] = [], dietaryRestrictions: [String] = []) async {
         guard let user = SupabaseManager.shared.client.auth.currentUser else { return }
         let userId = String(describing: user.id)
-        let profile = SupabaseProfile(id: userId, full_name: fullName, dietary_filter: dietaryFilter)
+        let profile = SupabaseProfile(
+            id: userId,
+            full_name: fullName,
+            dietary_filter: dietaryFilter,
+            profile_picture_url: profilePictureURL,
+            allergies: allergies,
+            preferred_cuisines: preferredCuisines,
+            dietary_restrictions: dietaryRestrictions
+        )
         do {
             _ = try await SupabaseManager.shared.client
                 .from("profiles")
@@ -88,6 +113,10 @@ class AuthViewModel: ObservableObject {
                 .execute()
             let decoder = JSONDecoder()
             let profile = try decoder.decode(SupabaseProfile.self, from: response.data)
+            self.profilePictureURL = profile.profile_picture_url
+            self.allergies = profile.allergies ?? []
+            self.preferredCuisines = profile.preferred_cuisines ?? []
+            self.dietaryRestrictions = profile.dietary_restrictions ?? []
             return profile
         } catch {
             print("Failed to fetch profile: \(error)")
@@ -95,17 +124,32 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    func updateProfile(fullName: String, dietaryFilter: Bool) async {
+    func updateProfile(fullName: String, dietaryFilter: Bool, profilePictureURL: String? = nil, allergies: [String] = [], preferredCuisines: [String] = [], dietaryRestrictions: [String] = []) async {
+        await saveProfile(fullName: fullName, dietaryFilter: dietaryFilter, profilePictureURL: profilePictureURL, allergies: allergies, preferredCuisines: preferredCuisines, dietaryRestrictions: dietaryRestrictions)
+    }
+
+    // Upload profile picture to Supabase Storage and return public URL
+    func uploadProfilePicture(image: UIImage) async -> String? {
+        print("uploadProfilePicture is not implemented yet.")
+        return nil
+    }
+
+    // Fetch user stats from user_stats table
+    func fetchUserStats() async {
         guard let user = SupabaseManager.shared.client.auth.currentUser else { return }
         let userId = String(describing: user.id)
-        let profile = SupabaseProfile(id: userId, full_name: fullName, dietary_filter: dietaryFilter)
         do {
-            _ = try await SupabaseManager.shared.client
-                .from("profiles")
-                .upsert([profile])
+            let response = try await SupabaseManager.shared.client
+                .from("user_stats")
+                .select()
+                .eq("user_id", value: userId)
+                .single()
                 .execute()
+            let decoder = JSONDecoder()
+            let stats = try decoder.decode(UserStats.self, from: response.data)
+            self.userStats = stats
         } catch {
-            print("Failed to update profile: \(error)")
+            print("Failed to fetch user stats: \(error)")
         }
     }
 }
