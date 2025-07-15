@@ -14,150 +14,169 @@ struct ProfileView: View {
     @State private var profileImage: Image? = Image(systemName: "person.crop.circle.fill")
     @State private var fullName: String = ""
     @State private var email: String = ""
-    @State private var passwordVisible: Bool = false
-    @State private var passwordField: String = "************" // Masked, not editable
     @State private var isLoading: Bool = true
     @State private var showSaveConfirmation: Bool = false
     @State private var showingLogoutAlert: Bool = false
     @State private var allergiesSelection: Set<String> = []
     @State private var cuisinesSelection: Set<String> = []
     @State private var restrictionsSelection: Set<String> = []
+    @State private var showPasswordSection: Bool = false
+    @State private var currentPassword: String = ""
+    @State private var newPassword: String = ""
+    @State private var confirmPassword: String = ""
+    @State private var passwordVisible: Bool = false
+    @State private var newPasswordVisible: Bool = false
+    @State private var confirmPasswordVisible: Bool = false
+    @State private var passwordChangeError: String? = nil
     let lumoGreen = Color(red: 0/255, green: 240/255, blue: 192/255)
     let allAllergies = ["Peanuts", "Tree Nuts", "Dairy", "Eggs", "Gluten", "Soy", "Fish", "Shellfish"]
     let allCuisines = ["Italian", "Mexican", "Asian", "American", "Indian", "Mediterranean", "French", "Other"]
     let allRestrictions = ["Vegan", "Vegetarian", "Keto", "Paleo", "Halal", "Kosher", "Low-Carb", "None"]
 
     var body: some View {
-        NavigationView {
+        ZStack {
+            LinearGradient(gradient: Gradient(colors: [Color.black, lumoGreen.opacity(0.5)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                .ignoresSafeArea()
             ScrollView {
-                VStack(spacing: 24) {
-                    Text("Profile Settings")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.bottom, 20)
-
-                    // Profile Picture Section
-                    VStack {
-                        if let url = authViewModel.profilePictureURL, let imageURL = URL(string: url) {
-                            AsyncImage(url: imageURL) { phase in
-                                switch phase {
-                                case .empty:
-                                    ProgressView()
-                                case .success(let image):
-                                    image.resizable().scaledToFill()
-                                default:
-                                    Image(systemName: "person.crop.circle.fill")
-                                        .resizable()
+                VStack(spacing: 32) {
+                    // Profile Card
+                    VStack(spacing: 20) {
+                        ZStack(alignment: .bottomTrailing) {
+                            if let url = authViewModel.profilePictureURL, let imageURL = URL(string: url) {
+                                AsyncImage(url: imageURL) { phase in
+                                    switch phase {
+                                    case .empty:
+                                        ProgressView()
+                                    case .success(let image):
+                                        image.resizable().scaledToFill()
+                                    default:
+                                        Image(systemName: "person.crop.circle.fill").resizable()
+                                    }
                                 }
-                            }
-                            .frame(width: 100, height: 100)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(lumoGreen, lineWidth: 2))
-                        } else if let profileImage = profileImage {
-                            profileImage
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 100, height: 100)
+                                .frame(width: 110, height: 110)
                                 .clipShape(Circle())
-                                .overlay(Circle().stroke(lumoGreen, lineWidth: 2))
-                        }
-                        PhotosPicker(selection: $selectedImage, matching: .images) {
-                            Text("Edit Photo")
-                                .font(.caption)
-                                .foregroundColor(lumoGreen)
-                        }
-                        .onChange(of: selectedImage) { newItem in
-                            Task {
-                                if let data = try? await newItem?.loadTransferable(type: Data.self), let uiImage = UIImage(data: data) {
-                                    profileImage = Image(uiImage: uiImage)
-                                    if let url = await authViewModel.uploadProfilePicture(image: uiImage) {
-                                        await authViewModel.updateProfile(
-                                            fullName: fullName,
-                                            dietaryFilter: false,
-                                            profilePictureURL: url,
-                                            allergies: Array(allergiesSelection),
-                                            preferredCuisines: Array(cuisinesSelection),
-                                            dietaryRestrictions: Array(restrictionsSelection)
-                                        )
+                                .shadow(radius: 8)
+                                .overlay(Circle().stroke(lumoGreen, lineWidth: 3))
+                            } else if let profileImage = profileImage {
+                                profileImage
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 110, height: 110)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 8)
+                                    .overlay(Circle().stroke(lumoGreen, lineWidth: 3))
+                            }
+                            PhotosPicker(selection: $selectedImage, matching: .images) {
+                                ZStack {
+                                    Circle().fill(lumoGreen).frame(width: 36, height: 36)
+                                    Image(systemName: "pencil").foregroundColor(.black)
+                                }
+                                .shadow(radius: 2)
+                            }
+                            .offset(x: 4, y: 4)
+                            .onChange(of: selectedImage) { newItem in
+                                Task {
+                                    if let data = try? await newItem?.loadTransferable(type: Data.self), let uiImage = UIImage(data: data) {
+                                        profileImage = Image(uiImage: uiImage)
+                                        if let url = await authViewModel.uploadProfilePicture(image: uiImage) {
+                                            await authViewModel.updateProfile(
+                                                fullName: fullName,
+                                                dietaryFilter: false,
+                                                profilePictureURL: url,
+                                                allergies: Array(allergiesSelection),
+                                                preferredCuisines: Array(cuisinesSelection),
+                                                dietaryRestrictions: Array(restrictionsSelection)
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-
-                    // Form Fields
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Full name")
-                            .foregroundColor(.white)
-                            .font(.headline)
-                        TextField("", text: $fullName, onCommit: saveProfile)
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(10)
-                            .foregroundColor(.white)
-                            .accentColor(lumoGreen)
-
-                        Text("Email")
-                            .foregroundColor(.white)
-                            .font(.headline)
-                        TextField("", text: .constant(email))
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(10)
-                            .foregroundColor(.white)
-                            .accentColor(lumoGreen)
-                            .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
-                            .disabled(true)
-
-                        Text("Password")
-                            .foregroundColor(.white)
-                            .font(.headline)
-                        HStack {
-                            if passwordVisible {
-                                TextField("", text: $passwordField)
-                                    .padding()
-                                    .background(Color.gray.opacity(0.2))
-                                    .cornerRadius(10)
-                                    .foregroundColor(.white)
-                                    .accentColor(lumoGreen)
-                                    .disabled(true)
-                            } else {
-                                SecureField("", text: $passwordField)
-                                    .padding()
-                                    .background(Color.gray.opacity(0.2))
-                                    .cornerRadius(10)
-                                    .foregroundColor(.white)
-                                    .accentColor(lumoGreen)
-                                    .disabled(true)
+                        Text("@\(email.split(separator: "@").first ?? "user")")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                        // Editable Full Name
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("Full Name", systemImage: "person.fill")
+                                .foregroundColor(lumoGreen)
+                                .font(.headline)
+                            TextField("Enter your name", text: $fullName)
+                                .padding()
+                                .background(Color.white.opacity(0.08))
+                                .cornerRadius(12)
+                                .foregroundColor(.white)
+                                .accentColor(lumoGreen)
+                        }
+                        // Email (read-only)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("Email", systemImage: "envelope.fill")
+                                .foregroundColor(lumoGreen)
+                                .font(.headline)
+                            TextField("", text: .constant(email))
+                                .padding()
+                                .background(Color.white.opacity(0.08))
+                                .cornerRadius(12)
+                                .foregroundColor(.white)
+                                .accentColor(lumoGreen)
+                                .disabled(true)
+                        }
+                        // Change Password Section
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("Password", systemImage: "lock.fill")
+                                .foregroundColor(lumoGreen)
+                                .font(.headline)
+                            Button(action: { withAnimation { showPasswordSection.toggle() } }) {
+                                HStack {
+                                    Text(showPasswordSection ? "Cancel Password Change" : "Change Password")
+                                    Spacer()
+                                    Image(systemName: showPasswordSection ? "chevron.up" : "chevron.down")
+                                }
+                                .foregroundColor(.white)
+                                .padding(.vertical, 8)
                             }
-                            Button(action: {
-                                passwordVisible.toggle()
-                            }) {
-                                Image(systemName: passwordVisible ? "eye.slash.fill" : "eye.fill")
-                                    .foregroundColor(lumoGreen)
-                                    .animation(.easeInOut, value: passwordVisible)
+                            if showPasswordSection {
+                                VStack(spacing: 10) {
+                                    SecureInputField(title: "Current Password", text: $currentPassword, isVisible: $passwordVisible, accent: lumoGreen)
+                                    SecureInputField(title: "New Password", text: $newPassword, isVisible: $newPasswordVisible, accent: lumoGreen)
+                                    SecureInputField(title: "Confirm New Password", text: $confirmPassword, isVisible: $confirmPasswordVisible, accent: lumoGreen)
+                                    if let error = passwordChangeError {
+                                        Text(error).foregroundColor(.red).font(.caption)
+                                    }
+                                    Button(action: {
+                                        Task { await changePassword() }
+                                    }) {
+                                        Text("Update Password")
+                                            .foregroundColor(.black)
+                                            .padding(.horizontal, 24)
+                                            .padding(.vertical, 8)
+                                            .background(lumoGreen)
+                                            .cornerRadius(10)
+                                    }
+                                }
+                                .transition(.move(edge: .top).combined(with: .opacity))
                             }
-                            .padding(.trailing, 8)
                         }
                     }
+                    .padding()
+                    .background(BlurView(style: .systemUltraThinMaterialDark))
+                    .cornerRadius(28)
+                    .shadow(radius: 12)
                     .padding(.horizontal)
 
-                    // Dietary Preferences
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Allergies")
-                            .foregroundColor(.white)
+                    // Preferences Section
+                    VStack(alignment: .leading, spacing: 20) {
+                        Label("Allergies", systemImage: "exclamationmark.triangle.fill")
+                            .foregroundColor(lumoGreen)
                             .font(.headline)
-                        WrapChipsView(options: allAllergies, selection: $allergiesSelection, accent: lumoGreen)
-                        Text("Preferred Cuisines")
-                            .foregroundColor(.white)
+                        AnimatedChipsView(options: allAllergies, selection: $allergiesSelection, accent: lumoGreen)
+                        Label("Preferred Cuisines", systemImage: "fork.knife")
+                            .foregroundColor(lumoGreen)
                             .font(.headline)
-                        WrapChipsView(options: allCuisines, selection: $cuisinesSelection, accent: lumoGreen)
-                        Text("Dietary Restrictions")
-                            .foregroundColor(.white)
+                        AnimatedChipsView(options: allCuisines, selection: $cuisinesSelection, accent: lumoGreen)
+                        Label("Dietary Restrictions", systemImage: "leaf.fill")
+                            .foregroundColor(lumoGreen)
                             .font(.headline)
-                        WrapChipsView(options: allRestrictions, selection: $restrictionsSelection, accent: lumoGreen)
+                        AnimatedChipsView(options: allRestrictions, selection: $restrictionsSelection, accent: lumoGreen)
                         Button("Save Preferences") {
                             saveProfile()
                         }
@@ -167,12 +186,16 @@ struct ProfileView: View {
                         .background(lumoGreen)
                         .cornerRadius(10)
                     }
+                    .padding()
+                    .background(BlurView(style: .systemUltraThinMaterialDark))
+                    .cornerRadius(28)
+                    .shadow(radius: 12)
                     .padding(.horizontal)
 
                     // Progress Tracking
                     if let stats = authViewModel.userStats {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Your Trends")
+                            Label("Your Trends", systemImage: "chart.bar.fill")
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundColor(lumoGreen)
@@ -195,7 +218,7 @@ struct ProfileView: View {
                             }
                         }
                         .padding()
-                        .background(Color.black.opacity(0.7))
+                        .background(BlurView(style: .systemUltraThinMaterialDark))
                         .cornerRadius(16)
                         .padding(.horizontal)
                     }
@@ -204,6 +227,8 @@ struct ProfileView: View {
                     if showSaveConfirmation {
                         Text("Profile saved!")
                             .foregroundColor(lumoGreen)
+                            .font(.headline)
+                            .padding(.top, 8)
                             .transition(.opacity)
                     }
 
@@ -235,12 +260,18 @@ struct ProfileView: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .background(Color.black.ignoresSafeArea())
+                .padding(.top, 32)
                 .navigationBarHidden(true)
                 .task {
                     await loadProfile()
                     await authViewModel.fetchUserStats()
                 }
+            }
+            if isLoading {
+                Color.black.opacity(0.4).ignoresSafeArea()
+                ProgressView("Loading...")
+                    .progressViewStyle(CircularProgressViewStyle(tint: lumoGreen))
+                    .scaleEffect(1.5)
             }
         }
     }
@@ -260,6 +291,7 @@ struct ProfileView: View {
     }
 
     private func saveProfile() {
+        isLoading = true
         Task {
             await authViewModel.updateProfile(
                 fullName: fullName,
@@ -277,6 +309,30 @@ struct ProfileView: View {
                     showSaveConfirmation = false
                 }
             }
+            isLoading = false
+        }
+    }
+    
+    private func changePassword() async {
+        guard newPassword == confirmPassword else {
+            withAnimation { passwordChangeError = "Passwords do not match." }
+            return
+        }
+        isLoading = true
+        let success = await authViewModel.changePassword(currentPassword: currentPassword, newPassword: newPassword)
+        isLoading = false
+        if success {
+            withAnimation {
+                showPasswordSection = false
+                passwordChangeError = nil
+                currentPassword = ""
+                newPassword = ""
+                confirmPassword = ""
+            }
+        } else {
+            withAnimation {
+                passwordChangeError = authViewModel.errorMessage ?? "Failed to change password."
+            }
         }
     }
     
@@ -285,28 +341,84 @@ struct ProfileView: View {
     }
 }
 
-// Helper view for multi-select chips
-struct WrapChipsView: View {
+// SecureInputField: Custom field with eye toggle
+struct SecureInputField: View {
+    let title: String
+    @Binding var text: String
+    @Binding var isVisible: Bool
+    var accent: Color
+    var body: some View {
+        HStack {
+            if isVisible {
+                TextField(title, text: $text)
+                    .padding()
+                    .background(Color.white.opacity(0.08))
+                    .cornerRadius(10)
+                    .foregroundColor(.white)
+                    .accentColor(accent)
+            } else {
+                SecureField(title, text: $text)
+                    .padding()
+                    .background(Color.white.opacity(0.08))
+                    .cornerRadius(10)
+                    .foregroundColor(.white)
+                    .accentColor(accent)
+            }
+            Button(action: { isVisible.toggle() }) {
+                Image(systemName: isVisible ? "eye.slash.fill" : "eye.fill")
+                    .foregroundColor(accent)
+            }
+            .padding(.trailing, 8)
+        }
+    }
+}
+
+// AnimatedChipsView: Chips with checkmark and animation
+struct AnimatedChipsView: View {
     let options: [String]
     @Binding var selection: Set<String>
     var accent: Color
     var body: some View {
         FlexibleView(data: options, spacing: 8, alignment: .leading) { item in
-            Text(item)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-                .background(selection.contains(item) ? accent : Color.gray.opacity(0.2))
-                .foregroundColor(selection.contains(item) ? .black : .white)
-                .cornerRadius(16)
-                .onTapGesture {
-                    if selection.contains(item) {
-                        selection.remove(item)
-                    } else {
-                        selection.insert(item)
+            HStack(spacing: 6) {
+                Text(item)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(selection.contains(item) ? accent : Color.gray.opacity(0.2))
+                    .foregroundColor(selection.contains(item) ? .black : .white)
+                    .cornerRadius(16)
+                    .overlay(
+                        Group {
+                            if selection.contains(item) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.black)
+                                    .offset(x: 12, y: -12)
+                                    .transition(.scale)
+                            }
+                        }, alignment: .topTrailing
+                    )
+                    .onTapGesture {
+                        withAnimation(.spring()) {
+                            if selection.contains(item) {
+                                selection.remove(item)
+                            } else {
+                                selection.insert(item)
+                            }
+                        }
                     }
-                }
+            }
         }
     }
+}
+
+// BlurView for glass effect
+import UIKit
+struct BlurView: UIViewRepresentable {
+    var style: UIBlurEffect.Style
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        return UIVisualEffectView(effect: UIBlurEffect(style: style))
+    }
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
 }
 
 // FlexibleView for wrapping chips

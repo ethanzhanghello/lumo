@@ -152,4 +152,33 @@ class AuthViewModel: ObservableObject {
             print("Failed to fetch user stats: \(error)")
         }
     }
+
+    // Change user password using Supabase
+    func changePassword(currentPassword: String, newPassword: String) async -> Bool {
+        errorMessage = nil
+        guard let user = SupabaseManager.shared.client.auth.currentUser else {
+            errorMessage = "No user logged in."
+            return false
+        }
+        // Re-authenticate user (Supabase may require this for security)
+        do {
+            // Try signing in again to verify current password
+            try await SupabaseManager.shared.client.auth.signIn(
+                email: user.email ?? "",
+                password: currentPassword
+            )
+        } catch {
+            errorMessage = "Current password is incorrect."
+            return false
+        }
+        do {
+            // Update password
+            let attrs = UserAttributes(password: newPassword)
+            try await SupabaseManager.shared.client.auth.update(user: attrs)
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
 }
