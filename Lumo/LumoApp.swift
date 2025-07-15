@@ -32,7 +32,7 @@ struct LumoApp: App {
 
     var body: some Scene {
         WindowGroup {
-            Root()
+            RootView()
                 .environmentObject(appState)
                 .environmentObject(authViewModel)
         }
