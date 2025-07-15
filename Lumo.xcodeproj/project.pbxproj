@@ -28,6 +28,9 @@
 		94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */; };
 		94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */; };
 		94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916042E0372460036C7AA /* DietaryGoalsView.swift */; };
+		DED54D52CBFA4350A624094F /* AddMealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED54D52CBFA4350A624094E /* AddMealView.swift */; };
+		E4DF74227C624A34BFE53EA0 /* NutritionAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DF74227C624A34BFE53E9F /* NutritionAnalysisView.swift */; };
+		339964DCA19C4740ADEC1D60 /* GeneratedGroceryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339964DCA19C4740ADEC1D5F /* GeneratedGroceryListView.swift */; };
 		B041F25B2E262A810075EEE0 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = B041F25A2E262A810075EEE0 /* Auth */; };
 		B041F25D2E262A810075EEE0 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = B041F25C2E262A810075EEE0 /* Functions */; };
 		B041F25F2E262A810075EEE0 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = B041F25E2E262A810075EEE0 /* PostgREST */; };
@@ -165,6 +168,9 @@
 		B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartSubstitutionsView.swift; sourceTree = "<group>"; };
 		B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingHistoryView.swift; sourceTree = "<group>"; };
 		B0E916042E0372460036C7AA /* DietaryGoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DietaryGoalsView.swift; sourceTree = "<group>"; };
+		DED54D52CBFA4350A624094E /* AddMealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMealView.swift; sourceTree = "<group>"; };
+		E4DF74227C624A34BFE53E9F /* NutritionAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionAnalysisView.swift; sourceTree = "<group>"; };
+		339964DCA19C4740ADEC1D5F /* GeneratedGroceryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedGroceryListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -291,6 +297,9 @@
 				B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */,
 				B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */,
 				B0E916042E0372460036C7AA /* DietaryGoalsView.swift */,
+				DED54D52CBFA4350A624094E /* AddMealView.swift */,
+				E4DF74227C624A34BFE53E9F /* NutritionAnalysisView.swift */,
+				339964DCA19C4740ADEC1D5F /* GeneratedGroceryListView.swift */,
 				B0E915992E00AC7D0036C7A9 /* Assets.xcassets */,
 				B0E915D22E0372460036C7A9 /* GroceryItems.swift */,
 				B0E915CA2E03182E0036C7A9 /* StoreMap.swift */,
@@ -492,6 +501,9 @@
 				B0E915D32E0372460036C7A9 /* GroceryItems.swift in Sources */,
 				B0E915C92E00C0D60036C7A9 /* StoreSelection.swift in Sources */,
 				94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */,
+				DED54D52CBFA4350A624094F /* AddMealView.swift in Sources */,
+				E4DF74227C624A34BFE53EA0 /* NutritionAnalysisView.swift in Sources */,
+				339964DCA19C4740ADEC1D60 /* GeneratedGroceryListView.swift in Sources */,
 				94F8C4482E18C9AE005A09D9 /* MealPlanManager.swift in Sources */,
 				B041F26B2E262C020075EEE0 /* AuthViewModel.swift in Sources */,
 				B041F2692E262BED0075EEE0 /* SupbaseManager.swift in Sources */,
