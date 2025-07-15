@@ -265,8 +265,8 @@ struct NutritionAnalysisView: View {
             VStack(spacing: 12) {
                 GoalComparisonRow(
                     title: "Calories",
-                    actual: averageNutrition.calories,
-                    goal: mealManager.nutritionGoals.calories,
+                    actual: Double(averageNutrition.calories),
+                    goal: Double(mealManager.nutritionGoals.calories),
                     unit: "kcal"
                 )
                 
@@ -538,7 +538,10 @@ struct NutritionGoalsView: View {
                         VStack(spacing: 16) {
                             NutritionGoalRow(
                                 title: "Daily Calories",
-                                value: $goals.calories,
+                                value: Binding(
+                                    get: { Double(goals.calories) },
+                                    set: { goals.calories = Int($0) }
+                                ),
                                 unit: "kcal",
                                 range: 1200...3000
                             )

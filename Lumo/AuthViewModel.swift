@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import Supabase
+import
+Supabase
 
 struct SupabaseProfile: Codable {
     let id: String

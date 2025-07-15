@@ -37,26 +37,9 @@ struct LumoApp: App {
 
     var body: some Scene {
         WindowGroup {
-            Group {
-                if isLoggedIn {
-                    MainTabView()
-                        .environmentObject(appState)
-                        .environmentObject(authViewModel)
-                } else {
-                    RootView()
-                        .environmentObject(appState)
-                        .environmentObject(authViewModel)
-                }
-            }
-            .task {
-                // Async session check
-                if let session = try? await SupabaseManager.shared.client.auth.session, session != nil {
-                    isLoggedIn = true
-                }
-            }
-            .onReceive(authViewModel.$isAuthenticated) { authenticated in
-                isLoggedIn = authenticated
-            }
+            MainTabView()
+                .environmentObject(appState)
+                .environmentObject(authViewModel)
         }
     }
 }

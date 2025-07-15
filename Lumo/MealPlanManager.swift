@@ -46,6 +46,8 @@ enum MealType: String, CaseIterable, Codable, Identifiable {
     }
 }
 
+
+
 struct Meal: Identifiable, Codable, Equatable {
     var id = UUID()
     var date: Date
@@ -469,5 +471,13 @@ class MealPlanManager: ObservableObject {
         }
         
         return samplePlans
+    }
+}
+
+extension Date {
+    func startOfWeek() -> Date {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self)
+        return calendar.date(from: components) ?? self
     }
 } 

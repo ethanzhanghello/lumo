@@ -3,22 +3,36 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		940BE0B92E1494F600DC7316 /* GroceryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D62E0372460036C7A9 /* GroceryListView.swift */; };
 		940BE0BA2E1494F900DC7316 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D42E0372460036C7A9 /* ExploreView.swift */; };
 		940BE0BB2E1494FD00DC7316 /* ExploreSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D82E0372460036C7A9 /* ExploreSections.swift */; };
+		9413B35F2E25B26C00403EE3 /* GeneratedGroceryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B35C2E25B26C00403EE3 /* GeneratedGroceryListView.swift */; };
+		9413B3602E25B26C00403EE3 /* NutritionAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B35E2E25B26C00403EE3 /* NutritionAnalysisView.swift */; };
+		9413B3612E25B26C00403EE3 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B3592E25B26C00403EE3 /* AuthViewModel.swift */; };
+		9413B3622E25B26C00403EE3 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B35D2E25B26C00403EE3 /* LoginView.swift */; };
+		9413B3632E25B26C00403EE3 /* AddMealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B3582E25B26C00403EE3 /* AddMealView.swift */; };
+		9413B3642E25B26C00403EE3 /* ChatbotMealSuggestionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B35A2E25B26C00403EE3 /* ChatbotMealSuggestionCard.swift */; };
+		9413B3652E25B26C00403EE3 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9413B35B2E25B26C00403EE3 /* CreateAccountView.swift */; };
 		944E8F092E1DB40C00BB97F5 /* InventoryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F032E1DB40C00BB97F5 /* InventoryData.swift */; };
 		944E8F0A2E1DB40C00BB97F5 /* SuggestionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F082E1DB40C00BB97F5 /* SuggestionEngine.swift */; };
 		944E8F0B2E1DB40C00BB97F5 /* SharedListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F072E1DB40C00BB97F5 /* SharedListManager.swift */; };
 		944E8F0C2E1DB40C00BB97F5 /* PantryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F042E1DB40C00BB97F5 /* PantryManager.swift */; };
 		944E8F0D2E1DB40C00BB97F5 /* BudgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944E8F022E1DB40C00BB97F5 /* BudgetManager.swift */; };
 		944E8F0E2E1DB40C00BB97F5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 944E8F052E1DB40C00BB97F5 /* Preview Assets.xcassets */; };
+		94AC026A2E25B48C0067649A /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC02692E25B48C0067649A /* Auth */; };
+		94AC026C2E25B48C0067649A /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC026B2E25B48C0067649A /* Functions */; };
+		94AC026E2E25B48C0067649A /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC026D2E25B48C0067649A /* PostgREST */; };
+		94AC02702E25B48C0067649A /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC026F2E25B48C0067649A /* Realtime */; };
+		94AC02722E25B48C0067649A /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC02712E25B48C0067649A /* Storage */; };
+		94AC02752E25B5B60067649A /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 94AC02742E25B5B60067649A /* Supabase */; };
+		94AC02782E25B6200067649A /* StoreLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94AC02762E25B6200067649A /* StoreLocationView.swift */; };
+		94AC02792E25B6200067649A /* SupbaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94AC02772E25B6200067649A /* SupbaseManager.swift */; };
 		94D66E372E1DF1A1004F3DDB /* ApiKeyManager.md in Resources */ = {isa = PBXBuildFile; fileRef = 94D66E302E1DF1A1004F3DDB /* ApiKeyManager.md */; };
 		94D66E382E1DF1A1004F3DDB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 94D66E312E1DF1A1004F3DDB /* Preview Assets.xcassets */; };
-
 		94D66E3B2E1DF1A1004F3DDB /* SpoonacularService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D66E362E1DF1A1004F3DDB /* SpoonacularService.swift */; };
 		94D66E3C2E1DF1A1004F3DDB /* SpoonacularRecipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D66E352E1DF1A1004F3DDB /* SpoonacularRecipeView.swift */; };
 		94F8C4452E18C8E2005A09D9 /* FlyToCartAnimationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */; };
@@ -29,17 +43,6 @@
 		94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */; };
 		94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */; };
 		94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916042E0372460036C7AA /* DietaryGoalsView.swift */; };
-		B071CCBA2E1EF8D30013B800 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B071CCB92E1EF8D30013B800 /* CreateAccountView.swift */; };
-		B071CD2B2E20FB060013B800 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B071CD2A2E20FB060013B800 /* LoginView.swift */; };
-		B071CD2E2E20FB510013B800 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = B071CD2D2E20FB510013B800 /* Auth */; };
-		B071CD302E20FB510013B800 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = B071CD2F2E20FB510013B800 /* Functions */; };
-		B071CD322E20FB510013B800 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = B071CD312E20FB510013B800 /* PostgREST */; };
-		B071CD342E20FB510013B800 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = B071CD332E20FB510013B800 /* Realtime */; };
-		B071CD362E20FB510013B800 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = B071CD352E20FB510013B800 /* Storage */; };
-		B071CD382E20FB510013B800 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = B071CD372E20FB510013B800 /* Supabase */; };
-		B071CD3A2E20FC830013B800 /* SupbaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B071CD392E20FC830013B800 /* SupbaseManager.swift */; };
-		B071CD3E2E20FC8F0013B800 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B071CD3D2E20FC8F0013B800 /* AuthViewModel.swift */; };
-		B071CD462E241CA60013B800 /* StoreLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B071CD452E241CA60013B800 /* StoreLocationView.swift */; };
 		B0D283712E03D7F200C28B2C /* GroceryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283702E03D7F200C28B2C /* GroceryList.swift */; };
 		B0D283752E03DAD100C28B2C /* ApiKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */; };
 		B0E915962E00AC7C0036C7A9 /* LumoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915952E00AC7C0036C7A9 /* LumoApp.swift */; };
@@ -97,24 +100,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9413B3582E25B26C00403EE3 /* AddMealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMealView.swift; sourceTree = "<group>"; };
+		9413B3592E25B26C00403EE3 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		9413B35A2E25B26C00403EE3 /* ChatbotMealSuggestionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatbotMealSuggestionCard.swift; sourceTree = "<group>"; };
+		9413B35B2E25B26C00403EE3 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
+		9413B35C2E25B26C00403EE3 /* GeneratedGroceryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedGroceryListView.swift; sourceTree = "<group>"; };
+		9413B35D2E25B26C00403EE3 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		9413B35E2E25B26C00403EE3 /* NutritionAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionAnalysisView.swift; sourceTree = "<group>"; };
 		944E8F022E1DB40C00BB97F5 /* BudgetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetManager.swift; sourceTree = "<group>"; };
 		944E8F032E1DB40C00BB97F5 /* InventoryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryData.swift; sourceTree = "<group>"; };
 		944E8F042E1DB40C00BB97F5 /* PantryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PantryManager.swift; sourceTree = "<group>"; };
 		944E8F052E1DB40C00BB97F5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		944E8F072E1DB40C00BB97F5 /* SharedListManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedListManager.swift; sourceTree = "<group>"; };
 		944E8F082E1DB40C00BB97F5 /* SuggestionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionEngine.swift; sourceTree = "<group>"; };
+		94AC02762E25B6200067649A /* StoreLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreLocationView.swift; sourceTree = "<group>"; };
+		94AC02772E25B6200067649A /* SupbaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupbaseManager.swift; sourceTree = "<group>"; };
 		94D66E302E1DF1A1004F3DDB /* ApiKeyManager.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ApiKeyManager.md; sourceTree = "<group>"; };
 		94D66E312E1DF1A1004F3DDB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-
 		94D66E352E1DF1A1004F3DDB /* SpoonacularRecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpoonacularRecipeView.swift; sourceTree = "<group>"; };
 		94D66E362E1DF1A1004F3DDB /* SpoonacularService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpoonacularService.swift; sourceTree = "<group>"; };
 		94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartAnimationManager.swift; sourceTree = "<group>"; };
 		94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartOverlay.swift; sourceTree = "<group>"; };
-		B071CCB92E1EF8D30013B800 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
-		B071CD2A2E20FB060013B800 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
-		B071CD392E20FC830013B800 /* SupbaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupbaseManager.swift; sourceTree = "<group>"; };
-		B071CD3D2E20FC8F0013B800 /* AuthViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
-		B071CD452E241CA60013B800 /* StoreLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreLocationView.swift; sourceTree = "<group>"; };
 		B0D283702E03D7F200C28B2C /* GroceryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryList.swift; sourceTree = "<group>"; };
 		B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeyManager.swift; sourceTree = "<group>"; };
 		B0E915922E00AC7C0036C7A9 /* Lumo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lumo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -154,6 +160,7 @@
 		B0E915F02E0372460036C7AA /* ChatResponseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatResponseViews.swift; sourceTree = "<group>"; };
 		B0E915F22E0372460036C7AA /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
 		B0E915F42E0372460036C7AA /* RecipeDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDatabase.swift; sourceTree = "<group>"; };
+		B0E915F62E0372460036C7AA /* ChatbotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatbotTests.swift; sourceTree = "<group>"; };
 		B0E915F82E0372460036C7AA /* ChatbotUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatbotUITests.swift; sourceTree = "<group>"; };
 		B0E915FA2E0372460036C7AA /* MealPlanManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPlanManager.swift; sourceTree = "<group>"; };
 		B0E915FA2E0372460036C7AB /* TemplateViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateViews.swift; sourceTree = "<group>"; };
@@ -164,36 +171,6 @@
 		B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartSubstitutionsView.swift; sourceTree = "<group>"; };
 		B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingHistoryView.swift; sourceTree = "<group>"; };
 		B0E916042E0372460036C7AA /* DietaryGoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DietaryGoalsView.swift; sourceTree = "<group>"; };
-		B0E915992E00AC7D0036C7A9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B0E915D22E0372460036C7A9 /* GroceryItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryItems.swift; sourceTree = "<group>"; };
-		B0E915CA2E03182E0036C7A9 /* StoreMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreMap.swift; sourceTree = "<group>"; };
-		B0E9159B2E00AC7D0036C7A9 /* Lumo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lumo.entitlements; sourceTree = "<group>"; };
-		B0E9159C2E00AC7D0036C7A9 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				B0E9159D2E00AC7D0036C7A9 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		B0E915A62E00AC7D0036C7A9 /* LumoTests */ = {
-			isa = PBXGroup;
-			children = (
-				B0E915A72E00AC7D0036C7A9 /* LumoTests.swift */,
-			);
-			path = LumoTests;
-			sourceTree = "<group>";
-		};
-		B0E915B02E00AC7D0036C7A9 /* LumoUITests */ = {
-			isa = PBXGroup;
-			children = (
-				B0E915B12E00AC7D0036C7A9 /* LumoUITests.swift */,
-				B0E915F82E0372460036C7AA /* ChatbotUITests.swift */,
-				B0E915B32E00AC7D0036C7A9 /* LumoUITestsLaunchTests.swift */,
-			);
-			path = LumoUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -201,12 +178,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B071CD322E20FB510013B800 /* PostgREST in Frameworks */,
-				B071CD302E20FB510013B800 /* Functions in Frameworks */,
-				B071CD382E20FB510013B800 /* Supabase in Frameworks */,
-				B071CD2E2E20FB510013B800 /* Auth in Frameworks */,
-				B071CD362E20FB510013B800 /* Storage in Frameworks */,
-				B071CD342E20FB510013B800 /* Realtime in Frameworks */,
+				94AC026E2E25B48C0067649A /* PostgREST in Frameworks */,
+				94AC026C2E25B48C0067649A /* Functions in Frameworks */,
+				94AC02752E25B5B60067649A /* Supabase in Frameworks */,
+				94AC026A2E25B48C0067649A /* Auth in Frameworks */,
+				94AC02722E25B48C0067649A /* Storage in Frameworks */,
+				94AC02702E25B48C0067649A /* Realtime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,11 +204,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B071CCD42E1F05840013B800 /* Frameworks */ = {
+		944E8F062E1DB40C00BB97F5 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				944E8F052E1DB40C00BB97F5 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		94AC02732E25B5B60067649A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		94D66E322E1DF1A1004F3DDB /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				94D66E312E1DF1A1004F3DDB /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		B0E915892E00AC7C0036C7A9 = {
@@ -240,8 +233,8 @@
 				B0E915942E00AC7C0036C7A9 /* Lumo */,
 				B0E915A62E00AC7D0036C7A9 /* LumoTests */,
 				B0E915B02E00AC7D0036C7A9 /* LumoUITests */,
+				94AC02732E25B5B60067649A /* Frameworks */,
 				B0E915932E00AC7C0036C7A9 /* Products */,
-				B071CCD42E1F05840013B800 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -258,33 +251,37 @@
 		B0E915942E00AC7C0036C7A9 /* Lumo */ = {
 			isa = PBXGroup;
 			children = (
+				94AC02762E25B6200067649A /* StoreLocationView.swift */,
+				94AC02772E25B6200067649A /* SupbaseManager.swift */,
+				9413B3582E25B26C00403EE3 /* AddMealView.swift */,
+				9413B3592E25B26C00403EE3 /* AuthViewModel.swift */,
+				9413B35A2E25B26C00403EE3 /* ChatbotMealSuggestionCard.swift */,
+				9413B35B2E25B26C00403EE3 /* CreateAccountView.swift */,
+				9413B35C2E25B26C00403EE3 /* GeneratedGroceryListView.swift */,
+				9413B35D2E25B26C00403EE3 /* LoginView.swift */,
+				9413B35E2E25B26C00403EE3 /* NutritionAnalysisView.swift */,
 				94D66E302E1DF1A1004F3DDB /* ApiKeyManager.md */,
-				944E8F062E1DB40C00BB97F5 /* Preview Content */,
-
+				94D66E322E1DF1A1004F3DDB /* Preview Content */,
 				94D66E352E1DF1A1004F3DDB /* SpoonacularRecipeView.swift */,
 				94D66E362E1DF1A1004F3DDB /* SpoonacularService.swift */,
 				944E8F022E1DB40C00BB97F5 /* BudgetManager.swift */,
 				944E8F032E1DB40C00BB97F5 /* InventoryData.swift */,
 				944E8F042E1DB40C00BB97F5 /* PantryManager.swift */,
+				944E8F062E1DB40C00BB97F5 /* Preview Content */,
 				944E8F072E1DB40C00BB97F5 /* SharedListManager.swift */,
 				944E8F082E1DB40C00BB97F5 /* SuggestionEngine.swift */,
 				94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */,
 				94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */,
 				B0E915952E00AC7C0036C7A9 /* LumoApp.swift */,
-				B0E915C62E00C0440036C7A9 /* StoreData.swift */,
 				B0E915972E00AC7C0036C7A9 /* ContentView.swift */,
+				B0E915C62E00C0440036C7A9 /* StoreData.swift */,
+				B0E915CC2E0349A30036C7A9 /* AppState.swift */,
 				B0E915CE2E035F770036C7A9 /* Root.swift */,
 				B0E915C22E00B7F80036C7A9 /* StoreFinder.swift */,
-				B071CD452E241CA60013B800 /* StoreLocationView.swift */,
-				B0E915C82E00C0D60036C7A9 /* StoreSelection.swift */,
-				B071CCB92E1EF8D30013B800 /* CreateAccountView.swift */,
-				B071CD3D2E20FC8F0013B800 /* AuthViewModel.swift */,
-				B071CD392E20FC830013B800 /* SupbaseManager.swift */,
-				B071CD2A2E20FB060013B800 /* LoginView.swift */,
-				B0E915CC2E0349A30036C7A9 /* AppState.swift */,
 				B0E915D02E0369E50036C7A9 /* Browse.swift */,
 				B0D283702E03D7F200C28B2C /* GroceryList.swift */,
 				B0E915D62E0372460036C7A9 /* GroceryListView.swift */,
+				B0E915C82E00C0D60036C7A9 /* StoreSelection.swift */,
 				B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */,
 				B0E915C42E00BA300036C7A9 /* TabView.swift */,
 				B0E915D42E0372460036C7A9 /* ExploreView.swift */,
@@ -296,16 +293,15 @@
 				B0E915E22E0372460036C7A9 /* DealDetailView.swift */,
 				B0E915E42E0372460036C7A9 /* CouponDetailView.swift */,
 				B0E915E62E0372460036C7A9 /* DealsData.swift */,
-				B0E915EA2E0372460036C7AA /* CategoryFilterButton.swift */,
-				B0E915EC2E0372460036C7AA /* ChatbotView.swift */,
-				B0E915EE2E0372460036C7AA /* ChatMessage.swift */,
-				B0E915F02E0372460036C7AA /* ChatbotEngine.swift */,
-				B0E915F22E0372460036C7AA /* ChatResponseViews.swift */,
-				B0E915F42E0372460036C7AA /* Recipe.swift */,
-				B0E915F62E0372460036C7AA /* ChatbotTests.swift */,
-				B0E915F72E0372460036C7AB /* TemplateViews.swift */,
-				B0E915F92E0372460036C7AB /* AutoFillView.swift */,
-				B0E915FB2E0372460036C7AB /* SmartMealPlanGenerator.swift */,
+				B0E915EA2E0372460036C7AA /* ChatbotView.swift */,
+				B0E915EC2E0372460036C7AA /* ChatMessage.swift */,
+				B0E915EE2E0372460036C7AA /* ChatbotEngine.swift */,
+				B0E915F02E0372460036C7AA /* ChatResponseViews.swift */,
+				B0E915F22E0372460036C7AA /* Recipe.swift */,
+				B0E915F42E0372460036C7AA /* RecipeDatabase.swift */,
+				B0E915FA2E0372460036C7AB /* TemplateViews.swift */,
+				B0E915FC2E0372460036C7AB /* AutoFillView.swift */,
+				B0E915FE2E0372460036C7AB /* SmartMealPlanGenerator.swift */,
 				B0E915FA2E0372460036C7AA /* MealPlanManager.swift */,
 				B0E915FC2E0372460036C7AA /* MealPlanningView.swift */,
 				B0E915FE2E0372460036C7AA /* SmartSubstitutionManager.swift */,
@@ -334,6 +330,7 @@
 			isa = PBXGroup;
 			children = (
 				B0E915A72E00AC7D0036C7A9 /* LumoTests.swift */,
+				B0E915F62E0372460036C7AA /* ChatbotTests.swift */,
 			);
 			path = LumoTests;
 			sourceTree = "<group>";
@@ -364,14 +361,6 @@
 			dependencies = (
 			);
 			name = Lumo;
-			packageProductDependencies = (
-				B071CD2D2E20FB510013B800 /* Auth */,
-				B071CD2F2E20FB510013B800 /* Functions */,
-				B071CD312E20FB510013B800 /* PostgREST */,
-				B071CD332E20FB510013B800 /* Realtime */,
-				B071CD352E20FB510013B800 /* Storage */,
-				B071CD372E20FB510013B800 /* Supabase */,
-			);
 			productName = Lumo;
 			productReference = B0E915922E00AC7C0036C7A9 /* Lumo.app */;
 			productType = "com.apple.product-type.application";
@@ -436,7 +425,7 @@
 				};
 			};
 			buildConfigurationList = B0E9158D2E00AC7C0036C7A9 /* Build configuration list for PBXProject "Lumo" */;
-			compatibilityVersion = "Xcode 15.3";
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -445,8 +434,7 @@
 			);
 			mainGroup = B0E915892E00AC7C0036C7A9;
 			packageReferences = (
-				B071CCBB2E1EFDAB0013B800 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				B071CD2C2E20FB510013B800 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			productRefGroup = B0E915932E00AC7C0036C7A9 /* Products */;
 			projectDirPath = "";
@@ -499,10 +487,7 @@
 				B0E915CB2E03182E0036C7A9 /* StoreMap.swift in Sources */,
 				B0E915982E00AC7C0036C7A9 /* ContentView.swift in Sources */,
 				B0E915C72E00C0450036C7A9 /* StoreData.swift in Sources */,
-				B071CD462E241CA60013B800 /* StoreLocationView.swift in Sources */,
-				B071CCBA2E1EF8D30013B800 /* CreateAccountView.swift in Sources */,
 				B0E915D12E0369E50036C7A9 /* Browse.swift in Sources */,
-				B071CD3A2E20FC830013B800 /* SupbaseManager.swift in Sources */,
 				B0E915CD2E0349A30036C7A9 /* AppState.swift in Sources */,
 				94F8C4492E18C9E3005A09D9 /* MealPlanningView.swift in Sources */,
 				B0E915962E00AC7C0036C7A9 /* LumoApp.swift in Sources */,
@@ -529,20 +514,26 @@
 				944E8F092E1DB40C00BB97F5 /* InventoryData.swift in Sources */,
 				944E8F0A2E1DB40C00BB97F5 /* SuggestionEngine.swift in Sources */,
 				944E8F0B2E1DB40C00BB97F5 /* SharedListManager.swift in Sources */,
-
 				94D66E3B2E1DF1A1004F3DDB /* SpoonacularService.swift in Sources */,
 				94D66E3C2E1DF1A1004F3DDB /* SpoonacularRecipeView.swift in Sources */,
 				944E8F0C2E1DB40C00BB97F5 /* PantryManager.swift in Sources */,
 				944E8F0D2E1DB40C00BB97F5 /* BudgetManager.swift in Sources */,
 				B0E915E82E0372460036C7AA /* CategoryFilterButton.swift in Sources */,
 				94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */,
+				9413B35F2E25B26C00403EE3 /* GeneratedGroceryListView.swift in Sources */,
+				94AC02782E25B6200067649A /* StoreLocationView.swift in Sources */,
+				94AC02792E25B6200067649A /* SupbaseManager.swift in Sources */,
+				9413B3602E25B26C00403EE3 /* NutritionAnalysisView.swift in Sources */,
+				9413B3612E25B26C00403EE3 /* AuthViewModel.swift in Sources */,
+				9413B3622E25B26C00403EE3 /* LoginView.swift in Sources */,
+				9413B3632E25B26C00403EE3 /* AddMealView.swift in Sources */,
+				9413B3642E25B26C00403EE3 /* ChatbotMealSuggestionCard.swift in Sources */,
+				9413B3652E25B26C00403EE3 /* CreateAccountView.swift in Sources */,
 				B0E915E92E0372460036C7AA /* ChatbotView.swift in Sources */,
 				B0E915EB2E0372460036C7AA /* ChatMessage.swift in Sources */,
 				B0E915ED2E0372460036C7AA /* ChatbotEngine.swift in Sources */,
 				B0E915EF2E0372460036C7AA /* ChatResponseViews.swift in Sources */,
-				B071CD3E2E20FC8F0013B800 /* AuthViewModel.swift in Sources */,
 				B0E915F12E0372460036C7AA /* Recipe.swift in Sources */,
-				B071CD2B2E20FB060013B800 /* LoginView.swift in Sources */,
 				B0E915F32E0372460036C7AA /* RecipeDatabase.swift in Sources */,
 				B0E915F52E0372460036C7AB /* TemplateViews.swift in Sources */,
 				B0E915F72E0372460036C7AB /* AutoFillView.swift in Sources */,
@@ -555,6 +546,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B0E915A82E00AC7D0036C7A9 /* LumoTests.swift in Sources */,
+				B0E915F52E0372460036C7AA /* ChatbotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -711,7 +703,6 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show nearby stores.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -722,7 +713,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
@@ -750,7 +741,6 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show nearby stores.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -761,7 +751,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
@@ -908,15 +898,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B071CCBB2E1EFDAB0013B800 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 11.15.0;
-			};
-		};
-		B071CD2C2E20FB510013B800 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+		94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase/supabase-swift";
 			requirement = {
@@ -927,34 +909,34 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B071CD2D2E20FB510013B800 /* Auth */ = {
+		94AC02692E25B48C0067649A /* Auth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B071CD2C2E20FB510013B800 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Auth;
 		};
-		B071CD2F2E20FB510013B800 /* Functions */ = {
+		94AC026B2E25B48C0067649A /* Functions */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B071CD2C2E20FB510013B800 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Functions;
 		};
-		B071CD312E20FB510013B800 /* PostgREST */ = {
+		94AC026D2E25B48C0067649A /* PostgREST */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B071CD2C2E20FB510013B800 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = PostgREST;
 		};
-		B071CD332E20FB510013B800 /* Realtime */ = {
+		94AC026F2E25B48C0067649A /* Realtime */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B071CD2C2E20FB510013B800 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Realtime;
 		};
-		B071CD352E20FB510013B800 /* Storage */ = {
+		94AC02712E25B48C0067649A /* Storage */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B071CD2C2E20FB510013B800 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Storage;
 		};
-		B071CD372E20FB510013B800 /* Supabase */ = {
+		94AC02742E25B5B60067649A /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B071CD2C2E20FB510013B800 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 94AC02682E25B4570067649A /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */

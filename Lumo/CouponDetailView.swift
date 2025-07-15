@@ -73,6 +73,7 @@ struct CouponDetailView: View {
                 }
                 .foregroundColor(.white)
             }
+            
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { showingShareSheet = true }) {
                     Image(systemName: "square.and.arrow.up")
