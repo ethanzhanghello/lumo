@@ -61,8 +61,8 @@ struct LumoWelcomeView: View {
                 // Buttons
                 VStack(spacing: 16) {
                     Button(action: {
-                        // Create account action
-                        print("Create Account tapped")
+                        // Navigate to Create Account
+                        navigationPath.append("CreateAccount")
                     }) {
                         Text("Create an Account")
                             .font(.headline)
@@ -74,8 +74,8 @@ struct LumoWelcomeView: View {
                     }
 
                     Button(action: {
-                        // Log in action
-                        print("Log in tapped")
+                        // Navigate to Login
+                        navigationPath.append("Login")
                     }) {
                         Text("Log in")
                             .font(.headline)

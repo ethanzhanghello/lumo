@@ -13,6 +13,9 @@ import UIKit
 @main
 struct LumoApp: App {
     @StateObject var appState = AppState()
+    @StateObject var authViewModel = AuthViewModel()
+    @State private var isLoggedIn: Bool = false
+
     init() {
         #if canImport(UIKit)
         let appearance = UITabBarAppearance()
@@ -31,11 +34,29 @@ struct LumoApp: App {
         }
         #endif
     }
-    
+
     var body: some Scene {
         WindowGroup {
-            MainTabView()
-                .environmentObject(appState)
+            Group {
+                if isLoggedIn {
+                    MainTabView()
+                        .environmentObject(appState)
+                        .environmentObject(authViewModel)
+                } else {
+                    RootView()
+                        .environmentObject(appState)
+                        .environmentObject(authViewModel)
+                }
+            }
+            .task {
+                // Async session check
+                if let session = try? await SupabaseManager.shared.client.auth.session, session != nil {
+                    isLoggedIn = true
+                }
+            }
+            .onReceive(authViewModel.$isAuthenticated) { authenticated in
+                isLoggedIn = authenticated
+            }
         }
     }
 }

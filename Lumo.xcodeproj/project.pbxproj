@@ -18,7 +18,6 @@
 		944E8F0E2E1DB40C00BB97F5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 944E8F052E1DB40C00BB97F5 /* Preview Assets.xcassets */; };
 		94D66E372E1DF1A1004F3DDB /* ApiKeyManager.md in Resources */ = {isa = PBXBuildFile; fileRef = 94D66E302E1DF1A1004F3DDB /* ApiKeyManager.md */; };
 		94D66E382E1DF1A1004F3DDB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 94D66E312E1DF1A1004F3DDB /* Preview Assets.xcassets */; };
-
 		94D66E3B2E1DF1A1004F3DDB /* SpoonacularService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D66E362E1DF1A1004F3DDB /* SpoonacularService.swift */; };
 		94D66E3C2E1DF1A1004F3DDB /* SpoonacularRecipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D66E352E1DF1A1004F3DDB /* SpoonacularRecipeView.swift */; };
 		94F8C4452E18C8E2005A09D9 /* FlyToCartAnimationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */; };
@@ -29,6 +28,17 @@
 		94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */; };
 		94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */; };
 		94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916042E0372460036C7AA /* DietaryGoalsView.swift */; };
+		B041F25B2E262A810075EEE0 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = B041F25A2E262A810075EEE0 /* Auth */; };
+		B041F25D2E262A810075EEE0 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = B041F25C2E262A810075EEE0 /* Functions */; };
+		B041F25F2E262A810075EEE0 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = B041F25E2E262A810075EEE0 /* PostgREST */; };
+		B041F2612E262A810075EEE0 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = B041F2602E262A810075EEE0 /* Realtime */; };
+		B041F2632E262A810075EEE0 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = B041F2622E262A810075EEE0 /* Storage */; };
+		B041F2652E262A810075EEE0 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = B041F2642E262A810075EEE0 /* Supabase */; };
+		B041F2692E262BED0075EEE0 /* SupbaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F2682E262BED0075EEE0 /* SupbaseManager.swift */; };
+		B041F26B2E262C020075EEE0 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F26A2E262C020075EEE0 /* AuthViewModel.swift */; };
+		B041F26D2E262CE50075EEE0 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */; };
+		B041F26F2E262CF80075EEE0 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F26E2E262CF80075EEE0 /* LoginView.swift */; };
+		B041F2712E262D270075EEE0 /* StoreLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F2702E262D270075EEE0 /* StoreLocationView.swift */; };
 		B0D283712E03D7F200C28B2C /* GroceryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283702E03D7F200C28B2C /* GroceryList.swift */; };
 		B0D283752E03DAD100C28B2C /* ApiKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */; };
 		B0E915962E00AC7C0036C7A9 /* LumoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915952E00AC7C0036C7A9 /* LumoApp.swift */; };
@@ -94,11 +104,15 @@
 		944E8F082E1DB40C00BB97F5 /* SuggestionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionEngine.swift; sourceTree = "<group>"; };
 		94D66E302E1DF1A1004F3DDB /* ApiKeyManager.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ApiKeyManager.md; sourceTree = "<group>"; };
 		94D66E312E1DF1A1004F3DDB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-
 		94D66E352E1DF1A1004F3DDB /* SpoonacularRecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpoonacularRecipeView.swift; sourceTree = "<group>"; };
 		94D66E362E1DF1A1004F3DDB /* SpoonacularService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpoonacularService.swift; sourceTree = "<group>"; };
 		94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartAnimationManager.swift; sourceTree = "<group>"; };
 		94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartOverlay.swift; sourceTree = "<group>"; };
+		B041F2682E262BED0075EEE0 /* SupbaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupbaseManager.swift; sourceTree = "<group>"; };
+		B041F26A2E262C020075EEE0 /* AuthViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
+		B041F26E2E262CF80075EEE0 /* LoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		B041F2702E262D270075EEE0 /* StoreLocationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoreLocationView.swift; sourceTree = "<group>"; };
 		B0D283702E03D7F200C28B2C /* GroceryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryList.swift; sourceTree = "<group>"; };
 		B0D283742E03DAD100C28B2C /* ApiKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeyManager.swift; sourceTree = "<group>"; };
 		B0E915922E00AC7C0036C7A9 /* Lumo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lumo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -156,6 +170,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B041F25F2E262A810075EEE0 /* PostgREST in Frameworks */,
+				B041F25D2E262A810075EEE0 /* Functions in Frameworks */,
+				B041F2652E262A810075EEE0 /* Supabase in Frameworks */,
+				B041F25B2E262A810075EEE0 /* Auth in Frameworks */,
+				B041F2632E262A810075EEE0 /* Storage in Frameworks */,
+				B041F2612E262A810075EEE0 /* Realtime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,7 +237,6 @@
 			children = (
 				94D66E302E1DF1A1004F3DDB /* ApiKeyManager.md */,
 				94D66E322E1DF1A1004F3DDB /* Preview Content */,
-
 				94D66E352E1DF1A1004F3DDB /* SpoonacularRecipeView.swift */,
 				94D66E362E1DF1A1004F3DDB /* SpoonacularService.swift */,
 				944E8F022E1DB40C00BB97F5 /* BudgetManager.swift */,
@@ -229,11 +248,16 @@
 				94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */,
 				94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */,
 				B0E915952E00AC7C0036C7A9 /* LumoApp.swift */,
+				B041F2682E262BED0075EEE0 /* SupbaseManager.swift */,
+				B041F26A2E262C020075EEE0 /* AuthViewModel.swift */,
 				B0E915972E00AC7C0036C7A9 /* ContentView.swift */,
 				B0E915C62E00C0440036C7A9 /* StoreData.swift */,
 				B0E915CC2E0349A30036C7A9 /* AppState.swift */,
 				B0E915CE2E035F770036C7A9 /* Root.swift */,
 				B0E915C22E00B7F80036C7A9 /* StoreFinder.swift */,
+				B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */,
+				B041F26E2E262CF80075EEE0 /* LoginView.swift */,
+				B041F2702E262D270075EEE0 /* StoreLocationView.swift */,
 				B0E915D02E0369E50036C7A9 /* Browse.swift */,
 				B0D283702E03D7F200C28B2C /* GroceryList.swift */,
 				B0E915D62E0372460036C7A9 /* GroceryListView.swift */,
@@ -317,6 +341,14 @@
 			dependencies = (
 			);
 			name = Lumo;
+			packageProductDependencies = (
+				B041F25A2E262A810075EEE0 /* Auth */,
+				B041F25C2E262A810075EEE0 /* Functions */,
+				B041F25E2E262A810075EEE0 /* PostgREST */,
+				B041F2602E262A810075EEE0 /* Realtime */,
+				B041F2622E262A810075EEE0 /* Storage */,
+				B041F2642E262A810075EEE0 /* Supabase */,
+			);
 			productName = Lumo;
 			productReference = B0E915922E00AC7C0036C7A9 /* Lumo.app */;
 			productType = "com.apple.product-type.application";
@@ -389,6 +421,9 @@
 				Base,
 			);
 			mainGroup = B0E915892E00AC7C0036C7A9;
+			packageReferences = (
+				B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			productRefGroup = B0E915932E00AC7C0036C7A9 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -444,6 +479,7 @@
 				B0E915CD2E0349A30036C7A9 /* AppState.swift in Sources */,
 				94F8C4492E18C9E3005A09D9 /* MealPlanningView.swift in Sources */,
 				B0E915962E00AC7C0036C7A9 /* LumoApp.swift in Sources */,
+				B041F26F2E262CF80075EEE0 /* LoginView.swift in Sources */,
 				B0E915CF2E035F770036C7A9 /* Root.swift in Sources */,
 				94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */,
 				B0D283712E03D7F200C28B2C /* GroceryList.swift in Sources */,
@@ -454,20 +490,23 @@
 				B0E915C92E00C0D60036C7A9 /* StoreSelection.swift in Sources */,
 				94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */,
 				94F8C4482E18C9AE005A09D9 /* MealPlanManager.swift in Sources */,
+				B041F26B2E262C020075EEE0 /* AuthViewModel.swift in Sources */,
+				B041F2692E262BED0075EEE0 /* SupbaseManager.swift in Sources */,
 				B0E915C32E00B7F80036C7A9 /* StoreFinder.swift in Sources */,
 				B0E915DA2E0372460036C7A9 /* ItemDetailView.swift in Sources */,
+				B041F2712E262D270075EEE0 /* StoreLocationView.swift in Sources */,
 				94F8C44A2E18C9E6005A09D9 /* SmartSubstitutionManager.swift in Sources */,
 				B0E915DB2E0372460036C7A9 /* ProfileView.swift in Sources */,
 				B0E915DD2E0372460036C7A9 /* DealsView.swift in Sources */,
 				B0E915DF2E0372460036C7A9 /* DealFiltersView.swift in Sources */,
 				B0E915E12E0372460036C7A9 /* DealDetailView.swift in Sources */,
 				B0E915E32E0372460036C7A9 /* CouponDetailView.swift in Sources */,
+				B041F26D2E262CE50075EEE0 /* CreateAccountView.swift in Sources */,
 				B0E915E52E0372460036C7A9 /* DealsData.swift in Sources */,
 				94F8C4452E18C8E2005A09D9 /* FlyToCartAnimationManager.swift in Sources */,
 				944E8F092E1DB40C00BB97F5 /* InventoryData.swift in Sources */,
 				944E8F0A2E1DB40C00BB97F5 /* SuggestionEngine.swift in Sources */,
 				944E8F0B2E1DB40C00BB97F5 /* SharedListManager.swift in Sources */,
-
 				94D66E3B2E1DF1A1004F3DDB /* SpoonacularService.swift in Sources */,
 				94D66E3C2E1DF1A1004F3DDB /* SpoonacularRecipeView.swift in Sources */,
 				944E8F0C2E1DB40C00BB97F5 /* PantryManager.swift in Sources */,
@@ -841,6 +880,50 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B041F25A2E262A810075EEE0 /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		B041F25C2E262A810075EEE0 /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		B041F25E2E262A810075EEE0 /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		B041F2602E262A810075EEE0 /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		B041F2622E262A810075EEE0 /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		B041F2642E262A810075EEE0 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B041F2592E262A810075EEE0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B0E9158A2E00AC7C0036C7A9 /* Project object */;
 }
