@@ -398,7 +398,6 @@ struct FloatingActionButtons: View {
 // MARK: - Main Store Map View
 
 struct StoreMapView: View {
-    @State private var searchText: String = "" // State for the search text field
     @State private var selectedTab: StoreViewTab? = nil // Changed to optional, initially nil
     @EnvironmentObject var appState: AppState // Add EnvironmentObject for AppState
 
@@ -407,12 +406,9 @@ struct StoreMapView: View {
             Color.black.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header with logo and navigation
-                VStack(spacing: 16) {
-                    AppHeaderView(selectedTab: $selectedTab) // Pass the binding
-                    NavigationTabsView(selectedTab: $selectedTab) // Pass the binding
-                }
-                .padding(.top, 8)
+                // Header with logo only (removed navigation tabs)
+                AppHeaderView(selectedTab: $selectedTab) // Pass the binding
+                    .padding(.top, 8)
 
                 // Dynamic Content Section
                 ZStack(alignment: .topTrailing) {
@@ -432,40 +428,15 @@ struct StoreMapView: View {
                             GroceryListView().environmentObject(appState)
                         } else {
                             // Default content when no tab is selected (StoreMapLayout)
-                            VStack{
-                                StoreMapLayout()
-                                    .padding(.trailing, 40)
-                                // Floating action buttons positioned at the top right of the map section
-                                // Search bar - now a TextField with button
-                                HStack {
-                                    // Magnifying glass as a button
-                                    Button(action: {
-                                        // Action for search button, e.g., trigger search
-                                        print("Search button tapped! Query: \(searchText)")
-                                    }) {
-                                        Image(systemName: "magnifyingglass")
-                                            .foregroundColor(.gray)
-                                    }
-                                    .padding(.trailing, 5)
-
-                                    TextField("Search for items...", text: $searchText)
-                                        .foregroundColor(.white)
-                                        .accentColor(Color.lumoGreen) // Cursor color
-                                        .font(.body)
-                                }
-                                .padding()
-                                .background(
-                                    RoundedRectangle(cornerRadius: 25)
-                                        .stroke(Color.gray.opacity(0.5), lineWidth: 1)
-                                )
-                                .padding(.horizontal, 20)
-                                .padding(.bottom, -30)
-                            }
-                            
+                            StoreMapLayout()
+                                .padding(.trailing, 40)
                         }
                     }
 
-
+                    // Floating action buttons positioned at the top right
+                    FloatingActionButtons()
+                        .padding(.top, 20)
+                        .padding(.trailing, 20)
                 }
                 // These paddings apply to the entire content area (map, deals, grocery list)
                 .padding(.vertical, 20)

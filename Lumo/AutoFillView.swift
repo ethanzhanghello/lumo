@@ -14,39 +14,56 @@ struct AutoFillView: View {
     @State private var showingPreview = false
     @State private var generatedMeals: [Meal] = []
     @State private var weekStartDate = Date()
+    @State private var selectedDays: Set<Int> = Set(0..<7) // Default: all days selected
+    @State private var isGenerating = false
+    @State private var replaceExistingMeals = false // New option
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.black.ignoresSafeArea()
+        VStack(spacing: 0) {
+            // Custom Header
+            HStack {
+                Button("Cancel") {
+                    dismiss()
+                }
+                .foregroundColor(.gray)
                 
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Header
-                        headerSection
-                        
-                        // Preferences
-                        preferencesSection
-                        
-                        // Generate Button
-                        generateButton
-                        
-                        Spacer(minLength: 100)
-                    }
-                    .padding()
-                }
+                Spacer()
+                
+                Text("Auto-Fill Week")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Color.clear.frame(width: 60)
             }
-            .navigationTitle("Auto-Fill Week")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(.gray)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color.black)
+            
+            // Main Content
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Day Selection
+                    daySelectionSection
+                    
+                    // Preferences
+                    preferencesSection
+                    
+                    // Generate Button
+                    generateButton
+                    
+                    // Bottom spacing for safe scrolling
+                    Color.clear.frame(height: 20)
                 }
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
             }
+            .background(Color.black)
         }
+        .background(Color.black)
+        .ignoresSafeArea()
         .sheet(isPresented: $showingPreview) {
             AutoFillPreviewView(meals: generatedMeals, weekStart: weekStartDate) {
                 applyAutoFill()
@@ -54,18 +71,123 @@ struct AutoFillView: View {
         }
     }
     
-    // MARK: - Header Section
-    private var headerSection: some View {
+
+    
+    // MARK: - Day Selection Section
+    private var daySelectionSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Smart Meal Planning")
-                .font(.largeTitle)
+            Text("Select Days to Auto-Fill")
+                .font(.headline)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
             
-            Text("Let AI create a balanced week of meals based on your preferences and dietary goals.")
-                .font(.subheadline)
+            Text("Choose which days you want to generate meals for")
+                .font(.caption)
                 .foregroundColor(.gray)
+            
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible()),
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 12) {
+                ForEach(0..<7, id: \.self) { dayOffset in
+                    let date = Calendar.current.date(byAdding: .day, value: dayOffset, to: weekStartDate) ?? Date()
+                    let dayName = dayFormatter.string(from: date)
+                    let dateString = dayDateFormatter.string(from: date)
+                    let isSelected = selectedDays.contains(dayOffset)
+                    let mealCount = mealManager.meals(for: date).count
+                    
+                    Button(action: {
+                        if isSelected {
+                            selectedDays.remove(dayOffset)
+                        } else {
+                            selectedDays.insert(dayOffset)
+                        }
+                    }) {
+                        VStack(spacing: 8) {
+                            Text(dayName)
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(isSelected ? .white : .gray)
+                            
+                            Text(dateString)
+                                .font(.caption2)
+                                .foregroundColor(isSelected ? .white : .gray)
+                            
+                            if mealCount > 0 {
+                                Text("\(mealCount) meals")
+                                    .font(.caption2)
+                                    .foregroundColor(isSelected ? .orange : .gray)
+                                    .fontWeight(.medium)
+                            } else {
+                                Text("empty")
+                                    .font(.caption2)
+                                    .foregroundColor(isSelected ? .green : .gray)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(isSelected ? Color.lumoGreen : Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+                    }
+                }
+            }
+            
+            HStack {
+                Button("Select All") {
+                    selectedDays = Set(0..<7)
+                }
+                .foregroundColor(.lumoGreen)
+                .font(.caption)
+                
+                Spacer()
+                
+                Button("Clear All") {
+                    selectedDays.removeAll()
+                }
+                .foregroundColor(.gray)
+                .font(.caption)
+                
+                Spacer()
+                
+                Text("\(selectedDays.count) days selected")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            
+            // Replace Existing Meals Toggle
+            HStack {
+                Toggle("Replace existing meals", isOn: $replaceExistingMeals)
+                    .foregroundColor(.white)
+            }
+            .padding(.top, 8)
+            
+            if replaceExistingMeals {
+                Text("⚠️ This will replace all existing meals on selected days")
+                    .font(.caption)
+                    .foregroundColor(.orange)
+            } else {
+                Text("ℹ️ Only empty meal slots will be filled")
+                    .font(.caption)
+                    .foregroundColor(.blue)
+            }
         }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+    }
+    
+    private var dayFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE"
+        return formatter
+    }
+    
+    private var dayDateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d"
+        return formatter
     }
     
     // MARK: - Preferences Section
@@ -151,13 +273,13 @@ struct AutoFillView: View {
                 .foregroundColor(.white)
             
             HStack {
-                Text("$\(String(format: "%.2f", preferences.budgetPerMeal))")
+                Text("$\(preferences.budgetPerMeal, specifier: "%.2f")")
                     .font(.headline)
                     .foregroundColor(.lumoGreen)
                 
                 Spacer()
                 
-                Slider(value: $preferences.budgetPerMeal, in: 5...30, step: 1)
+                Slider(value: $preferences.budgetPerMeal, in: 5...50, step: 2.5)
                     .accentColor(.lumoGreen)
             }
         }
@@ -174,15 +296,15 @@ struct AutoFillView: View {
                 GridItem(.flexible()),
                 GridItem(.flexible())
             ], spacing: 8) {
-                ForEach(cuisineOptions, id: \.self) { cuisine in
+                ForEach(cuisineOptions, id: \.self) { option in
                     CuisineChip(
-                        title: cuisine,
-                        isSelected: preferences.preferredCuisines.contains(cuisine)
+                        title: option,
+                        isSelected: preferences.preferredCuisines.contains(option)
                     ) {
-                        if preferences.preferredCuisines.contains(cuisine) {
-                            preferences.preferredCuisines.removeAll { $0 == cuisine }
+                        if preferences.preferredCuisines.contains(option) {
+                            preferences.preferredCuisines.removeAll { $0 == option }
                         } else {
-                            preferences.preferredCuisines.append(cuisine)
+                            preferences.preferredCuisines.append(option)
                         }
                     }
                 }
@@ -198,53 +320,32 @@ struct AutoFillView: View {
                 .foregroundColor(.white)
             
             HStack {
-                Button(action: {
-                    if preferences.servingsPerMeal > 1 {
-                        preferences.servingsPerMeal -= 1
-                    }
-                }) {
-                    Image(systemName: "minus.circle.fill")
-                        .foregroundColor(.lumoGreen)
-                        .font(.title2)
-                }
-                .disabled(preferences.servingsPerMeal <= 1)
+                Text("\(preferences.servingsPerMeal) servings")
+                    .font(.headline)
+                    .foregroundColor(.lumoGreen)
                 
                 Spacer()
                 
-                VStack(spacing: 4) {
-                    Text("\(preferences.servingsPerMeal)")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    Text("servings")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                
-                Spacer()
-                
-                Button(action: {
-                    preferences.servingsPerMeal += 1
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundColor(.lumoGreen)
-                        .font(.title2)
-                }
+                Stepper("", value: $preferences.servingsPerMeal, in: 1...8)
+                    .labelsHidden()
             }
-            .padding()
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(12)
         }
     }
     
+    // MARK: - Generate Button
     private var generateButton: some View {
         Button(action: generateMealPlan) {
             HStack {
-                Image(systemName: "wand.and.stars")
-                    .font(.title2)
+                if isGenerating {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .scaleEffect(0.8)
+                } else {
+                    Image(systemName: "wand.and.stars")
+                        .font(.title3)
+                }
                 
-                Text("Generate Meal Plan")
+                Text(isGenerating ? "Generating..." : "Generate Meal Plan")
                     .font(.headline)
                     .fontWeight(.semibold)
             }
@@ -252,18 +353,27 @@ struct AutoFillView: View {
             .frame(maxWidth: .infinity)
             .padding()
             .background(
-                LinearGradient(
-                    colors: [.purple, .blue],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
+                selectedDays.isEmpty ? 
+                    AnyShapeStyle(Color.gray) : 
+                    AnyShapeStyle(LinearGradient(
+                        colors: [.purple, .blue],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ))
             )
             .cornerRadius(16)
         }
+        .disabled(selectedDays.isEmpty || isGenerating)
     }
     
     // MARK: - Helper Functions
     private func generateMealPlan() {
+        print("🔵 Starting meal generation...")
+        print("🔵 Selected days: \(selectedDays)")
+        print("🔵 Replace existing meals: \(replaceExistingMeals)")
+        
+        isGenerating = true
+        
         // Calculate week start (Monday)
         let calendar = Calendar.current
         let today = Date()
@@ -271,14 +381,57 @@ struct AutoFillView: View {
         let daysToSubtract = weekday == 1 ? 0 : weekday - 2 // Monday is 2, so subtract 1
         weekStartDate = calendar.date(byAdding: .day, value: -daysToSubtract, to: today) ?? today
         
-        generatedMeals = mealManager.generateAutoFillPlan(for: weekStartDate, preferences: preferences)
-        showingPreview = true
+        print("🔵 Week start date: \(weekStartDate)")
+        print("🔵 Preferences: \(preferences)")
+        
+        // Generate meals only for selected days
+        let allGeneratedMeals = mealManager.generateAutoFillPlan(for: weekStartDate, preferences: preferences, replaceExisting: replaceExistingMeals)
+        
+        print("🔵 All generated meals count: \(allGeneratedMeals.count)")
+        for meal in allGeneratedMeals {
+            print("🔵 Generated meal: \(meal.recipeName) for \(meal.date.formatted(date: .abbreviated, time: .omitted))")
+        }
+        
+        // Filter to only include selected days
+        generatedMeals = allGeneratedMeals.filter { meal in
+            let dayOffset = calendar.dateComponents([.day], from: weekStartDate, to: meal.date).day ?? 0
+            let isSelected = selectedDays.contains(dayOffset)
+            print("🔵 Meal \(meal.recipeName) day offset: \(dayOffset), selected: \(isSelected)")
+            return isSelected
+        }
+        
+        print("🔵 Filtered meals count: \(generatedMeals.count)")
+        print("🔵 Generated \(generatedMeals.count) meals for \(selectedDays.count) selected days")
+        
+        isGenerating = false
+        
+        if !generatedMeals.isEmpty {
+            print("🔵 Showing preview with \(generatedMeals.count) meals")
+            showingPreview = true
+        } else {
+            print("🔴 No meals generated - not showing preview")
+        }
     }
     
     private func applyAutoFill() {
-        print("Applying \(generatedMeals.count) meals to meal plan")
+        print("🔵 Applying \(generatedMeals.count) meals to meal plan")
+        print("🔵 Replace existing meals: \(replaceExistingMeals)")
+        
+        // If replacing existing meals, remove them first
+        if replaceExistingMeals {
+            for dayOffset in selectedDays {
+                guard let dayDate = Calendar.current.date(byAdding: .day, value: dayOffset, to: weekStartDate) else { continue }
+                let existingMeals = mealManager.meals(for: dayDate)
+                print("🔵 Removing \(existingMeals.count) existing meals from \(dayDate.formatted(date: .abbreviated, time: .omitted))")
+                for meal in existingMeals {
+                    mealManager.removeMeal(meal)
+                }
+            }
+        }
+        
+        // Add new generated meals
         for meal in generatedMeals {
-            print("Adding meal: \(meal.recipeName) for \(meal.date.formatted(date: .abbreviated, time: .omitted))")
+            print("🔵 Adding meal: \(meal.recipeName) for \(meal.date.formatted(date: .abbreviated, time: .omitted))")
             mealManager.addMeal(meal)
         }
         
@@ -287,7 +440,7 @@ struct AutoFillView: View {
             mealManager.objectWillChange.send()
         }
         
-        print("Auto-fill applied successfully. Total meals in plan: \(mealManager.mealPlan.values.flatMap { $0 }.count)")
+        print("🔵 Auto-fill applied successfully. Total meals in plan: \(mealManager.mealPlan.values.flatMap { $0 }.count)")
         dismiss()
     }
     
@@ -351,9 +504,34 @@ struct AutoFillPreviewView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.black.ignoresSafeArea()
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Custom Header
+                HStack {
+                    Button("Back") {
+                        dismiss()
+                    }
+                    .foregroundColor(.gray)
+                    
+                    Spacer()
+                    
+                    Text("Preview (\(meals.count) meals)")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                    
+                    Spacer()
+                    
+                    Button("Apply") {
+                        onApply()
+                        dismiss()
+                    }
+                    .foregroundColor(.lumoGreen)
+                }
+                .padding()
+                .background(Color.black)
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -378,24 +556,6 @@ struct AutoFillPreviewView: View {
                         Spacer(minLength: 100)
                     }
                     .padding()
-                }
-            }
-            .navigationTitle("Preview")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Back") {
-                        dismiss()
-                    }
-                    .foregroundColor(.gray)
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Apply") {
-                        onApply()
-                        dismiss()
-                    }
-                    .foregroundColor(.lumoGreen)
                 }
             }
         }

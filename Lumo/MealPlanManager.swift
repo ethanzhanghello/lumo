@@ -46,6 +46,8 @@ enum MealType: String, CaseIterable, Codable, Identifiable {
     }
 }
 
+
+
 struct Meal: Identifiable, Codable, Equatable {
     var id = UUID()
     var date: Date
@@ -183,15 +185,32 @@ class MealPlanManager: ObservableObject {
     }
     
     // MARK: - Auto-Fill Functions
-    func generateAutoFillPlan(for weekStart: Date, preferences: AutoFillPreferences) -> [Meal] {
+    func generateAutoFillPlan(for weekStart: Date, preferences: AutoFillPreferences, replaceExisting: Bool = false) -> [Meal] {
+        print("🟡 generateAutoFillPlan called (replaceExisting: \(replaceExisting))")
         var generatedMeals: [Meal] = []
         let availableRecipes = RecipeDatabase.recipes
+        
+        print("🟡 Available recipes count: \(availableRecipes.count)")
+        if availableRecipes.isEmpty {
+            print("🔴 No recipes available in RecipeDatabase!")
+            return generatedMeals
+        }
+        
+        for (index, recipe) in availableRecipes.prefix(3).enumerated() {
+            print("🟡 Sample recipe \(index): \(recipe.name)")
+        }
         
         for dayOffset in 0..<7 {
             guard let dayDate = Calendar.current.date(byAdding: .day, value: dayOffset, to: weekStart) else { continue }
             
+            print("🟡 Processing day \(dayOffset): \(dayDate.formatted(date: .abbreviated, time: .omitted))")
+            
             for mealType in MealType.allCases {
-                if !hasMeal(for: dayDate, type: mealType) {
+                let hasExistingMeal = hasMeal(for: dayDate, type: mealType)
+                print("🟡 \(mealType.rawValue) on \(dayDate.formatted(date: .abbreviated, time: .omitted)): existing meal = \(hasExistingMeal)")
+                
+                // Generate meal if no existing meal OR if replacing existing meals
+                if !hasExistingMeal || replaceExisting {
                     if let recipe = findSuitableRecipe(for: mealType, preferences: preferences, availableRecipes: availableRecipes) {
                         let meal = Meal(
                             date: dayDate,
@@ -202,34 +221,47 @@ class MealPlanManager: ObservableObject {
                             servings: preferences.servingsPerMeal
                         )
                         generatedMeals.append(meal)
+                        print("🟢 Generated meal: \(recipe.name) for \(mealType.rawValue) on \(dayDate.formatted(date: .abbreviated, time: .omitted))")
+                    } else {
+                        print("🔴 No suitable recipe found for \(mealType.rawValue) on \(dayDate.formatted(date: .abbreviated, time: .omitted))")
                     }
+                } else {
+                    print("🟡 Skipping \(mealType.rawValue) on \(dayDate.formatted(date: .abbreviated, time: .omitted)) - existing meal and not replacing")
                 }
             }
         }
         
+        print("🟡 Total generated meals: \(generatedMeals.count)")
         return generatedMeals
     }
     
     private func findSuitableRecipe(for mealType: MealType, preferences: AutoFillPreferences, availableRecipes: [Recipe]) -> Recipe? {
-        print("Finding recipe for \(mealType.rawValue) with \(availableRecipes.count) available recipes")
+        print("🟠 Finding recipe for \(mealType.rawValue) with \(availableRecipes.count) available recipes")
         
         var filteredRecipes = availableRecipes
+        print("🟠 Starting with \(filteredRecipes.count) recipes")
         
         // Filter by cooking time
         filteredRecipes = filteredRecipes.filter { recipe in
             let totalTime = recipe.prepTime + recipe.cookTime
             let meetsTimeRequirement = totalTime <= preferences.maxCookingTime
-            print("Recipe \(recipe.name): total time \(totalTime) <= \(preferences.maxCookingTime) = \(meetsTimeRequirement)")
+            if !meetsTimeRequirement {
+                print("🟠 Recipe \(recipe.name): total time \(totalTime) > \(preferences.maxCookingTime) - FILTERED OUT")
+            }
             return meetsTimeRequirement
         }
+        print("🟠 After time filter: \(filteredRecipes.count) recipes remain")
         
         // Filter by budget (if budget is reasonable)
         if preferences.budgetPerMeal > 5 {
             filteredRecipes = filteredRecipes.filter { recipe in
                 let meetsBudget = recipe.estimatedCost <= preferences.budgetPerMeal
-                print("Recipe \(recipe.name): cost \(recipe.estimatedCost) <= \(preferences.budgetPerMeal) = \(meetsBudget)")
+                if !meetsBudget {
+                    print("🟠 Recipe \(recipe.name): cost \(recipe.estimatedCost) > \(preferences.budgetPerMeal) - FILTERED OUT")
+                }
                 return meetsBudget
             }
+            print("🟠 After budget filter: \(filteredRecipes.count) recipes remain")
         }
         
         // Filter by dietary restrictions (only if specified)
@@ -239,31 +271,39 @@ class MealPlanManager: ObservableObject {
                 let hasMatchingRestriction = preferences.dietaryRestrictions.contains { restriction in
                     recipeTags.contains { $0.lowercased().contains(restriction.lowercased()) }
                 }
-                print("Recipe \(recipe.name): dietary match = \(hasMatchingRestriction)")
+                if !hasMatchingRestriction {
+                    print("🟠 Recipe \(recipe.name): no dietary match - FILTERED OUT")
+                }
                 return hasMatchingRestriction
             }
+            print("🟠 After dietary filter: \(filteredRecipes.count) recipes remain")
         }
         
         // Filter by cuisine preference (only if specified)
         if !preferences.preferredCuisines.isEmpty {
             filteredRecipes = filteredRecipes.filter { recipe in
-                let hasPreferredCuisine = preferences.preferredCuisines.contains { cuisine in
+                let hasMatchingCuisine = preferences.preferredCuisines.contains { cuisine in
                     recipe.cuisine.lowercased().contains(cuisine.lowercased())
                 }
-                print("Recipe \(recipe.name): cuisine match = \(hasPreferredCuisine)")
-                return hasPreferredCuisine
+                if !hasMatchingCuisine {
+                    print("🟠 Recipe \(recipe.name): no cuisine match - FILTERED OUT")
+                }
+                return hasMatchingCuisine
             }
+            print("🟠 After cuisine filter: \(filteredRecipes.count) recipes remain")
         }
         
-        print("Final filtered recipes for \(mealType.rawValue): \(filteredRecipes.count)")
+        print("🟠 Final filtered recipes count: \(filteredRecipes.count)")
         
-        // If no recipes match strict criteria, return any recipe
-        if filteredRecipes.isEmpty {
-            print("No recipes match criteria, returning any recipe")
-            return availableRecipes.randomElement()
+        // Return a random suitable recipe
+        let selectedRecipe = filteredRecipes.randomElement()
+        if let recipe = selectedRecipe {
+            print("🟢 Selected recipe: \(recipe.name) for \(mealType.rawValue)")
+        } else {
+            print("🔴 No suitable recipe found for \(mealType.rawValue)")
         }
         
-        return filteredRecipes.randomElement()
+        return selectedRecipe
     }
     
     // MARK: - Nutrition Analysis
@@ -469,5 +509,13 @@ class MealPlanManager: ObservableObject {
         }
         
         return samplePlans
+    }
+}
+
+extension Date {
+    func startOfWeek() -> Date {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self)
+        return calendar.date(from: components) ?? self
     }
 } 

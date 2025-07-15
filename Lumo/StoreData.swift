@@ -77,7 +77,14 @@ let sampleLAStores: [Store] = [
     Store(name: "Lumo Hollywood", address: "789 Sunset Blvd", city: "Hollywood", state: "CA", zip: "90028", phone: "(323) 555-3003", latitude: 34.0901, longitude: -118.3304, storeType: .department, hours: "9AM-8PM", rating: 4.4),
     Store(name: "Lumo Pasadena", address: "101 Colorado Blvd", city: "Pasadena", state: "CA", zip: "91105", phone: "(626) 555-4004", latitude: 34.1478, longitude: -118.1445, storeType: .pharmacy, hours: "8AM-10PM", rating: 4.7),
     Store(name: "Lumo Long Beach", address: "200 Pine Ave", city: "Long Beach", state: "CA", zip: "90802", phone: "(562) 555-5005", latitude: 33.7686, longitude: -118.1956, storeType: .convenience, hours: "6AM-11PM", rating: 4.2),
-    Store(name: "Lumo Beverly Hills", address: "300 Rodeo Dr", city: "Beverly Hills", state: "CA", zip: "90210", phone: "(310) 555-6006", latitude: 34.0736, longitude: -118.4004, storeType: .specialty, hours: "10AM-7PM", rating: 4.9, isFavorite: true)
+    Store(name: "Lumo Beverly Hills", address: "300 Rodeo Dr", city: "Beverly Hills", state: "CA", zip: "90210", phone: "(310) 555-6006", latitude: 34.0736, longitude: -118.4004, storeType: .specialty, hours: "10AM-7PM", rating: 4.9, isFavorite: true),
+    // --- Berkeley Stores ---
+    Store(name: "Berkeley Bowl", address: "2020 Oregon St", city: "Berkeley", state: "CA", zip: "94703", phone: "(510) 843-6929", latitude: 37.8590, longitude: -122.2727, storeType: .grocery, hours: "9AM-8PM", rating: 4.7),
+    Store(name: "Trader Joe's Berkeley", address: "1885 University Ave", city: "Berkeley", state: "CA", zip: "94703", phone: "(510) 204-9074", latitude: 37.8715, longitude: -122.2727, storeType: .grocery, hours: "8AM-9PM", rating: 4.6),
+    Store(name: "Safeway Berkeley", address: "1444 Shattuck Pl", city: "Berkeley", state: "CA", zip: "94709", phone: "(510) 526-3086", latitude: 37.8796, longitude: -122.2697, storeType: .grocery, hours: "6AM-12AM", rating: 4.2),
+    Store(name: "Whole Foods Market", address: "3000 Telegraph Ave", city: "Berkeley", state: "CA", zip: "94705", phone: "(510) 649-1333", latitude: 37.8555, longitude: -122.2588, storeType: .grocery, hours: "8AM-10PM", rating: 4.5),
+    Store(name: "Monterey Market", address: "1550 Hopkins St", city: "Berkeley", state: "CA", zip: "94707", phone: "(510) 526-6042", latitude: 37.8822, longitude: -122.2822, storeType: .grocery, hours: "8AM-7PM", rating: 4.8),
+    Store(name: "CVS Pharmacy Berkeley", address: "2300 Shattuck Ave", city: "Berkeley", state: "CA", zip: "94704", phone: "(510) 705-8401", latitude: 37.8688, longitude: -122.2670, storeType: .pharmacy, hours: "8AM-10PM", rating: 4.1)
 ]
 
 // Extension to make it easier to get CLLocationCoordinate2D from Store

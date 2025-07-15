@@ -28,6 +28,15 @@ struct ChatbotView: View {
     @State private var sheetRecipe: Recipe? = nil
     @State private var sheetProduct: Product? = nil
     
+    // Enhanced meal planning states
+    @State private var showMealPlanningSheet = false
+    @State private var selectedRecipeForPlanning: Recipe? = nil
+    @State private var selectedDate = Date()
+    @State private var selectedMealType: MealType = .dinner
+    @State private var selectedServings = 2
+    @State private var showBatchPlanningSheet = false
+    @State private var batchMeals: [BatchMealSelection] = []
+    
     init() {
         // Initialize with a placeholder - will be updated in onAppear
         self._chatbotEngine = StateObject(wrappedValue: ChatbotEngine(appState: AppState()))
@@ -142,6 +151,32 @@ struct ChatbotView: View {
             }
             .sheet(isPresented: $showShareSheet) {
                 ActivityView(activityItems: [shareText])
+            }
+            .sheet(isPresented: $showMealPlanningSheet) {
+                if let recipe = selectedRecipeForPlanning {
+                    EnhancedMealPlanningSheet(
+                        recipe: recipe,
+                        selectedDate: $selectedDate,
+                        selectedMealType: $selectedMealType,
+                        selectedServings: $selectedServings,
+                        onConfirm: {
+                            addMealToPlan(recipe: recipe, date: selectedDate, mealType: selectedMealType, servings: selectedServings)
+                            showMealPlanningSheet = false
+                        }
+                    )
+                }
+            }
+            .sheet(isPresented: $showBatchPlanningSheet) {
+                if let recipe = selectedRecipeForPlanning {
+                    BatchMealPlanningSheet(
+                        recipe: recipe,
+                        batchMeals: $batchMeals,
+                        onConfirm: {
+                            addBatchMealsToPlan()
+                            showBatchPlanningSheet = false
+                        }
+                    )
+                }
             }
         }
         .onAppear {
@@ -432,105 +467,33 @@ struct ChatbotView: View {
         impactFeedback.impactOccurred()
         
         switch action {
-        case .addToList, .addToCart:
-            // Add all recipe or product ingredients to grocery list
+        case .addToList:
             if let recipe = message.recipe {
-                var missingIngredients: [String] = []
+                // Enhanced ingredient addition with better feedback
                 var addedIngredients: [String] = []
+                var missingIngredients: [String] = []
                 
                 for ingredient in recipe.ingredients {
-                    print("Processing ingredient: \(ingredient.name)")
-                    
-                    // Try exact match first
-                    if let matchedItem = sampleGroceryItems.first(where: { $0.name.lowercased() == ingredient.name.lowercased() }) {
-                        print("Exact match found: \(matchedItem.name)")
-                        appState.quickAddToGroceryList(matchedItem)
-                        addedIngredients.append(matchedItem.name)
+                    // Try to find matching grocery item
+                    if let groceryItem = sampleGroceryItems.first(where: { item in
+                        item.name.lowercased().contains(ingredient.name.lowercased()) ||
+                        ingredient.name.lowercased().contains(item.name.lowercased())
+                    }) {
+                        let scaledAmount = ingredient.amount * (Double(selectedServings) / Double(recipe.servings))
+                        let itemToAdd = GroceryItem(
+                            name: ingredient.name,
+                            description: "\(scaledAmount) \(ingredient.unit) - from \(recipe.name)",
+                            price: groceryItem.price,
+                            category: groceryItem.category,
+                            aisle: groceryItem.aisle,
+                            brand: groceryItem.brand,
+                            hasDeal: groceryItem.hasDeal,
+                            dealDescription: groceryItem.dealDescription
+                        )
+                        appState.groceryList.addItem(itemToAdd)
+                        addedIngredients.append(ingredient.name)
                     } else {
-                        // Try partial match (e.g., "chicken breast" matches "Chicken Breast")
-                        let ingredientWords = ingredient.name.lowercased().split(separator: " ")
-                        if let matchedItem = sampleGroceryItems.first(where: { item in
-                            let itemWords = item.name.lowercased().split(separator: " ")
-                            return ingredientWords.allSatisfy { word in
-                                itemWords.contains(word)
-                            }
-                        }) {
-                            print("Partial match found: \(matchedItem.name) for \(ingredient.name)")
-                            appState.quickAddToGroceryList(matchedItem)
-                            addedIngredients.append(matchedItem.name)
-                        } else {
-                            print("No match for ingredient: \(ingredient.name)")
-                            missingIngredients.append(ingredient.name)
-                        }
-                    }
-                }
-                
-                print("Added ingredients: \(addedIngredients)")
-                print("Missing ingredients: \(missingIngredients)")
-                
-                if missingIngredients.isEmpty {
-                    showConfirmationToast("Added all ingredients to your grocery list!")
-                } else if !addedIngredients.isEmpty {
-                    showConfirmationToast("Added \(addedIngredients.joined(separator: ", ")) to your list. Some items not found: \(missingIngredients.joined(separator: ", "))")
-                } else {
-                    showConfirmationToast("Could not add any ingredients to your grocery list.")
-                }
-            } else if let product = message.product {
-                print("Processing product: \(product.name)")
-                if let matchedItem = sampleGroceryItems.first(where: { $0.name.lowercased() == product.name.lowercased() }) {
-                    print("Matched sampleGroceryItem: \(matchedItem.name)")
-                    appState.quickAddToGroceryList(matchedItem)
-                    showConfirmationToast("Added \(product.name) to your grocery list!")
-                } else {
-                    print("No match for product: \(product.name)")
-                    showConfirmationToast("Could not add \(product.name) to your grocery list.")
-                }
-            } else {
-                // Parse ingredients from message content (for meal overviews)
-                print("No recipe or product found, parsing message content for ingredients")
-                let ingredients = extractIngredientsFromMessage(message.content)
-                print("Extracted ingredients from message: \(ingredients)")
-                
-                var missingIngredients: [String] = []
-                var addedIngredients: [String] = []
-                
-                for ingredient in ingredients {
-                    print("Processing extracted ingredient: \(ingredient)")
-                    
-                    // Try exact match first
-                    if let matchedItem = sampleGroceryItems.first(where: { $0.name.lowercased() == ingredient.lowercased() }) {
-                        print("Exact match found: \(matchedItem.name)")
-                        appState.quickAddToGroceryList(matchedItem)
-                        addedIngredients.append(matchedItem.name)
-                    } else {
-                        // Try partial match with more flexible logic
-                        let ingredientWords = ingredient.lowercased().split(separator: " ")
-                        if let matchedItem = sampleGroceryItems.first(where: { item in
-                            let itemWords = item.name.lowercased().split(separator: " ")
-                            // Check if all ingredient words are found in item words
-                            return ingredientWords.allSatisfy { word in
-                                itemWords.contains(word) || itemWords.contains { $0.contains(word) }
-                            }
-                        }) {
-                            print("Partial match found: \(matchedItem.name) for \(ingredient)")
-                            appState.quickAddToGroceryList(matchedItem)
-                            addedIngredients.append(matchedItem.name)
-                        } else {
-                            // Try reverse matching (item words in ingredient)
-                            if let matchedItem = sampleGroceryItems.first(where: { item in
-                                let itemWords = item.name.lowercased().split(separator: " ")
-                                return itemWords.allSatisfy { word in
-                                    ingredientWords.contains(word) || ingredientWords.contains { $0.contains(word) }
-                                }
-                            }) {
-                                print("Reverse match found: \(matchedItem.name) for \(ingredient)")
-                                appState.quickAddToGroceryList(matchedItem)
-                                addedIngredients.append(matchedItem.name)
-                            } else {
-                                print("No match for extracted ingredient: \(ingredient)")
-                                missingIngredients.append(ingredient)
-                            }
-                        }
+                        missingIngredients.append(ingredient.name)
                     }
                 }
                 
@@ -538,66 +501,56 @@ struct ChatbotView: View {
                 print("Missing ingredients: \(missingIngredients)")
                 
                 if missingIngredients.isEmpty && !addedIngredients.isEmpty {
-                    showConfirmationToast("Added all ingredients to your grocery list!")
+                    showConfirmationToast("Added all \(addedIngredients.count) ingredients to your grocery list!")
                 } else if !addedIngredients.isEmpty {
-                    showConfirmationToast("Added \(addedIngredients.joined(separator: ", ")) to your list. Some items not found: \(missingIngredients.joined(separator: ", "))")
+                    showConfirmationToast("Added \(addedIngredients.count) ingredients. \(missingIngredients.count) items need manual addition.")
                 } else {
-                    showConfirmationToast("Could not add any ingredients to your grocery list.")
+                    showConfirmationToast("Could not add any ingredients automatically. Please add manually.")
                 }
             }
-        case .mealPlan:
-            // Add recipe to today's meal plan as dinner
+            
+        case .mealPlan, .addToMealPlan:
+            // Enhanced meal planning with date/time selection
             if let recipe = message.recipe {
-                let meal = Meal(
-                    date: Date(),
-                    type: .dinner,
-                    recipeName: recipe.name,
-                    ingredients: recipe.ingredients.map { $0.name },
-                    recipe: recipe,
-                    servings: recipe.servings
-                )
-                MealPlanManager.shared.addMeal(meal)
-                showConfirmationToast("Added \(recipe.name) to your meal plan for today!")
+                selectedRecipeForPlanning = recipe
+                selectedDate = Date()
+                selectedMealType = .dinner
+                selectedServings = recipe.servings
+                showMealPlanningSheet = true
+            } else {
+                showConfirmationToast("No recipe found to add to meal plan")
             }
-        case .addToMealPlan:
-            // Add recipe to meal plan with specific date and meal type
-            if let recipe = message.recipe {
-                // For now, add to today's dinner, but this could be enhanced with date/meal type selection
-                let meal = Meal(
-                    date: Date(),
-                    type: .dinner,
-                    recipeName: recipe.name,
-                    ingredients: recipe.ingredients.map { $0.name },
-                    recipe: recipe,
-                    servings: recipe.servings
-                )
-                MealPlanManager.shared.addMeal(meal)
-                showConfirmationToast("Added \(recipe.name) to your meal plan!")
-            }
+            
         case .showAisle:
             if let recipe = message.recipe {
                 showRecipeRoute(recipe)
             } else if let product = message.product {
                 showProductLocation(product)
             }
+            
         case .scaleRecipe:
             if let recipe = message.recipe {
                 sheetRecipe = recipe
                 scaleServings = recipe.servings
                 showScaleSheet = true
             }
+            
         case .findAlternatives:
             if let product = message.product {
                 showProductAlternatives(product)
             }
+            
         case .clipCoupon:
             if let deal = message.deal {
                 clipCoupon(deal)
             }
+            
         case .showDeals:
             showDealsPage()
+            
         case .navigateTo:
             showStoreNavigation()
+            
         case .addToFavorites:
             if let recipe = message.recipe {
                 appState.addRecipeToFavorites(recipe)
@@ -606,13 +559,16 @@ struct ChatbotView: View {
                 appState.addProductToFavorites(product)
                 showConfirmationToast("Added \(product.name) to favorites!")
             }
+            
         case .shareRecipe:
             if let recipe = message.recipe {
                 shareText = "Recipe: \(recipe.name)\n\nIngredients:\n" + recipe.ingredients.map { "- \($0.displayAmount) \($0.name)" }.joined(separator: "\n")
                 showShareSheet = true
             }
+            
         case .filterByDiet:
             showDietaryFilters()
+            
         case .showNutrition:
             if let recipe = message.recipe {
                 sheetRecipe = recipe
@@ -621,67 +577,107 @@ struct ChatbotView: View {
                 sheetProduct = product
                 showNutritionSheet = true
             }
+            
         case .findInStore:
             showStoreFinder()
+            
         case .comparePrices:
             showPriceComparison()
+            
         case .pantryCheck:
             showPantryCheck()
+            
         case .budgetFilter:
             showBudgetFilter()
+            
         case .timeFilter:
             showTimeFilter()
+            
         case .allergenCheck:
             showAllergenCheck()
+            
         case .storeInfo:
             showStoreInfo()
+            
         case .showIngredients:
             if let recipe = message.recipe {
                 sheetRecipe = recipe
                 showIngredientsSheet = true
             }
+            
         case .surpriseMeal:
             generateSurpriseMeal()
+            
         case .showRecipe:
-            break
-        case .showUrgent:
-            // Show urgent items in shared list (placeholder)
-            showConfirmationToast("Showing urgent items!")
-        case .shareList:
-            // Share the current shared list (placeholder)
-            showConfirmationToast("Shared the list!")
-        case .syncStatus:
-            showConfirmationToast("Sync status checked!")
-        case .showBudget:
-            showConfirmationToast("Showing budget!")
-        case .optimizeBudget:
-            showConfirmationToast("Optimizing budget!")
-        case .showSeasonal:
-            showConfirmationToast("Showing seasonal items!")
-        case .showFrequent:
-            showConfirmationToast("Showing frequent items!")
-        case .showWeather:
-            showConfirmationToast("Showing weather-based suggestions!")
-        case .showHoliday:
-            showConfirmationToast("Showing holiday items!")
-        case .addAllSuggestions:
-            showConfirmationToast("Added all suggestions!")
-        case .scanBarcode:
-            showConfirmationToast("Barcode scanner opened!")
-        case .removeExpired:
-            showConfirmationToast("Removed expired items!")
-        case .addToPantry:
-            showConfirmationToast("Added to pantry!")
-        case .showSharedLists:
-            showConfirmationToast("Showing shared lists!")
-        case .addToSharedList:
-            showConfirmationToast("Added to shared list!")
-        case .showFamily:
-            showConfirmationToast("Showing family members!")
+            if let recipe = message.recipe {
+                // Show detailed recipe view
+                sheetRecipe = recipe
+                showIngredientsSheet = true
+            }
+            
+        // Enhanced batch planning action
+        case .addToCart:
+            if let recipe = message.recipe {
+                // Start batch planning workflow
+                batchMeals = []
+                selectedRecipeForPlanning = recipe
+                showBatchPlanningSheet = true
+            }
+            
+        // Add missing cases
         case .showInventory:
             showConfirmationToast("Showing inventory!")
+            
         case .showPantry:
             showConfirmationToast("Showing pantry!")
+            
+        case .scanBarcode:
+            showConfirmationToast("Opening barcode scanner!")
+            
+        case .removeExpired:
+            showConfirmationToast("Removing expired items!")
+            
+        case .addToPantry:
+            showConfirmationToast("Adding to pantry!")
+            
+        case .showSharedLists:
+            showConfirmationToast("Showing shared lists!")
+            
+        case .addToSharedList:
+            showConfirmationToast("Adding to shared list!")
+            
+        case .showFamily:
+            showConfirmationToast("Showing family members!")
+            
+        case .showUrgent:
+            showConfirmationToast("Showing urgent items!")
+            
+        case .shareList:
+            showConfirmationToast("Shared the list!")
+            
+        case .syncStatus:
+            showConfirmationToast("Sync status checked!")
+            
+        case .showBudget:
+            showConfirmationToast("Showing budget!")
+            
+        case .optimizeBudget:
+            showConfirmationToast("Optimizing budget!")
+            
+        case .showSeasonal:
+            showConfirmationToast("Showing seasonal items!")
+            
+        case .showFrequent:
+            showConfirmationToast("Showing frequent items!")
+            
+        case .showWeather:
+            showConfirmationToast("Showing weather-based suggestions!")
+            
+        case .showHoliday:
+            showConfirmationToast("Showing holiday items!")
+            
+        case .addAllSuggestions:
+            showConfirmationToast("Adding all suggestions!")
         }
     }
     
@@ -997,6 +993,61 @@ struct ChatbotView: View {
         }
         
         return Array(Set(inferredIngredients))
+    }
+    
+    // MARK: - Enhanced Helper Functions
+    
+    private func addMealToPlan(recipe: Recipe, date: Date, mealType: MealType, servings: Int) {
+        let meal = Meal(
+            date: date,
+            type: mealType,
+            recipeName: recipe.name,
+            ingredients: recipe.ingredients.map { $0.name },
+            recipe: recipe,
+            servings: servings
+        )
+        
+        MealPlanManager.shared.addMeal(meal)
+        
+        // Enhanced feedback with specific details
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        let dateString = dateFormatter.string(from: date)
+        
+        showConfirmationToast("Added \(recipe.name) to \(mealType.rawValue.lowercased()) on \(dateString)!")
+        
+        // Haptic feedback for success
+        let notificationFeedback = UINotificationFeedbackGenerator()
+        notificationFeedback.notificationOccurred(.success)
+    }
+    
+    private func addBatchMealsToPlan() {
+        var addedCount = 0
+        
+        for batchMeal in batchMeals {
+            guard let recipe = selectedRecipeForPlanning else { continue }
+            
+            let meal = Meal(
+                date: batchMeal.date,
+                type: batchMeal.mealType,
+                recipeName: recipe.name,
+                ingredients: recipe.ingredients.map { $0.name },
+                recipe: recipe,
+                servings: batchMeal.servings
+            )
+            
+            MealPlanManager.shared.addMeal(meal)
+            addedCount += 1
+        }
+        
+        showConfirmationToast("Added \(addedCount) meals to your meal plan!")
+        
+        // Clear batch selections
+        batchMeals = []
+        
+        // Haptic feedback for success
+        let notificationFeedback = UINotificationFeedbackGenerator()
+        notificationFeedback.notificationOccurred(.success)
     }
 }
 
@@ -1328,16 +1379,67 @@ struct NutritionSheet: View {
 // MARK: - Product Nutrition Sheet
 struct ProductNutritionSheet: View {
     let product: Product
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
-        VStack(spacing: 16) {
-            Text(product.name)
-                .font(.title2)
-                .bold()
-            // Add product nutrition info here if available
-            Text("Nutrition info not available.")
-            Spacer()
+        NavigationView {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text(product.name)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        
+                        if let nutrition = product.nutritionInfo {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Nutrition Facts")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                                
+                                VStack(spacing: 8) {
+                                    NutritionRow(label: "Calories", value: "\(nutrition.calories)")
+                                    NutritionRow(label: "Protein", value: String(format: "%.1f", nutrition.protein) + "g")
+                                    NutritionRow(label: "Carbs", value: String(format: "%.1f", nutrition.carbs) + "g")
+                                    NutritionRow(label: "Fat", value: String(format: "%.1f", nutrition.fat) + "g")
+                                    if let fiber = nutrition.fiber {
+                                        NutritionRow(label: "Fiber", value: String(format: "%.1f", fiber) + "g")
+                                    }
+                                    if let sugar = nutrition.sugar {
+                                        NutritionRow(label: "Sugar", value: String(format: "%.1f", sugar) + "g")
+                                    }
+                                    if let sodium = nutrition.sodium {
+                                        NutritionRow(label: "Sodium", value: "\(sodium)mg")
+                                    }
+                                }
+                                .padding()
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(12)
+                            }
+                        } else {
+                            Text("Nutrition information not available")
+                                .foregroundColor(.gray)
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Nutrition Info")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .foregroundColor(.lumoGreen)
+                }
+            }
         }
-        .padding()
     }
 }
 
@@ -1369,5 +1471,748 @@ struct ActivityView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIActivityViewController {
         UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
     }
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+} 
+
+// MARK: - Enhanced Meal Planning Sheet
+struct EnhancedMealPlanningSheet: View {
+    let recipe: Recipe
+    @Binding var selectedDate: Date
+    @Binding var selectedMealType: MealType
+    @Binding var selectedServings: Int
+    let onConfirm: () -> Void
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Recipe Preview
+                        recipePreviewSection
+                        
+                        // Date Selection
+                        dateSelectionSection
+                        
+                        // Meal Type Selection
+                        mealTypeSelectionSection
+                        
+                        // Servings Selection
+                        servingsSelectionSection
+                        
+                        // Confirm Button
+                        confirmButton
+                        
+                        Spacer(minLength: 20)
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Add to Meal Plan")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(
+                leading: Button("Cancel") { dismiss() },
+                trailing: Button("Add") { onConfirm() }
+                    .fontWeight(.semibold)
+                    .foregroundColor(.lumoGreen)
+            )
+        }
+    }
+    
+    private var recipePreviewSection: some View {
+        VStack(spacing: 12) {
+            Text(recipe.name)
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+            
+            Text(recipe.description)
+                .font(.subheadline)
+                .foregroundColor(.gray)
+                .multilineTextAlignment(.center)
+            
+            HStack(spacing: 16) {
+                InfoChip(icon: "clock", text: "\(recipe.totalTime) min")
+                InfoChip(icon: "person.2", text: "\(recipe.servings) servings")
+                InfoChip(icon: "star.fill", text: String(format: "%.1f", recipe.rating))
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+    }
+    
+    private var dateSelectionSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Select Date")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            DatePicker(
+                "Date",
+                selection: $selectedDate,
+                in: Date()...,
+                displayedComponents: .date
+            )
+            .datePickerStyle(.graphical)
+            .colorScheme(.dark)
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+    }
+    
+    private var mealTypeSelectionSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Meal Type")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 12) {
+                ForEach(MealType.allCases, id: \.self) { mealType in
+                    MealTypeSelectionCard(
+                        mealType: mealType,
+                        isSelected: selectedMealType == mealType
+                    ) {
+                        selectedMealType = mealType
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+    }
+    
+    private var servingsSelectionSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Servings")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            HStack {
+                Button(action: {
+                    if selectedServings > 1 {
+                        selectedServings -= 1
+                    }
+                }) {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(selectedServings > 1 ? .lumoGreen : .gray)
+                }
+                .disabled(selectedServings <= 1)
+                
+                Spacer()
+                
+                Text("\(selectedServings)")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Button(action: {
+                    if selectedServings < 12 {
+                        selectedServings += 1
+                    }
+                }) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(selectedServings < 12 ? .lumoGreen : .gray)
+                }
+                .disabled(selectedServings >= 12)
+            }
+            .padding()
+            .background(Color.gray.opacity(0.05))
+            .cornerRadius(8)
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+    }
+    
+    private var confirmButton: some View {
+        Button(action: onConfirm) {
+            HStack {
+                Image(systemName: "calendar.badge.plus")
+                    .font(.title2)
+                
+                Text("Add to Meal Plan")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                LinearGradient(
+                    colors: [.lumoGreen, .green],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .cornerRadius(12)
+        }
+    }
+}
+
+// MARK: - Batch Meal Planning Sheet
+struct BatchMealPlanningSheet: View {
+    let recipe: Recipe
+    @Binding var batchMeals: [BatchMealSelection]
+    let onConfirm: () -> Void
+    @Environment(\.dismiss) private var dismiss
+    
+    @State private var selectedDates: Set<Date> = []
+    @State private var selectedMealTypes: Set<MealType> = [.dinner]
+    @State private var defaultServings = 2
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Header
+                        headerSection
+                        
+                        // Quick Selection Buttons
+                        quickSelectionSection
+                        
+                        // Date Range Selection
+                        dateRangeSection
+                        
+                        // Meal Types Selection
+                        mealTypesSection
+                        
+                        // Preview Section
+                        previewSection
+                        
+                        // Confirm Button
+                        confirmButton
+                        
+                        Spacer(minLength: 20)
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Batch Meal Planning")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(
+                leading: Button("Cancel") { dismiss() },
+                trailing: Button("Add All") { 
+                    generateBatchMeals()
+                    onConfirm() 
+                }
+                .fontWeight(.semibold)
+                .foregroundColor(.lumoGreen)
+                .disabled(selectedDates.isEmpty || selectedMealTypes.isEmpty)
+            )
+        }
+        .onAppear {
+            generateBatchMeals()
+        }
+        .onChange(of: selectedDates) { _, _ in generateBatchMeals() }
+        .onChange(of: selectedMealTypes) { _, _ in generateBatchMeals() }
+        .onChange(of: defaultServings) { _, _ in generateBatchMeals() }
+    }
+    
+    private var headerSection: some View {
+        VStack(spacing: 12) {
+            Text("Plan Multiple Meals")
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            Text("Select dates and meal types to add \(recipe.name) to your meal plan")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+                .multilineTextAlignment(.center)
+        }
+    }
+    
+    private var quickSelectionSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Quick Selection")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 12) {
+                QuickBatchButton(title: "This Week", subtitle: "7 days") {
+                    selectWeek()
+                }
+                
+                QuickBatchButton(title: "Next 3 Days", subtitle: "Quick plan") {
+                    selectNext3Days()
+                }
+                
+                QuickBatchButton(title: "All Dinners", subtitle: "Evening meals") {
+                    selectedMealTypes = [.dinner]
+                }
+                
+                QuickBatchButton(title: "All Meals", subtitle: "Full day") {
+                    selectedMealTypes = Set(MealType.allCases)
+                }
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+    }
+    
+    private var dateRangeSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Select Dates")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            // Custom date picker with multiple selection would go here
+            // For now, using a simplified approach
+            VStack(spacing: 8) {
+                ForEach(0..<7, id: \.self) { dayOffset in
+                    if let date = Calendar.current.date(byAdding: .day, value: dayOffset, to: Date()) {
+                        DateSelectionRow(
+                            date: date,
+                            isSelected: selectedDates.contains(date)
+                        ) {
+                            toggleDateSelection(date)
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+    }
+    
+    private var mealTypesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Meal Types")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 12) {
+                ForEach(MealType.allCases, id: \.self) { mealType in
+                    MealTypeSelectionCard(
+                        mealType: mealType,
+                        isSelected: selectedMealTypes.contains(mealType)
+                    ) {
+                        toggleMealTypeSelection(mealType)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+    }
+    
+    private var previewSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Preview (\(batchMeals.count) meals)")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            if batchMeals.isEmpty {
+                Text("Select dates and meal types to see preview")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding()
+            } else {
+                LazyVStack(spacing: 8) {
+                    ForEach(batchMeals.prefix(5), id: \.id) { meal in
+                        BatchMealPreviewRow(meal: meal)
+                    }
+                    
+                    if batchMeals.count > 5 {
+                        Text("+ \(batchMeals.count - 5) more meals")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+    }
+    
+    private var confirmButton: some View {
+        Button(action: {
+            generateBatchMeals()
+            onConfirm()
+        }) {
+            HStack {
+                Image(systemName: "calendar.badge.plus")
+                    .font(.title2)
+                
+                Text("Add \(batchMeals.count) Meals")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                batchMeals.isEmpty ? 
+                AnyView(Color.gray.opacity(0.3)) :
+                AnyView(LinearGradient(
+                    colors: [.lumoGreen, .green],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                ))
+            )
+            .cornerRadius(12)
+        }
+        .disabled(batchMeals.isEmpty)
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func selectWeek() {
+        selectedDates = Set((0..<7).compactMap { dayOffset in
+            Calendar.current.date(byAdding: .day, value: dayOffset, to: Date())
+        })
+    }
+    
+    private func selectNext3Days() {
+        selectedDates = Set((0..<3).compactMap { dayOffset in
+            Calendar.current.date(byAdding: .day, value: dayOffset, to: Date())
+        })
+    }
+    
+    private func toggleDateSelection(_ date: Date) {
+        if selectedDates.contains(date) {
+            selectedDates.remove(date)
+        } else {
+            selectedDates.insert(date)
+        }
+    }
+    
+    private func toggleMealTypeSelection(_ mealType: MealType) {
+        if selectedMealTypes.contains(mealType) {
+            selectedMealTypes.remove(mealType)
+        } else {
+            selectedMealTypes.insert(mealType)
+        }
+    }
+    
+    private func generateBatchMeals() {
+        batchMeals = []
+        
+        for date in selectedDates.sorted() {
+            for mealType in selectedMealTypes {
+                let batchMeal = BatchMealSelection(
+                    date: date,
+                    mealType: mealType,
+                    servings: defaultServings
+                )
+                batchMeals.append(batchMeal)
+            }
+        }
+    }
+}
+
+// MARK: - Supporting Data Structures
+
+struct BatchMealSelection: Identifiable {
+    let id = UUID()
+    let date: Date
+    let mealType: MealType
+    let servings: Int
+}
+
+// MARK: - Supporting UI Components
+
+struct InfoChip: View {
+    let icon: String
+    let text: String
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.caption)
+            Text(text)
+                .font(.caption)
+        }
+        .foregroundColor(.white.opacity(0.8))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Color.white.opacity(0.1))
+        .cornerRadius(6)
+    }
+}
+
+struct MealTypeSelectionCard: View {
+    let mealType: MealType
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 8) {
+                Text(mealType.emoji)
+                    .font(.title2)
+                
+                Text(mealType.rawValue)
+                    .font(.caption)
+                    .fontWeight(.medium)
+            }
+            .foregroundColor(isSelected ? .white : .gray)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                isSelected ? 
+                mealType.color.opacity(0.8) : 
+                Color.gray.opacity(0.1)
+            )
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(
+                        isSelected ? mealType.color : Color.clear,
+                        lineWidth: 2
+                    )
+            )
+        }
+    }
+}
+
+struct QuickBatchButton: View {
+    let title: String
+    let subtitle: String
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .background(Color.gray.opacity(0.1))
+            .cornerRadius(8)
+        }
+    }
+}
+
+struct DateSelectionRow: View {
+    let date: Date
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMM d"
+        return formatter
+    }
+    
+    var body: some View {
+        Button(action: onTap) {
+            HStack {
+                Text(dateFormatter.string(from: date))
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(isSelected ? .lumoGreen : .gray)
+            }
+            .padding()
+            .background(
+                isSelected ? 
+                Color.lumoGreen.opacity(0.1) : 
+                Color.gray.opacity(0.05)
+            )
+            .cornerRadius(8)
+        }
+    }
+}
+
+struct BatchMealPreviewRow: View {
+    let meal: BatchMealSelection
+    
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter
+    }
+    
+    var body: some View {
+        HStack {
+            Text(meal.mealType.emoji)
+                .font(.title3)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(meal.mealType.rawValue)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(.white)
+                
+                Text(dateFormatter.string(from: meal.date))
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            
+            Spacer()
+            
+            Text("\(meal.servings) servings")
+                .font(.caption)
+                .foregroundColor(.gray)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(6)
+    }
+} 
+
+// MARK: - Additional Sheet Views
+
+struct RecipeIngredientsSheet: View {
+    let recipe: Recipe
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Ingredients")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        
+                        ForEach(recipe.ingredients, id: \.name) { ingredient in
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(ingredient.name)
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.white)
+                                    
+                                    Text(ingredient.displayAmount)
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                }
+                                
+                                Spacer()
+                                
+                                Image(systemName: "plus.circle")
+                                    .foregroundColor(.lumoGreen)
+                                    .font(.title3)
+                            }
+                            .padding()
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(8)
+                        }
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle(recipe.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing: Button("Done") { dismiss() })
+        }
+    }
+}
+
+struct RecipeNutritionSheet: View {
+    let recipe: Recipe
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        let nutrition = recipe.nutritionInfo
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Nutrition Facts")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            
+                            NutritionRow(label: "Calories", value: "\(nutrition.calories)")
+                            NutritionRow(label: "Protein", value: "\(nutrition.protein)g")
+                            NutritionRow(label: "Carbs", value: "\(nutrition.carbs)g")
+                            NutritionRow(label: "Fat", value: "\(nutrition.fat)g")
+                        }
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Nutrition")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing: Button("Done") { dismiss() })
+        }
+    }
+}
+
+struct NutritionRow: View {
+    let label: String
+    let value: String
+    
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.subheadline)
+                .foregroundColor(.white)
+            
+            Spacer()
+            
+            Text(value)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(.lumoGreen)
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(8)
+    }
+}
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+    
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 } 
