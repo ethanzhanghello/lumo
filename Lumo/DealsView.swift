@@ -25,7 +25,7 @@ struct DealsView: View {
     
     var body: some View {
         NavigationView {
-            ZStack {
+            ZStack(alignment: .topTrailing) {
                 Color.black.ignoresSafeArea()
                 
                 ScrollView {
@@ -59,24 +59,20 @@ struct DealsView: View {
                     }
                     .padding(.bottom, 100)
                 }
-            }
-            .navigationTitle("Deals")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark")
-                            .foregroundColor(.white)
-                    }
+                // Custom filter button overlay
+                Button(action: { showingFilters = true }) {
+                    Image(systemName: "slider.horizontal.3")
+                        .foregroundColor(.white)
+                        .font(.title2)
+                        .padding(16)
+                        .background(Color.black.opacity(0.7))
+                        .clipShape(Circle())
+                        .shadow(radius: 4)
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingFilters = true }) {
-                        Image(systemName: "slider.horizontal.3")
-                            .foregroundColor(.white)
-                    }
-                }
+                .padding(.top, 16)
+                .padding(.trailing, 20)
             }
+            .navigationBarHidden(true)
         }
         .sheet(isPresented: $showingFilters) {
             DealFiltersView(

@@ -40,9 +40,7 @@ struct MealPlanningView: View {
                     .padding(.horizontal)
                 }
             }
-            .navigationTitle("Meal Planning")
-            .navigationBarTitleDisplayMode(.large)
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarHidden(true)
         }
         .sheet(isPresented: $showingAddMeal) {
             Text("Add Meal View - Coming Soon")
