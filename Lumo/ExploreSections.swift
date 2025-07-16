@@ -113,6 +113,7 @@ struct StoreCard: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var appState: AppState
     @State private var isLoading = false
+    @State private var heartScale: CGFloat = 1.0
     
     var isFavorite: Bool {
         authViewModel.favoriteStoreIDs.contains(store.id.uuidString)
@@ -144,6 +145,14 @@ struct StoreCard: View {
                     Button(action: {
                         guard !isLoading else { return }
                         isLoading = true
+                        withAnimation(.spring(response: 0.2, dampingFraction: 0.4)) {
+                            heartScale = 1.3
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+                            withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
+                                heartScale = 1.0
+                            }
+                        }
                         Task {
                             await authViewModel.toggleFavoriteStore(
                                 store,
@@ -160,6 +169,7 @@ struct StoreCard: View {
                         Image(systemName: isFavorite ? "heart.fill" : "heart")
                             .foregroundColor(isFavorite ? .red : .gray)
                             .font(.caption)
+                            .scaleEffect(heartScale)
                     }
                 }
                 
@@ -618,8 +628,8 @@ struct FeaturedItemRow: View {
 
 // MARK: - Deals Section
 struct DealsSection: View {
-    @EnvironmentObject var appState: AppState
     var selectedCategory: String?
+    @State private var showDealsView = false
 
     var dealsItems: [GroceryItem] {
         let filtered = sampleGroceryItems.filter { _ in Bool.random() }
@@ -633,15 +643,13 @@ struct DealsSection: View {
         VStack(alignment: .leading, spacing: 16) {
             // Section Header
             HStack {
-                Text("Today's Deals")
+                Text("Deals")
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
-                
                 Spacer()
-                
                 Button("View All") {
-                    // Navigate to deals
+                    showDealsView = true
                 }
                 .font(.subheadline)
                 .foregroundColor(Color.lumoGreen)
@@ -658,6 +666,7 @@ struct DealsSection: View {
                 }
             }
             .padding(.horizontal)
+            NavigationLink(destination: DealsView(), isActive: $showDealsView) { EmptyView() }
         }
     }
 }
