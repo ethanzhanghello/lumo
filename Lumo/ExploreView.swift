@@ -113,6 +113,9 @@ struct ExploreView: View {
                                 }
                             }
                         }
+                        .onAppear {
+                            print("Current favoriteStoreIDs in ExploreView: \(authViewModel.favoriteStoreIDs)")
+                        }
                         .navigationTitle("Favorited Stores")
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
@@ -139,6 +142,9 @@ struct ExploreView: View {
                     EmptyView()
                 }
             }
+        }
+        .task {
+            await authViewModel.fetchProfile()
         }
     }
 }

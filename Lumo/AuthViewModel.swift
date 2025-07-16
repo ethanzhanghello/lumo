@@ -121,6 +121,7 @@ class AuthViewModel: ObservableObject {
             self.preferredCuisines = profile.preferred_cuisines ?? []
             self.dietaryRestrictions = profile.dietary_restrictions ?? []
             self.favoriteStoreIDs = profile.favorite_store_ids ?? []
+            print("[fetchProfile] Loaded favoriteStoreIDs: \(self.favoriteStoreIDs)")
             return profile
         } catch {
             print("Failed to fetch profile: \(error)")
