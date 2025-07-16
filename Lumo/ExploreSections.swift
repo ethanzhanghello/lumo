@@ -11,6 +11,8 @@ import SwiftUI
 struct NearbyStoresSection: View {
     @Binding var selectedStore: Store?
     @State private var selectedStoreType: StoreType? = nil
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @EnvironmentObject var appState: AppState
     
     var filteredStores: [Store] {
         if let selectedType = selectedStoreType {
@@ -67,6 +69,8 @@ struct NearbyStoresSection: View {
                     ForEach(filteredStores) { store in
                         Button(action: { selectedStore = store }) {
                             StoreCard(store: store)
+                                .environmentObject(authViewModel)
+                                .environmentObject(appState)
                         }
                     }
                 }
@@ -106,11 +110,13 @@ struct StoreTypeFilterButton: View {
 // MARK: - Store Card
 struct StoreCard: View {
     let store: Store
-    @State private var isFavorite: Bool
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @EnvironmentObject var appState: AppState
+    @State private var isLoading = false
+    @State private var heartScale: CGFloat = 1.0
     
-    init(store: Store) {
-        self.store = store
-        self._isFavorite = State(initialValue: store.isFavorite)
+    var isFavorite: Bool {
+        authViewModel.favoriteStoreIDs.contains(store.id.uuidString)
     }
     
     var body: some View {
@@ -137,11 +143,33 @@ struct StoreCard: View {
                     Spacer()
                     
                     Button(action: {
-                        isFavorite.toggle()
+                        guard !isLoading else { return }
+                        isLoading = true
+                        withAnimation(.spring(response: 0.2, dampingFraction: 0.4)) {
+                            heartScale = 1.3
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+                            withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
+                                heartScale = 1.0
+                            }
+                        }
+                        Task {
+                            await authViewModel.toggleFavoriteStore(
+                                store,
+                                fullName: authViewModel.email, // You may want to use the actual full name if available
+                                dietaryFilter: false,
+                                profilePictureURL: authViewModel.profilePictureURL,
+                                allergies: authViewModel.allergies,
+                                preferredCuisines: authViewModel.preferredCuisines,
+                                dietaryRestrictions: authViewModel.dietaryRestrictions
+                            )
+                            isLoading = false
+                        }
                     }) {
                         Image(systemName: isFavorite ? "heart.fill" : "heart")
                             .foregroundColor(isFavorite ? .red : .gray)
                             .font(.caption)
+                            .scaleEffect(heartScale)
                     }
                 }
                 
@@ -600,8 +628,8 @@ struct FeaturedItemRow: View {
 
 // MARK: - Deals Section
 struct DealsSection: View {
-    @EnvironmentObject var appState: AppState
     var selectedCategory: String?
+    @State private var showDealsView = false
 
     var dealsItems: [GroceryItem] {
         let filtered = sampleGroceryItems.filter { _ in Bool.random() }
@@ -615,15 +643,13 @@ struct DealsSection: View {
         VStack(alignment: .leading, spacing: 16) {
             // Section Header
             HStack {
-                Text("Today's Deals")
+                Text("Deals")
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
-                
                 Spacer()
-                
                 Button("View All") {
-                    // Navigate to deals
+                    showDealsView = true
                 }
                 .font(.subheadline)
                 .foregroundColor(Color.lumoGreen)
@@ -640,6 +666,7 @@ struct DealsSection: View {
                 }
             }
             .padding(.horizontal)
+            NavigationLink(destination: DealsView(), isActive: $showDealsView) { EmptyView() }
         }
     }
 }

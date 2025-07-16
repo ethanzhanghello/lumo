@@ -22,6 +22,8 @@ struct DealFiltersView: View {
     @State private var showInStoreOnly = false
     @State private var showDigitalCouponsOnly = false
     
+    @EnvironmentObject var authViewModel: AuthViewModel
+    
     private let dietaryPreferences = [
         "Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", 
         "Nut-Free", "Organic", "Non-GMO", "Keto", "Paleo"
