@@ -11,6 +11,8 @@ import SwiftUI
 struct NearbyStoresSection: View {
     @Binding var selectedStore: Store?
     @State private var selectedStoreType: StoreType? = nil
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @EnvironmentObject var appState: AppState
     
     var filteredStores: [Store] {
         if let selectedType = selectedStoreType {
@@ -67,6 +69,8 @@ struct NearbyStoresSection: View {
                     ForEach(filteredStores) { store in
                         Button(action: { selectedStore = store }) {
                             StoreCard(store: store)
+                                .environmentObject(authViewModel)
+                                .environmentObject(appState)
                         }
                     }
                 }
@@ -106,11 +110,12 @@ struct StoreTypeFilterButton: View {
 // MARK: - Store Card
 struct StoreCard: View {
     let store: Store
-    @State private var isFavorite: Bool
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @EnvironmentObject var appState: AppState
+    @State private var isLoading = false
     
-    init(store: Store) {
-        self.store = store
-        self._isFavorite = State(initialValue: store.isFavorite)
+    var isFavorite: Bool {
+        authViewModel.favoriteStoreIDs.contains(store.id.uuidString)
     }
     
     var body: some View {
@@ -137,7 +142,20 @@ struct StoreCard: View {
                     Spacer()
                     
                     Button(action: {
-                        isFavorite.toggle()
+                        guard !isLoading else { return }
+                        isLoading = true
+                        Task {
+                            await authViewModel.toggleFavoriteStore(
+                                store,
+                                fullName: authViewModel.email, // You may want to use the actual full name if available
+                                dietaryFilter: false,
+                                profilePictureURL: authViewModel.profilePictureURL,
+                                allergies: authViewModel.allergies,
+                                preferredCuisines: authViewModel.preferredCuisines,
+                                dietaryRestrictions: authViewModel.dietaryRestrictions
+                            )
+                            isLoading = false
+                        }
                     }) {
                         Image(systemName: isFavorite ? "heart.fill" : "heart")
                             .foregroundColor(isFavorite ? .red : .gray)

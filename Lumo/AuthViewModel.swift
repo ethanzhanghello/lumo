@@ -17,6 +17,7 @@ struct SupabaseProfile: Codable {
     var allergies: [String]?
     var preferred_cuisines: [String]?
     var dietary_restrictions: [String]?
+    var favorite_store_ids: [String]? // Add this line
 }
 
 struct UserStats: Codable {
@@ -37,6 +38,7 @@ class AuthViewModel: ObservableObject {
     @Published var preferredCuisines: [String] = []
     @Published var dietaryRestrictions: [String] = []
     @Published var userStats: UserStats?
+    @Published var favoriteStoreIDs: [String] = []
 
     func signUp() async {
         errorMessage = nil // Clear previous errors
@@ -89,7 +91,8 @@ class AuthViewModel: ObservableObject {
             profile_picture_url: profilePictureURL,
             allergies: allergies,
             preferred_cuisines: preferredCuisines,
-            dietary_restrictions: dietaryRestrictions
+            dietary_restrictions: dietaryRestrictions,
+            favorite_store_ids: favoriteStoreIDs
         )
         do {
             _ = try await SupabaseManager.shared.client
@@ -117,6 +120,7 @@ class AuthViewModel: ObservableObject {
             self.allergies = profile.allergies ?? []
             self.preferredCuisines = profile.preferred_cuisines ?? []
             self.dietaryRestrictions = profile.dietary_restrictions ?? []
+            self.favoriteStoreIDs = profile.favorite_store_ids ?? []
             return profile
         } catch {
             print("Failed to fetch profile: \(error)")
@@ -180,5 +184,23 @@ class AuthViewModel: ObservableObject {
             errorMessage = error.localizedDescription
             return false
         }
+    }
+
+    // Toggle favorite store for the user and update profile
+    func toggleFavoriteStore(_ store: Store, fullName: String, dietaryFilter: Bool = false, profilePictureURL: String? = nil, allergies: [String] = [], preferredCuisines: [String] = [], dietaryRestrictions: [String] = []) async {
+        let id = store.id.uuidString
+        if let idx = favoriteStoreIDs.firstIndex(of: id) {
+            favoriteStoreIDs.remove(at: idx)
+        } else {
+            favoriteStoreIDs.append(id)
+        }
+        await saveProfile(
+            fullName: fullName,
+            dietaryFilter: dietaryFilter,
+            profilePictureURL: profilePictureURL,
+            allergies: allergies,
+            preferredCuisines: preferredCuisines,
+            dietaryRestrictions: dietaryRestrictions
+        )
     }
 }
