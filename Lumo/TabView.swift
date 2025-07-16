@@ -20,18 +20,12 @@ struct MainTabView: View {
                 }
             
             // BROWSE TAB
-            BrowseView()
-                .tabItem {
-                    Image(systemName: "list.bullet")
-                    Text("Browse")
-                }
+            //BrowseView()
+             //   .tabItem {
+             //       Image(systemName: "list.bullet")
+            //        Text("Browse")
+            //    }
             
-            // DEALS TAB
-            DealsView()
-                .tabItem {
-                    Image(systemName: "tag")
-                    Text("Deals")
-                }
             
             // MEAL PLANNING TAB
             MealPlanningView()
@@ -41,6 +35,7 @@ struct MainTabView: View {
                 }
             
             // GROCERY LIST TAB: GroceryListView
+            /*
             if appState.groceryList.totalItems > 0 {
                 GroceryListView()
                     .tabItem {
@@ -55,6 +50,8 @@ struct MainTabView: View {
                         Text("Grocery List")
                     }
             }
+            */
+
             
             // MAP TAB
             StoreMapView()
