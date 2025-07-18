@@ -920,6 +920,7 @@ struct StoreDetailView: View {
                 }
             }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

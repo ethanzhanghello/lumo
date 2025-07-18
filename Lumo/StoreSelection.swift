@@ -165,8 +165,7 @@ struct StoreSelectionView: View {
                 Spacer()
             }
         }
-        // No explicit navigation bar hidden/back button hidden here,
-        // it's controlled by the NavigationStack when pushed.
+        .navigationBarBackButtonHidden(true)
     }
 }
 
