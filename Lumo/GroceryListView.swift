@@ -209,6 +209,29 @@ struct GroceryListView: View {
                         } else {
                             FlatGroceryListView()
                         }
+                        // Checkout Button
+                        Button(action: {
+                            Task {
+                                await savePastGroceryList(
+                                    storeID: appState.selectedStore?.id.uuidString,
+                                    items: appState.groceryList.groceryItems,
+                                    totalPrice: appState.groceryList.totalCost
+                                )
+                                appState.groceryList.clearAll()
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: "cart.fill.badge.plus")
+                                Text("Checkout & Save List")
+                            }
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.lumoGreen)
+                            .cornerRadius(12)
+                            .padding(.horizontal)
+                            .padding(.bottom, 16)
+                        }
                     }
                     
                     // Checkout Button

@@ -27,6 +27,13 @@ struct UserStats: Codable {
     let last_updated: String?
 }
 
+struct PastGroceryListInsert: Encodable {
+    let user_id: String
+    let items: String // JSON string
+    let store_id: String?
+    let total_price: Double?
+}
+
 @MainActor
 class AuthViewModel: ObservableObject {
     @Published var email = ""
@@ -203,5 +210,34 @@ class AuthViewModel: ObservableObject {
             preferredCuisines: preferredCuisines,
             dietaryRestrictions: dietaryRestrictions
         )
+    }
+}
+
+extension Encodable {
+    func toJSONString() -> String? {
+        guard let data = try? JSONEncoder().encode(self) else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+}
+
+@MainActor
+func savePastGroceryList(storeID: String?, items: [GroceryListItem], totalPrice: Double?) async {
+    guard let user = SupabaseManager.shared.client.auth.currentUser else { return }
+    let userID = String(describing: user.id)
+    let itemsJSON = items.toJSONString() ?? "[]"
+    let list = PastGroceryListInsert(
+        user_id: userID,
+        items: itemsJSON,
+        store_id: storeID,
+        total_price: totalPrice
+    )
+    do {
+        _ = try await SupabaseManager.shared.client
+            .from("past_grocery_lists")
+            .insert(list)
+            .execute()
+        print("Past grocery list saved!")
+    } catch {
+        print("Failed to save past grocery list: \(error)")
     }
 }
