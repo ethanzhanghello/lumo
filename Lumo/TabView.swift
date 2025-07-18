@@ -35,7 +35,6 @@ struct MainTabView: View {
                 }
             
             // GROCERY LIST TAB: GroceryListView
-            /*
             if appState.groceryList.totalItems > 0 {
                 GroceryListView()
                     .tabItem {
@@ -50,21 +49,14 @@ struct MainTabView: View {
                         Text("Grocery List")
                     }
             }
-            */
 
-            
-            // MAP TAB
-            StoreMapView()
-                .tabItem {
-                    Image(systemName: "map")
-                    Text("Map")
-                }
+
             
             // AI ASSISTANT TAB
             ChatbotView()
                 .tabItem {
                     Image(systemName: "brain.head.profile")
-                    Text("AI Assistant")
+                    Text("Lumo Assistant")
                 }
             
             // PROFILE TAB
