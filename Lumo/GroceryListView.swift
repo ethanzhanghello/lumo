@@ -37,15 +37,21 @@ struct GroceryListView: View {
                 Button("Checkout") {
                     if let store = checkoutStore {
                         let itemsForStore = appState.groceryList.groceryItems.filter { $0.store.id == store.id }
-                        checkoutResult = CheckoutResult(
-                            success: true,
-                            message: "Checked out \(itemsForStore.reduce(0) { $0 + $1.quantity }) items from \(store.name) for $\(itemsForStore.reduce(0) { $0 + $1.totalPrice })",
-         
-                            totalCost: itemsForStore.reduce(0) { $0 + $1.totalPrice },
-                            itemCount: itemsForStore.reduce(0) { $0 + $1.quantity }
-                        )
-                        appState.groceryList.groceryItems.removeAll { $0.store.id == store.id }
-                        showingOrderConfirmation = true
+                        Task {
+                            await savePastGroceryList(
+                                storeID: store.id.uuidString,
+                                items: itemsForStore,
+                                totalPrice: itemsForStore.reduce(0) { $0 + $1.totalPrice }
+                            )
+                            checkoutResult = CheckoutResult(
+                                success: true,
+                                message: "Checked out \(itemsForStore.reduce(0) { $0 + $1.quantity }) items from \(store.name) for $\(itemsForStore.reduce(0) { $0 + $1.totalPrice })",
+                                totalCost: itemsForStore.reduce(0) { $0 + $1.totalPrice },
+                                itemCount: itemsForStore.reduce(0) { $0 + $1.quantity }
+                            )
+                            appState.groceryList.groceryItems.removeAll { $0.store.id == store.id }
+                            showingOrderConfirmation = true
+                        }
                     }
                 }
             } message: {
@@ -379,18 +385,35 @@ struct GroupedGroceryListView: View {
         List {
             ForEach(Array(groupedItems.keys), id: \.id) { store in
                 Section(header:
-                    VStack(alignment: .leading) {
-                        Text(store.name)
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .foregroundColor(.lumoGreen)
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack(alignment: .center, spacing: 8) {
+                            Text(store.name)
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundColor(.lumoGreen)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                                .fixedSize(horizontal: true, vertical: false)
+                            Spacer()
+                            Text("\(groupedItems[store]?.values.flatMap { $0 }.count ?? 0) items")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
                         Text(store.address)
                             .font(.caption)
                             .foregroundColor(.gray)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                            .fixedSize(horizontal: true, vertical: false)
+                        Rectangle()
+                            .fill(Color(red: 0, green: 0.94, blue: 0.75))
+                            .frame(height: 1)
+                            .padding(.top, 4)
                     }
                     .padding(.vertical, 4)
                 ) {
                     ForEach(Array(groupedItems[store]!.keys.sorted()), id: \.self) { category in
+                        // Always show category header, even if only one
                         Section(header:
                             HStack {
                                 Text(category)
