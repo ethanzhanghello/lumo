@@ -218,21 +218,21 @@ class SubstitutionViewModel: ObservableObject {
         }
     }
     
-    func applySubstitution(_ substitution: SmartSubstitution, to list: GroceryList) {
+    func applySubstitution(_ substitution: SmartSubstitution, to list: GroceryList, store: Store) {
         // Remove original item
-        list.removeItem(substitution.originalItem)
+        list.removeItem(substitution.originalItem, store: store)
         
         // Add first alternative
         if let alternative = substitution.alternatives.first {
-            list.addItem(alternative)
+            list.addItem(alternative, store: store)
         }
     }
     
-    func applySubstitution(_ substitution: SmartSubstitution, with alternative: GroceryItem, to list: GroceryList) {
+    func applySubstitution(_ substitution: SmartSubstitution, with alternative: GroceryItem, to list: GroceryList, store: Store) {
         // Remove original item
-        list.removeItem(substitution.originalItem)
+        list.removeItem(substitution.originalItem, store: store)
         
         // Add selected alternative
-        list.addItem(alternative)
+        list.addItem(alternative, store: store)
     }
 } 

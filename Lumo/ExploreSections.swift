@@ -358,7 +358,9 @@ struct RecommendationCard: View {
             
             // Add to Cart Button
             Button(action: {
-                appState.groceryList.addItem(item)
+                if let selectedStore = appState.selectedStore {
+                    appState.groceryList.addItem(item, store: selectedStore)
+                }
             }) {
                 HStack {
                     Image(systemName: "plus")
@@ -616,7 +618,9 @@ struct FeaturedItemRow: View {
             Spacer()
             
             Button(action: {
-                appState.groceryList.addItem(item)
+                if let selectedStore = appState.selectedStore {
+                    appState.groceryList.addItem(item, store: selectedStore)
+                }
             }) {
                 Image(systemName: "plus.circle.fill")
                     .foregroundColor(Color.lumoGreen)
@@ -733,7 +737,9 @@ struct DealCard: View {
             
             // Add to Cart Button
             Button(action: {
-                appState.groceryList.addItem(item)
+                if let selectedStore = appState.selectedStore {
+                    appState.groceryList.addItem(item, store: selectedStore)
+                }
             }) {
                 Text("Add to Cart")
                     .font(.caption2)
@@ -911,7 +917,7 @@ struct StoreDetailView: View {
                                 GridItem(.flexible())
                             ], spacing: 16) {
                                 ForEach(filteredItems) { item in
-                                    ItemCard(item: item)
+                                    StoreItemCard(item: item, store: store)
                                 }
                             }
                             .padding()
@@ -968,7 +974,7 @@ struct StoreItemCard: View {
                     Spacer()
                     
                     Button(action: {
-                        appState.groceryList.addItem(item)
+                        appState.groceryList.addItem(item, store: store)
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .foregroundColor(Color.lumoGreen)
@@ -1177,6 +1183,7 @@ struct CategoryStoreCard: View {
 struct ItemCard: View {
     @EnvironmentObject var appState: AppState
     let item: GroceryItem
+    let store: Store
     @State private var showingItemDetail = false
     
     var body: some View {
@@ -1229,7 +1236,7 @@ struct ItemCard: View {
             
             // Add to Cart Button
             Button(action: {
-                appState.groceryList.addItem(item)
+                appState.groceryList.addItem(item, store: store)
             }) {
                 HStack {
                     Image(systemName: "plus")

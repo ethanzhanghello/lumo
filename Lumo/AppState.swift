@@ -695,7 +695,9 @@ class AppState: ObservableObject {
     
     // MARK: - Quick Actions
     func quickAddToGroceryList(_ item: GroceryItem, quantity: Int = 1) {
-        groceryList.addItem(item, quantity: quantity)
+        if let store = selectedStore {
+            groceryList.addItem(item, store: store, quantity: quantity)
+        }
     }
     
     func quickAddToPantry(_ item: GroceryItem, quantity: Int = 1) {

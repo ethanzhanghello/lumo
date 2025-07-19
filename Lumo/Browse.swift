@@ -298,8 +298,8 @@ struct QuickButton: View {
         Button(action: {
             print("\(title) button tapped!")
             // Find the corresponding grocery item and add it to the cart
-            if let item = sampleGroceryItems.first(where: { $0.name == title }) {
-                appState.groceryList.addItem(item)
+            if let item = sampleGroceryItems.first(where: { $0.name == title }), let selectedStore = appState.selectedStore {
+                appState.groceryList.addItem(item, store: selectedStore)
                 print("Added \(item.name) to grocery list. Total items: \(appState.groceryList.totalItems)")
             }
         }) {

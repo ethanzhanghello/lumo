@@ -629,8 +629,10 @@ struct AlternativeDetailView: View {
             .cornerRadius(12)
             
             Button("Add Alternative to List") {
-                appState.groceryList.addItem(alternative)
-                dismiss()
+                if let selectedStore = appState.selectedStore {
+                    appState.groceryList.addItem(alternative, store: selectedStore)
+                    dismiss()
+                }
             }
             .foregroundColor(.lumoGreen)
             .padding()
@@ -642,8 +644,10 @@ struct AlternativeDetailView: View {
     
     // MARK: - Helper Methods
     private func replaceItem() {
-        appState.groceryList.removeItem(originalItem)
-        appState.groceryList.addItem(alternative)
+        if let selectedStore = appState.selectedStore {
+            appState.groceryList.removeItem(originalItem, store: selectedStore)
+            appState.groceryList.addItem(alternative, store: selectedStore)
+        }
     }
 }
 

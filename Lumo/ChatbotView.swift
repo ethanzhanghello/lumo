@@ -490,8 +490,10 @@ struct ChatbotView: View {
                             hasDeal: groceryItem.hasDeal,
                             dealDescription: groceryItem.dealDescription
                         )
-                        appState.groceryList.addItem(itemToAdd)
-                        addedIngredients.append(ingredient.name)
+                        if let store = appState.selectedStore {
+                            appState.groceryList.addItem(itemToAdd, store: store)
+                            addedIngredients.append(ingredient.name)
+                        }
                     } else {
                         missingIngredients.append(ingredient.name)
                     }

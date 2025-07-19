@@ -22,293 +22,317 @@ struct GroceryListView: View {
     @State private var removedItem: GroceryListItem?
     @State private var showingUndoToast = false
     @State private var selectedCategory: String?
+    @State private var checkoutStore: Store? = nil
+    @State private var showingStorePicker = false
     
     var body: some View {
         NavigationView {
             ZStack {
                 Color.black.ignoresSafeArea()
-                
-                VStack(spacing: 0) {
-                    // Header with Search
-                    VStack(spacing: 16) {
-                        HStack {
-                            Button(action: {
-                                dismiss()
-                            }) {
-                                Image(systemName: "xmark")
-                                    .foregroundColor(.white)
-                                    .font(.title2)
-                            }
-                            
-                            Spacer()
-                            
-                            Text("Grocery List")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                            
-                            Spacer()
-                            
-                            Button(action: {
-                                showingShareSheet = true
-                            }) {
-                                Image(systemName: "square.and.arrow.up")
-                                    .foregroundColor(.white)
-                                    .font(.title2)
-                            }
-                        }
-                        .padding(.horizontal)
-                        
-                        // Search Bar
-                        HStack {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundColor(.gray)
-                            TextField("Search or add items...", text: $searchText)
-                                .foregroundColor(.white)
-                                .textFieldStyle(.plain)
-                                .onSubmit {
-                                    if !searchText.isEmpty {
-                                        addItemFromSearch()
-                                    }
-                                }
-                            if !searchText.isEmpty {
-                                Button(action: {
-                                    searchText = ""
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.gray)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(12)
-                        .padding(.horizontal)
-                        
-                        // List Summary and Controls
-                        if !appState.groceryList.isEmpty {
-                            VStack(spacing: 12) {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("\(appState.groceryList.totalItems) items")
-                                            .font(.subheadline)
-                                            .foregroundColor(.white.opacity(0.8))
-                                        Text("Estimated time: \(appState.groceryList.estimatedTimeMinutes) min")
-                                            .font(.caption)
-                                            .foregroundColor(.white.opacity(0.6))
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    VStack(alignment: .trailing, spacing: 4) {
-                                        Text("Total")
-                                            .font(.subheadline)
-                                            .foregroundColor(.white.opacity(0.8))
-                                        Text("$\(appState.groceryList.totalCost, specifier: "%.2f")")
-                                            .font(.title2)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(Color.lumoGreen)
-                                    }
-                                }
-                                
-                                // Control Buttons
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 12) {
-                                        Button(action: {
-                                            showingGroupedView.toggle()
-                                        }) {
-                                            HStack {
-                                                Image(systemName: showingGroupedView ? "list.bullet" : "folder")
-                                                Text(showingGroupedView ? "Flat View" : "Grouped")
-                                            }
-                                            .font(.caption)
-                                            .foregroundColor(.white)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
-                                            .background(Color.gray.opacity(0.3))
-                                            .cornerRadius(8)
-                                        }
-                                        
-                                        Button(action: {
-                                            showingRoutePreview = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "map")
-                                                Text("Route")
-                                            }
-                                            .font(.caption)
-                                            .foregroundColor(.white)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
-                                            .background(Color.lumoGreen)
-                                            .cornerRadius(8)
-                                        }
-                                        
-                                        Button(action: {
-                                            showingSmartSuggestions = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "lightbulb")
-                                                Text("Suggestions")
-                                            }
-                                            .font(.caption)
-                                            .foregroundColor(.white)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
-                                            .background(Color.orange)
-                                            .cornerRadius(8)
-                                        }
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                            .padding(.vertical, 12)
-                            .background(Color.gray.opacity(0.1))
-                            .cornerRadius(12)
-                            .padding(.horizontal)
-                        }
-                    }
-                    .padding(.top)
-                    
-                    // Grocery Items List
-                    if appState.groceryList.isEmpty {
-                        VStack(spacing: 20) {
-                            Spacer()
-                            
-                            Image(systemName: "list.bullet")
-                                .font(.system(size: 60))
-                                .foregroundColor(.gray)
-                            
-                            Text("Your grocery list is empty")
-                                .font(.title2)
-                                .fontWeight(.medium)
-                                .foregroundColor(.white)
-                            
-                            Text("Add some items to get started")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.7))
-                            
-                            Button(action: {
-                                showingSmartSuggestions = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "plus.circle.fill")
-                                    Text("Add Common Items")
-                                }
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 10)
-                                .background(Color.lumoGreen)
-                                .cornerRadius(8)
-                            }
-                            
-                            Spacer()
-                        }
-                    } else {
-                        if showingGroupedView {
-                            GroupedGroceryListView()
-                        } else {
-                            FlatGroceryListView()
-                        }
-                        // Checkout & Save List Button (with cost, black text)
-                        Button(action: {
-                            Task {
-                                await savePastGroceryList(
-                                    storeID: appState.selectedStore?.id.uuidString,
-                                    items: appState.groceryList.groceryItems,
-                                    totalPrice: appState.groceryList.totalCost
-                                )
-                                appState.groceryList.clearAll()
-                            }
-                        }) {
-                            HStack {
-                                Image(systemName: "cart.fill.badge.plus")
-                                Text("Checkout & Save List")
-                                Spacer()
-                                Text("$\(appState.groceryList.totalCost, specifier: "%.2f")")
-                            }
-                            .foregroundColor(.black)
-                            .font(.headline)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.lumoGreen)
-                            .cornerRadius(12)
-                            .padding(.horizontal)
-                            .padding(.bottom, 16)
-                        }
-                    }
-                    
-                    // Remove the credit card checkout button section (the one with .creditcard.fill)
-                }
+                mainContent
             }
             .navigationBarItems(trailing: EmptyView())
-        }
-        .alert("Confirm Checkout", isPresented: $showingCheckoutAlert) {
-            Button("Cancel", role: .cancel) { }
-            Button("Checkout") {
-                checkoutResult = appState.groceryList.checkout()
-                showingOrderConfirmation = true
-            }
-        } message: {
-            Text("Are you sure you want to checkout with \(appState.groceryList.totalItems) items for $\(appState.groceryList.totalCost, specifier: "%.2f")?")
-        }
-        .alert("Order Confirmation", isPresented: $showingOrderConfirmation) {
-            Button("OK") {
-                dismiss()
-            }
-        } message: {
-            if let result = checkoutResult {
-                Text(result.message)
-            }
-        }
-        .sheet(isPresented: $showingRoutePreview) {
-            RoutePreviewView()
-                .environmentObject(appState)
-        }
-        .sheet(isPresented: $showingSmartSuggestions) {
-            SmartSuggestionsView()
-                .environmentObject(appState)
-        }
-        .sheet(isPresented: $showingShareSheet) {
-            ShareSheet(activityItems: ["Check out my grocery list on Lumo!", URL(string: "https://www.lumoapp.com")!])
-        }
-        .overlay(
-            // Undo Toast
-            VStack {
-                if showingUndoToast {
-                    HStack {
-                        Text("Item removed")
-                            .foregroundColor(.white)
-                        Button("Undo") {
-                            if let item = removedItem {
-                                appState.groceryList.addItem(item.item, quantity: item.quantity)
-                                showingUndoToast = false
-                            }
-                        }
-                        .foregroundColor(.lumoGreen)
-                    }
-                    .padding()
-                    .background(Color.gray.opacity(0.9))
-                    .cornerRadius(8)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                            withAnimation {
-                                showingUndoToast = false
-                            }
-                        }
+            .alert("Confirm Checkout", isPresented: $showingCheckoutAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Checkout") {
+                    if let store = checkoutStore {
+                        let itemsForStore = appState.groceryList.groceryItems.filter { $0.store.id == store.id }
+                        checkoutResult = CheckoutResult(
+                            success: true,
+                            message: "Checked out \(itemsForStore.reduce(0) { $0 + $1.quantity }) items from \(store.name) for $\(itemsForStore.reduce(0) { $0 + $1.totalPrice })",
+         
+                            totalCost: itemsForStore.reduce(0) { $0 + $1.totalPrice },
+                            itemCount: itemsForStore.reduce(0) { $0 + $1.quantity }
+                        )
+                        appState.groceryList.groceryItems.removeAll { $0.store.id == store.id }
+                        showingOrderConfirmation = true
                     }
                 }
-                Spacer()
+            } message: {
+                if let store = checkoutStore {
+                    let itemsForStore = appState.groceryList.groceryItems.filter { $0.store.id == store.id }
+                    Text("Are you sure you want to checkout with \(itemsForStore.reduce(0) { $0 + $1.quantity }) items from \(store.name) for $\(itemsForStore.reduce(0) { $0 + $1.totalPrice }, specifier: "%.2f")?")
+                }
             }
-            .padding(.top, 100)
-        )
+            .alert("Order Confirmation", isPresented: $showingOrderConfirmation) {
+                Button("OK") {
+                    dismiss()
+                }
+            } message: {
+                if let result = checkoutResult {
+                    Text(result.message)
+                }
+            }
+            .sheet(isPresented: $showingRoutePreview) {
+                RoutePreviewView().environmentObject(appState)
+            }
+            .sheet(isPresented: $showingSmartSuggestions) {
+                SmartSuggestionsView().environmentObject(appState)
+            }
+            .sheet(isPresented: $showingShareSheet) {
+                ShareSheet(activityItems: ["Check out my grocery list on Lumo!", URL(string: "https://www.lumoapp.com")!])
+            }
+            .sheet(isPresented: $showingStorePicker) {
+                storePickerSheet
+            }
+            .overlay(undoToastOverlay)
+        }
+    }
+    
+    private var mainContent: some View {
+        VStack(spacing: 0) {
+            headerSection
+            if appState.groceryList.isEmpty {
+                emptyListSection
+            } else {
+                itemsSection
+            }
+        }
+    }
+    
+    private var headerSection: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark")
+                        .foregroundColor(.white)
+                        .font(.title2)
+                }
+                Spacer()
+                Text("Grocery List")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                Spacer()
+                Button(action: { showingShareSheet = true }) {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundColor(.white)
+                        .font(.title2)
+                }
+            }
+            .padding(.horizontal)
+            // Search Bar
+            HStack {
+                Image(systemName: "magnifyingglass").foregroundColor(.gray)
+                TextField("Search or add items...", text: $searchText)
+                    .foregroundColor(.white)
+                    .textFieldStyle(.plain)
+                    .onSubmit {
+                        if !searchText.isEmpty { addItemFromSearch() }
+                    }
+                if !searchText.isEmpty {
+                    Button(action: { searchText = "" }) {
+                        Image(systemName: "xmark.circle.fill").foregroundColor(.gray)
+                    }
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.gray.opacity(0.2))
+            .cornerRadius(12)
+            .padding(.horizontal)
+            // List Summary and Controls
+            if !appState.groceryList.isEmpty {
+                summarySection
+            }
+        }
+        .padding(.top)
+    }
+    
+    private var summarySection: some View {
+        VStack(spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("\(appState.groceryList.totalItems) items")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.8))
+                    Text("Estimated time: \(appState.groceryList.estimatedTimeMinutes) min")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.6))
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("Total")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.8))
+                    Text("$\(appState.groceryList.totalCost, specifier: "%.2f")")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(Color.lumoGreen)
+                }
+            }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    Button(action: { showingGroupedView.toggle() }) {
+                        HStack {
+                            Image(systemName: showingGroupedView ? "list.bullet" : "folder")
+                            Text(showingGroupedView ? "Flat View" : "Grouped")
+                        }
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(8)
+                    }
+                    Button(action: { showingRoutePreview = true }) {
+                        HStack {
+                            Image(systemName: "map")
+                            Text("Route")
+                        }
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.lumoGreen)
+                        .cornerRadius(8)
+                    }
+                    Button(action: { showingSmartSuggestions = true }) {
+                        HStack {
+                            Image(systemName: "lightbulb")
+                            Text("Suggestions")
+                        }
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.orange)
+                        .cornerRadius(8)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 12)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
+    
+    private var emptyListSection: some View {
+        VStack(spacing: 20) {
+            Spacer()
+            Image(systemName: "list.bullet")
+                .font(.system(size: 60))
+                .foregroundColor(.gray)
+            Text("Your grocery list is empty")
+                .font(.title2)
+                .fontWeight(.medium)
+                .foregroundColor(.white)
+            Text("Add some items to get started")
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.7))
+            Button(action: { showingSmartSuggestions = true }) {
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                    Text("Add Common Items")
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(Color.lumoGreen)
+                .cornerRadius(8)
+            }
+            Spacer()
+        }
+    }
+    
+    private var itemsSection: some View {
+        Group {
+            if showingGroupedView {
+                GroupedGroceryListView()
+            } else {
+                FlatGroceryListView()
+            }
+            checkoutButton
+        }
+    }
+    
+    private var checkoutButton: some View {
+        Button(action: {
+            let stores = Set(appState.groceryList.groceryItems.map { $0.store })
+            if stores.count > 1 {
+                showingStorePicker = true
+            } else if let onlyStore = stores.first {
+                checkoutStore = onlyStore
+                showingCheckoutAlert = true
+            }
+        }) {
+            HStack {
+                Image(systemName: "cart.fill.badge.plus")
+                Text("Checkout & Save List")
+                Spacer()
+                Text("$\(appState.groceryList.totalCost, specifier: "%.2f")")
+            }
+            .foregroundColor(.black)
+            .font(.headline)
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.lumoGreen)
+            .cornerRadius(12)
+            .padding(.horizontal)
+            .padding(.bottom, 16)
+        }
+    }
+    
+    private var storePickerSheet: some View {
+        VStack(spacing: 20) {
+            Text("Select a store to checkout from:")
+                .font(.headline)
+            ForEach(Array(Set(appState.groceryList.groceryItems.map { $0.store })), id: \.id) { store in
+                Button(action: {
+                    checkoutStore = store
+                    showingStorePicker = false
+                    showingCheckoutAlert = true
+                }) {
+                    Text(store.name)
+                        .font(.title3)
+                        .foregroundColor(.lumoGreen)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                showingStorePicker = false
+            }
+            .foregroundColor(.red)
+        }
+        .padding()
+    }
+    
+    private var undoToastOverlay: some View {
+        VStack {
+            if showingUndoToast {
+                HStack {
+                    Text("Item removed").foregroundColor(.white)
+                    Button("Undo") {
+                        if let item = removedItem {
+                            appState.groceryList.addItem(item.item, store: item.store, quantity: item.quantity)
+                            showingUndoToast = false
+                        }
+                    }
+                    .foregroundColor(.lumoGreen)
+                }
+                .padding()
+                .background(Color.gray.opacity(0.9))
+                .cornerRadius(8)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                        withAnimation { showingUndoToast = false }
+                    }
+                }
+            }
+            Spacer()
+        }
+        .padding(.top, 100)
     }
     
     private func addItemFromSearch() {
-        if let foundItem = sampleGroceryItems.first(where: { $0.name.lowercased().contains(searchText.lowercased()) }) {
-            appState.groceryList.addItem(foundItem)
+        if let foundItem = sampleGroceryItems.first(where: { $0.name.lowercased().contains(searchText.lowercased()) }), let store = appState.selectedStore {
+            appState.groceryList.addItem(foundItem, store: store)
             searchText = ""
         }
     }
@@ -327,7 +351,7 @@ struct FlatGroceryListView: View {
                     .swipeActions(edge: .trailing) {
                         Button(role: .destructive) {
                             removedItem = groceryItem
-                            appState.groceryList.removeItem(groceryItem.item)
+                            appState.groceryList.removeItem(groceryItem.item, store: groceryItem.store)
                             withAnimation {
                                 showingUndoToast = true
                             }
@@ -345,30 +369,45 @@ struct GroupedGroceryListView: View {
     @EnvironmentObject var appState: AppState
     @State private var selectedCategory: String?
     
-    var groupedItems: [String: [GroceryListItem]] {
-        Dictionary(grouping: appState.groceryList.groceryItems) { item in
-            item.item.category
+    var groupedItems: [Store: [String: [GroceryListItem]]] {
+        Dictionary(grouping: appState.groceryList.groceryItems, by: { $0.store }).mapValues { items in
+            Dictionary(grouping: items, by: { $0.item.category })
         }
     }
     
     var body: some View {
         List {
-            ForEach(Array(groupedItems.keys.sorted()), id: \.self) { category in
-                Section(header: 
-                    HStack {
-                        Text(category)
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        Spacer()
-                        Text("\(groupedItems[category]?.count ?? 0) items")
+            ForEach(Array(groupedItems.keys), id: \.id) { store in
+                Section(header:
+                    VStack(alignment: .leading) {
+                        Text(store.name)
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundColor(.lumoGreen)
+                        Text(store.address)
                             .font(.caption)
                             .foregroundColor(.gray)
                     }
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 4)
                 ) {
-                    ForEach(groupedItems[category] ?? [], id: \.id) { groceryItem in
-                        GroceryItemCard(groceryItem: groceryItem)
-                            .listRowBackground(Color.clear)
+                    ForEach(Array(groupedItems[store]!.keys.sorted()), id: \.self) { category in
+                        Section(header:
+                            HStack {
+                                Text(category)
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Spacer()
+                                Text("\(groupedItems[store]![category]?.count ?? 0) items")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            .padding(.vertical, 8)
+                        ) {
+                            ForEach(groupedItems[store]![category] ?? [], id: \.id) { groceryItem in
+                                GroceryItemCard(groceryItem: groceryItem)
+                                    .listRowBackground(Color.clear)
+                            }
+                        }
                     }
                 }
             }
@@ -433,7 +472,11 @@ struct GroceryItemCard: View {
                             Text("Aisle \(groceryItem.item.aisle)")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.6))
-                            
+                            Text("•")
+                                .foregroundColor(.white.opacity(0.4))
+                            Text(groceryItem.store.name)
+                                .font(.caption)
+                                .foregroundColor(.lumoGreen)
                             if groceryItem.item.hasDeal {
                                 Text("2 for $5")
                                     .font(.caption)
@@ -460,7 +503,7 @@ struct GroceryItemCard: View {
                         animateQuantityChange {
                             if groceryItem.quantity > 1 {
                                 print("Updating quantity from \(groceryItem.quantity) to \(groceryItem.quantity - 1)")
-                                appState.groceryList.updateQuantity(for: groceryItem.item, to: groceryItem.quantity - 1)
+                                appState.groceryList.updateQuantity(for: groceryItem.item, store: groceryItem.store, to: groceryItem.quantity - 1)
                             } else {
                                 print("Cannot decrement below 1")
                             }
@@ -485,7 +528,7 @@ struct GroceryItemCard: View {
                         print("Increment button tapped for \(groceryItem.item.name), current quantity: \(groceryItem.quantity)")
                         animateQuantityChange {
                             print("Updating quantity from \(groceryItem.quantity) to \(groceryItem.quantity + 1)")
-                            appState.groceryList.updateQuantity(for: groceryItem.item, to: groceryItem.quantity + 1)
+                            appState.groceryList.updateQuantity(for: groceryItem.item, store: groceryItem.store, to: groceryItem.quantity + 1)
                         }
                     }) {
                         Image(systemName: "plus.circle.fill")
@@ -666,7 +709,9 @@ struct SuggestionCard: View {
                 .foregroundColor(.lumoGreen)
             
             Button("Add") {
-                appState.groceryList.addItem(item)
+                if let selectedStore = appState.selectedStore {
+                    appState.groceryList.addItem(item, store: selectedStore)
+                }
             }
             .font(.caption)
             .foregroundColor(.white)

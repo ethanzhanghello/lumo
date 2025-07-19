@@ -10,7 +10,7 @@ import Foundation // For UUID
 import SwiftUI // For Image
 
 // MARK: - Store Type Enum
-enum StoreType: String, CaseIterable, Codable {
+enum StoreType: String, CaseIterable, Codable, Hashable {
     case grocery = "Grocery"
     case pharmacy = "Pharmacy"
     case convenience = "Convenience"
@@ -39,7 +39,7 @@ enum StoreType: String, CaseIterable, Codable {
 }
 
 // Define your Store struct to include location data
-struct Store: Identifiable, Equatable, Codable {
+struct Store: Identifiable, Equatable, Codable, Hashable {
     let id: UUID // Required for Identifiable protocol
     let name: String
     let address: String

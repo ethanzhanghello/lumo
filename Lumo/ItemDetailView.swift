@@ -119,8 +119,10 @@ struct ItemDetailView: View {
                         
                         // Add to Cart Button
                         Button(action: {
-                            appState.groceryList.addItem(item, quantity: quantity)
-                            dismiss()
+                            if let selectedStore = appState.selectedStore {
+                                appState.groceryList.addItem(item, store: selectedStore, quantity: quantity)
+                                dismiss()
+                            }
                         }) {
                             HStack {
                                 Image(systemName: "cart.badge.plus")
