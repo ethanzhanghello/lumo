@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -29,12 +29,12 @@
 		94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */; };
 		94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */; };
 		94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916042E0372460036C7AA /* DietaryGoalsView.swift */; };
-		B034DE652E286D870082134F /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE642E286D870082134F /* Auth */; };
-		B034DE672E286D870082134F /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE662E286D870082134F /* Functions */; };
-		B034DE692E286D870082134F /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE682E286D870082134F /* PostgREST */; };
-		B034DE6B2E286D870082134F /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE6A2E286D870082134F /* Realtime */; };
-		B034DE6D2E286D870082134F /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE6C2E286D870082134F /* Storage */; };
-		B034DE6F2E286D870082134F /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE6E2E286D870082134F /* Supabase */; };
+		B034DE722E2B47EE0082134F /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE712E2B47EE0082134F /* Auth */; };
+		B034DE742E2B47EE0082134F /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE732E2B47EE0082134F /* Functions */; };
+		B034DE762E2B47EE0082134F /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE752E2B47EE0082134F /* PostgREST */; };
+		B034DE782E2B47EE0082134F /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE772E2B47EE0082134F /* Realtime */; };
+		B034DE7A2E2B47EE0082134F /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE792E2B47EE0082134F /* Storage */; };
+		B034DE7C2E2B47EE0082134F /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE7B2E2B47EE0082134F /* Supabase */; };
 		B041F2692E262BED0075EEE0 /* SupbaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F2682E262BED0075EEE0 /* SupbaseManager.swift */; };
 		B041F26B2E262C020075EEE0 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F26A2E262C020075EEE0 /* AuthViewModel.swift */; };
 		B041F26D2E262CE50075EEE0 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */; };
@@ -178,12 +178,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B034DE692E286D870082134F /* PostgREST in Frameworks */,
-				B034DE672E286D870082134F /* Functions in Frameworks */,
-				B034DE6F2E286D870082134F /* Supabase in Frameworks */,
-				B034DE652E286D870082134F /* Auth in Frameworks */,
-				B034DE6D2E286D870082134F /* Storage in Frameworks */,
-				B034DE6B2E286D870082134F /* Realtime in Frameworks */,
+				B034DE762E2B47EE0082134F /* PostgREST in Frameworks */,
+				B034DE742E2B47EE0082134F /* Functions in Frameworks */,
+				B034DE7C2E2B47EE0082134F /* Supabase in Frameworks */,
+				B034DE722E2B47EE0082134F /* Auth in Frameworks */,
+				B034DE7A2E2B47EE0082134F /* Storage in Frameworks */,
+				B034DE782E2B47EE0082134F /* Realtime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,12 +354,12 @@
 			);
 			name = Lumo;
 			packageProductDependencies = (
-				B034DE642E286D870082134F /* Auth */,
-				B034DE662E286D870082134F /* Functions */,
-				B034DE682E286D870082134F /* PostgREST */,
-				B034DE6A2E286D870082134F /* Realtime */,
-				B034DE6C2E286D870082134F /* Storage */,
-				B034DE6E2E286D870082134F /* Supabase */,
+				B034DE712E2B47EE0082134F /* Auth */,
+				B034DE732E2B47EE0082134F /* Functions */,
+				B034DE752E2B47EE0082134F /* PostgREST */,
+				B034DE772E2B47EE0082134F /* Realtime */,
+				B034DE792E2B47EE0082134F /* Storage */,
+				B034DE7B2E2B47EE0082134F /* Supabase */,
 			);
 			productName = Lumo;
 			productReference = B0E915922E00AC7C0036C7A9 /* Lumo.app */;
@@ -427,7 +427,7 @@
 				};
 			};
 			buildConfigurationList = B0E9158D2E00AC7C0036C7A9 /* Build configuration list for PBXProject "Lumo" */;
-			compatibilityVersion = "Xcode 14.0";
+			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -436,7 +436,7 @@
 			);
 			mainGroup = B0E915892E00AC7C0036C7A9;
 			packageReferences = (
-				B034DE632E286D870082134F /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				B034DE702E2B47EE0082134F /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			productRefGroup = B0E915932E00AC7C0036C7A9 /* Products */;
 			projectDirPath = "";
@@ -697,6 +697,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Lumo/Lumo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -705,6 +706,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Lumo;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -724,9 +726,10 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -735,6 +738,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Lumo/Lumo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -743,6 +747,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Lumo;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -762,9 +767,10 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -900,7 +906,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B034DE632E286D870082134F /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+		B034DE702E2B47EE0082134F /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase/supabase-swift";
 			requirement = {
@@ -911,34 +917,34 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B034DE642E286D870082134F /* Auth */ = {
+		B034DE712E2B47EE0082134F /* Auth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B034DE632E286D870082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B034DE702E2B47EE0082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Auth;
 		};
-		B034DE662E286D870082134F /* Functions */ = {
+		B034DE732E2B47EE0082134F /* Functions */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B034DE632E286D870082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B034DE702E2B47EE0082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Functions;
 		};
-		B034DE682E286D870082134F /* PostgREST */ = {
+		B034DE752E2B47EE0082134F /* PostgREST */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B034DE632E286D870082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B034DE702E2B47EE0082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = PostgREST;
 		};
-		B034DE6A2E286D870082134F /* Realtime */ = {
+		B034DE772E2B47EE0082134F /* Realtime */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B034DE632E286D870082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B034DE702E2B47EE0082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Realtime;
 		};
-		B034DE6C2E286D870082134F /* Storage */ = {
+		B034DE792E2B47EE0082134F /* Storage */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B034DE632E286D870082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B034DE702E2B47EE0082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Storage;
 		};
-		B034DE6E2E286D870082134F /* Supabase */ = {
+		B034DE7B2E2B47EE0082134F /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B034DE632E286D870082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B034DE702E2B47EE0082134F /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */

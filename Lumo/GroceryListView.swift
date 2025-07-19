@@ -113,50 +113,52 @@ struct GroceryListView: View {
                                 }
                                 
                                 // Control Buttons
-                                HStack(spacing: 12) {
-                                    Button(action: {
-                                        showingGroupedView.toggle()
-                                    }) {
-                                        HStack {
-                                            Image(systemName: showingGroupedView ? "list.bullet" : "folder")
-                                            Text(showingGroupedView ? "Flat View" : "Grouped")
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 12) {
+                                        Button(action: {
+                                            showingGroupedView.toggle()
+                                        }) {
+                                            HStack {
+                                                Image(systemName: showingGroupedView ? "list.bullet" : "folder")
+                                                Text(showingGroupedView ? "Flat View" : "Grouped")
+                                            }
+                                            .font(.caption)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 6)
+                                            .background(Color.gray.opacity(0.3))
+                                            .cornerRadius(8)
                                         }
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(Color.gray.opacity(0.3))
-                                        .cornerRadius(8)
-                                    }
-                                    
-                                    Button(action: {
-                                        showingRoutePreview = true
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "map")
-                                            Text("Route")
+                                        
+                                        Button(action: {
+                                            showingRoutePreview = true
+                                        }) {
+                                            HStack {
+                                                Image(systemName: "map")
+                                                Text("Route")
+                                            }
+                                            .font(.caption)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 6)
+                                            .background(Color.lumoGreen)
+                                            .cornerRadius(8)
                                         }
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(Color.lumoGreen)
-                                        .cornerRadius(8)
-                                    }
-                                    
-                                    Button(action: {
-                                        showingSmartSuggestions = true
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "lightbulb")
-                                            Text("Suggestions")
+                                        
+                                        Button(action: {
+                                            showingSmartSuggestions = true
+                                        }) {
+                                            HStack {
+                                                Image(systemName: "lightbulb")
+                                                Text("Suggestions")
+                                            }
+                                            .font(.caption)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 6)
+                                            .background(Color.orange)
+                                            .cornerRadius(8)
                                         }
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(Color.orange)
-                                        .cornerRadius(8)
                                     }
                                 }
                             }
@@ -209,7 +211,7 @@ struct GroceryListView: View {
                         } else {
                             FlatGroceryListView()
                         }
-                        // Checkout Button
+                        // Checkout & Save List Button (with cost, black text)
                         Button(action: {
                             Task {
                                 await savePastGroceryList(
@@ -223,8 +225,11 @@ struct GroceryListView: View {
                             HStack {
                                 Image(systemName: "cart.fill.badge.plus")
                                 Text("Checkout & Save List")
+                                Spacer()
+                                Text("$\(appState.groceryList.totalCost, specifier: "%.2f")")
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(.black)
+                            .font(.headline)
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(Color.lumoGreen)
@@ -234,28 +239,7 @@ struct GroceryListView: View {
                         }
                     }
                     
-                    // Checkout Button
-                    if !appState.groceryList.isEmpty {
-                        VStack(spacing: 12) {
-                            Button(action: {
-                                showingCheckoutAlert = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "creditcard.fill")
-                                    Text("Checkout")
-                                    Spacer()
-                                    Text("$\(appState.groceryList.totalCost, specifier: "%.2f")")
-                                }
-                                .font(.headline)
-                                .foregroundColor(.black)
-                                .padding()
-                                .background(Color.lumoGreen)
-                                .cornerRadius(12)
-                            }
-                            .padding(.horizontal)
-                        }
-                        .background(Color.black)
-                    }
+                    // Remove the credit card checkout button section (the one with .creditcard.fill)
                 }
             }
             .navigationBarItems(trailing: EmptyView())
@@ -435,7 +419,8 @@ struct GroceryItemCard: View {
                         Text(groceryItem.item.name)
                             .font(.headline)
                             .foregroundColor(.white)
-                            .lineLimit(2)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
                             .strikethrough(isChecked)
                         
                         if !groceryItem.item.brand.isEmpty {
@@ -460,6 +445,7 @@ struct GroceryItemCard: View {
                             }
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     
                     Spacer()
                 }
