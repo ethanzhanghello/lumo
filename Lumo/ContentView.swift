@@ -91,7 +91,7 @@ struct LumoWelcomeView: View {
                     Button(action: {
                         // Append a string identifier to the navigation path
                         // This will trigger the .navigationDestination in RootView
-                        navigationPath.append("StoreFinder")
+                        navigationPath.append("TabBar")
                     }) {
                         Text("Continue as guest")
                             .font(.footnote)

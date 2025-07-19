@@ -161,7 +161,7 @@ struct LoginView: View {
         if authViewModel.errorMessage == nil {
             // Clear the navigation stack and go to store finder
             navigationPath.removeLast()
-            navigationPath.append("StoreFinder")
+            navigationPath.append("TabBar")
         }
     }
 }
