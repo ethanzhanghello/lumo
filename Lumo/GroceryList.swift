@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import UIKit // <-- Add this for haptic feedback
 
 // MARK: - GroceryItem Model (to track quantities)
 struct GroceryListItem: Identifiable, Codable, Hashable {
@@ -66,6 +67,11 @@ class GroceryList: ObservableObject {
             // Add new item-store combo
             let newItem = GroceryListItem(item: item, store: store, quantity: quantity)
             groceryItems.append(newItem)
+        }
+        // Haptic feedback
+        DispatchQueue.main.async {
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
         }
     }
     
