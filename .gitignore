@@ -2,4 +2,4 @@
 openai.key
 
 # Spoonacular API key (local only)
-spoonacular.key 
+spoonacular.key Lumo/openai.key
