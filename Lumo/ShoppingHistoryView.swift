@@ -580,7 +580,7 @@ struct InsightCard: View {
                     .fontWeight(.semibold)
                     .foregroundColor(.white)
                 
-                Text(insight.message)
+                Text(insight.description)
                     .font(.caption)
                     .foregroundColor(.gray)
                     .lineLimit(2)
@@ -595,19 +595,21 @@ struct InsightCard: View {
     
     private var insightColor: Color {
         switch insight.type {
-        case "Budget": return .red
-        case "Savings": return .green
-        case "Reminder": return .blue
-        default: return .lumoGreen
+        case .savings: return .green
+        case .frequency: return .blue
+        case .preference: return .orange
+        case .trend: return .purple
+        case .recommendation: return .lumoGreen
         }
     }
     
     private var insightIcon: String {
         switch insight.type {
-        case "Budget": return "exclamationmark.triangle"
-        case "Savings": return "dollarsign.circle"
-        case "Reminder": return "bell"
-        default: return "lightbulb"
+        case .savings: return "dollarsign.circle"
+        case .frequency: return "chart.bar"
+        case .preference: return "heart"
+        case .trend: return "chart.line.uptrend.xyaxis"
+        case .recommendation: return "lightbulb"
         }
     }
 }
@@ -711,7 +713,7 @@ struct DetailedInsightCard: View {
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                     
-                    Text(insight.type)
+                    Text(insight.type.rawValue)
                         .font(.caption)
                         .foregroundColor(insightColor)
                         .padding(.horizontal, 8)
@@ -724,7 +726,7 @@ struct DetailedInsightCard: View {
             }
             
             // Message
-            Text(insight.message)
+            Text(insight.description)
                 .font(.subheadline)
                 .foregroundColor(.gray)
                 .lineLimit(nil)
@@ -747,19 +749,21 @@ struct DetailedInsightCard: View {
     
     private var insightColor: Color {
         switch insight.type {
-        case "Budget": return .red
-        case "Savings": return .green
-        case "Reminder": return .blue
-        default: return .lumoGreen
+        case .savings: return .green
+        case .frequency: return .blue
+        case .preference: return .orange
+        case .trend: return .purple
+        case .recommendation: return .lumoGreen
         }
     }
     
     private var insightIcon: String {
         switch insight.type {
-        case "Budget": return "exclamationmark.triangle"
-        case "Savings": return "dollarsign.circle"
-        case "Reminder": return "bell"
-        default: return "lightbulb"
+        case .savings: return "dollarsign.circle"
+        case .frequency: return "chart.bar"
+        case .preference: return "heart"
+        case .trend: return "chart.line.uptrend.xyaxis"
+        case .recommendation: return "lightbulb"
         }
     }
 } 

@@ -279,8 +279,22 @@ struct BrowseView: View {
         // This will be more reliable and consistent with the rest of the app
         let suggestions = appState.getSmartSuggestions()
         
-        DispatchQueue.main.async {
-            self.smartSuggestions = suggestions
+        Task { @MainActor in
+            self.smartSuggestions = suggestions.map { suggestion in
+                SmartSuggestion(
+                    item: GroceryItem(
+                        name: suggestion,
+                        description: "Smart suggestion based on your preferences",
+                        price: 2.99,
+                        category: "Suggested",
+                        aisle: 1
+                    ),
+                    reason: "Based on your shopping patterns",
+                    confidence: 0.8,
+                    category: .frequent,
+                    priority: 1
+                )
+            }
             self.isLoadingSuggestions = false
         }
     }

@@ -48,32 +48,45 @@ enum MealType: String, CaseIterable, Codable, Identifiable {
 
 
 
-struct Meal: Identifiable, Codable, Equatable {
-    var id = UUID()
+struct MealPlan: Identifiable, Codable {
+    let id = UUID()
     var date: Date
-    var type: MealType
-    var recipeName: String
-    var ingredients: [String]
-    var recipe: Recipe?
-    var customMeal: String?
-    var servings: Int
-    var notes: String?
-    var isCompleted: Bool
+    var meals: [Meal]
     
-    init(date: Date, type: MealType, recipeName: String, ingredients: [String], recipe: Recipe? = nil, customMeal: String? = nil, servings: Int = 1, notes: String? = nil, isCompleted: Bool = false) {
+    init(date: Date, meals: [Meal] = []) {
         self.date = date
-        self.type = type
-        self.recipeName = recipeName
-        self.ingredients = ingredients
-        self.recipe = recipe
-        self.customMeal = customMeal
-        self.servings = servings
-        self.notes = notes
-        self.isCompleted = isCompleted
+        self.meals = meals
     }
     
-    static func == (lhs: Meal, rhs: Meal) -> Bool {
-        lhs.id == rhs.id
+    struct Meal: Identifiable, Codable, Equatable {
+        typealias MealType = Lumo.MealType
+        
+        var id = UUID()
+        var date: Date
+        var type: MealType
+        var recipeName: String
+        var ingredients: [String]
+        var recipe: Recipe?
+        var customMeal: String?
+        var servings: Int
+        var notes: String?
+        var isCompleted: Bool
+        
+        init(date: Date, type: MealType, recipeName: String, ingredients: [String], recipe: Recipe? = nil, customMeal: String? = nil, servings: Int = 1, notes: String? = nil, isCompleted: Bool = false) {
+            self.date = date
+            self.type = type
+            self.recipeName = recipeName
+            self.ingredients = ingredients
+            self.recipe = recipe
+            self.customMeal = customMeal
+            self.servings = servings
+            self.notes = notes
+            self.isCompleted = isCompleted
+        }
+        
+        static func == (lhs: Meal, rhs: Meal) -> Bool {
+            lhs.id == rhs.id
+        }
     }
 }
 

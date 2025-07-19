@@ -6,7 +6,82 @@
 //
 
 import Foundation
+import SwiftUI
 
+// MARK: - Smart Substitution Models
+struct SmartSubstitution: Identifiable, Codable, Hashable {
+    let id: UUID
+    let originalItem: GroceryItem
+    let suggestedItem: GroceryItem
+    let reason: SubstitutionReason
+    let confidence: Double // 0.0 to 1.0
+    let nutritionalComparison: NutritionalComparison?
+    let priceComparison: PriceComparison
+    let availability: AvailabilityStatus
+    let userRating: Double?
+    
+    enum SubstitutionReason: String, Codable, CaseIterable {
+        case outOfStock = "Out of Stock"
+        case betterPrice = "Better Price"
+        case healthier = "Healthier Option"
+        case dietaryRestriction = "Dietary Restriction"
+        case brandPreference = "Brand Preference" 
+        case seasonal = "Seasonal Alternative"
+        case bulkSaving = "Bulk Savings"
+        case similarProduct = "Similar Product"
+        case allergenFree = "Allergen Free"
+    }
+    
+    enum AvailabilityStatus: String, Codable, CaseIterable {
+        case inStock = "In Stock"
+        case lowStock = "Low Stock"
+        case preOrder = "Pre-Order"
+        case limitedQuantity = "Limited Quantity"
+    }
+    
+    init(id: UUID = UUID(), originalItem: GroceryItem, suggestedItem: GroceryItem, reason: SubstitutionReason, confidence: Double, nutritionalComparison: NutritionalComparison? = nil, priceComparison: PriceComparison, availability: AvailabilityStatus = .inStock, userRating: Double? = nil) {
+        self.id = id
+        self.originalItem = originalItem
+        self.suggestedItem = suggestedItem
+        self.reason = reason
+        self.confidence = confidence
+        self.nutritionalComparison = nutritionalComparison
+        self.priceComparison = priceComparison
+        self.availability = availability
+        self.userRating = userRating
+    }
+}
+
+struct NutritionalComparison: Codable, Hashable {
+    let calories: ComparisonValue
+    let protein: ComparisonValue
+    let carbs: ComparisonValue
+    let fat: ComparisonValue
+    let overallHealthScore: Double // -1.0 to 1.0 (negative = worse, positive = better)
+}
+
+struct ComparisonValue: Codable, Hashable {
+    let original: Double
+    let suggested: Double
+    let percentChange: Double
+    
+    var isImprovement: Bool {
+        return percentChange > 0
+    }
+}
+
+struct PriceComparison: Codable, Hashable {
+    let originalPrice: Double
+    let suggestedPrice: Double
+    let savings: Double
+    let percentSavings: Double
+    
+    var isSavings: Bool {
+        return savings > 0
+    }
+}
+
+// MARK: - Smart Substitution Manager
 class SmartSubstitutionManager: ObservableObject {
     
     // MARK: - Substitution Database
@@ -118,12 +193,18 @@ class SmartSubstitutionManager: ObservableObject {
         if let rules = substitutionDatabase[itemName] {
             for rule in rules {
                 let alternatives = findGroceryItems(matching: rule.alternatives)
-                if !alternatives.isEmpty {
+                if let alternative = alternatives.first {
                     substitutions.append(SmartSubstitution(
                         originalItem: item,
-                        alternatives: alternatives,
-                        reason: rule.reason,
-                        confidence: rule.confidence
+                        suggestedItem: alternative,
+                        reason: SmartSubstitution.SubstitutionReason(rawValue: rule.reason) ?? .similarProduct,
+                        confidence: rule.confidence,
+                        priceComparison: PriceComparison(
+                            originalPrice: item.price,
+                            suggestedPrice: alternative.price,
+                            savings: max(0, item.price - alternative.price),
+                            percentSavings: max(0, (item.price - alternative.price) / item.price * 100)
+                        )
                     ))
                 }
             }
@@ -134,12 +215,18 @@ class SmartSubstitutionManager: ObservableObject {
             if itemName.contains(key) || key.contains(itemName) {
                 for rule in rules {
                     let alternatives = findGroceryItems(matching: rule.alternatives)
-                    if !alternatives.isEmpty {
+                    if let alternative = alternatives.first {
                         substitutions.append(SmartSubstitution(
                             originalItem: item,
-                            alternatives: alternatives,
-                            reason: rule.reason,
-                            confidence: rule.confidence * 0.8 // Lower confidence for partial matches
+                            suggestedItem: alternative,
+                            reason: SmartSubstitution.SubstitutionReason(rawValue: rule.reason) ?? .similarProduct,
+                            confidence: rule.confidence * 0.8, // Lower confidence for partial matches
+                            priceComparison: PriceComparison(
+                                originalPrice: item.price,
+                                suggestedPrice: alternative.price,
+                                savings: max(0, item.price - alternative.price),
+                                percentSavings: max(0, (item.price - alternative.price) / item.price * 100)
+                            )
                         ))
                     }
                 }
@@ -222,10 +309,8 @@ class SubstitutionViewModel: ObservableObject {
         // Remove original item
         list.removeItem(substitution.originalItem, store: store)
         
-        // Add first alternative
-        if let alternative = substitution.alternatives.first {
-            list.addItem(alternative, store: store)
-        }
+        // Add suggested alternative
+        list.addItem(substitution.suggestedItem, store: store)
     }
     
     func applySubstitution(_ substitution: SmartSubstitution, with alternative: GroceryItem, to list: GroceryList, store: Store) {

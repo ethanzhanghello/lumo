@@ -1,15 +1,15 @@
 Command line invocation:
-    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -scheme Lumo -destination "platform=iOS Simulator,name=iPhone 16" build
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project Lumo.xcodeproj -scheme Lumo -destination "platform=iOS Simulator,name=iPhone 16,OS=18.5" build
 
 Resolve Package Graph
 
 
 Resolved source packages:
-  swift-crypto: https://github.com/apple/swift-crypto.git @ 3.12.3
+  Supabase: https://github.com/supabase/supabase-swift @ 2.30.0
   swift-asn1: https://github.com/apple/swift-asn1.git @ 1.4.0
-  swift-http-types: https://github.com/apple/swift-http-types.git @ 1.4.0
-  Supabase: https://github.com/supabase/supabase-swift @ 2.30.1
+  swift-crypto: https://github.com/apple/swift-crypto.git @ 3.12.3
   swift-concurrency-extras: https://github.com/pointfreeco/swift-concurrency-extras @ 1.3.1
+  swift-http-types: https://github.com/apple/swift-http-types.git @ 1.4.0
   swift-clocks: https://github.com/pointfreeco/swift-clocks @ 1.0.6
   xctest-dynamic-overlay: https://github.com/pointfreeco/xctest-dynamic-overlay @ 1.5.2
 
@@ -177,156 +177,17 @@ SwiftDriver Lumo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'L
     cd /Users/ethanzhang/Desktop/lumo
     builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Lumo -Onone -enforce-exclusivity\=checked @/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk -target arm64-apple-ios17.5-simulator -g -module-cache-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Index.noindex/DataStore -swift-version 5 -I /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64 -c -j12 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -output-file-map /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/ethanzhang/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo_const_extract_protocols.json -Xcc -iquote -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-generated-files.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-own-target-headers.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo-68368ce3e92784c920e404bc4850370a-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-project-headers.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources-normal/arm64 -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources/arm64 -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo-Swift.h -working-directory /Users/ethanzhang/Desktop/lumo -experimental-emit-module-separately -disable-cmo
 
-SwiftCompile normal arm64 Compiling\ AppState.swift,\ MealPlanningView.swift,\ LumoApp.swift /Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift /Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift /Users/ethanzhang/Desktop/lumo/Lumo/LumoApp.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift (in target 'Lumo' from project 'Lumo')
+CompileAssetCatalogVariant thinned /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app /Users/ethanzhang/Desktop/lumo/Lumo/Preview\ Content/Preview\ Assets.xcassets /Users/ethanzhang/Desktop/lumo/Lumo/Assets.xcassets (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
-    
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:177:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:177:9: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:177:9: note: make the property mutable instead
-    let id = UUID()
-    ~~~ ^
-    var
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:269:13: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
-        let id = UUID()
-            ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:269:13: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
-        let id = UUID()
-            ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:269:13: note: make the property mutable instead
-        let id = UUID()
-        ~~~ ^
-        var
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:263:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:263:9: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:263:9: note: make the property mutable instead
-    let id = UUID()
-    ~~~ ^
-    var
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:285:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:285:9: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:285:9: note: make the property mutable instead
-    let id = UUID()
-    ~~~ ^
-    var
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:294:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:294:9: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:294:9: note: make the property mutable instead
-    let id = UUID()
-    ~~~ ^
-    var
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:313:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:313:9: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:313:9: note: make the property mutable instead
-    let id = UUID()
-    ~~~ ^
-    var
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:332:13: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
-        let id = UUID()
-            ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:332:13: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
-        let id = UUID()
-            ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:332:13: note: make the property mutable instead
-        let id = UUID()
-        ~~~ ^
-        var
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:321:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:321:9: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:321:9: note: make the property mutable instead
-    let id = UUID()
-    ~~~ ^
-    var
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:341:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:341:9: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:341:9: note: make the property mutable instead
-    let id = UUID()
-    ~~~ ^
-    var
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:367:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:367:9: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
-    let id = UUID()
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:367:9: note: make the property mutable instead
-    let id = UUID()
-    ~~~ ^
-    var
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:706:16: warning: value 'activeList' was defined but never used; consider replacing with boolean test
-        if let activeList = getActiveSharedLists().first {
-           ~~~~^~~~~~~~~~~~~
-                                                         != nil
-/Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift:718:13: warning: initialization of immutable value 'ingredients' was never used; consider replacing with assignment to '_' or removing it
-        let ingredients = recipe.ingredients.compactMap { ingredient in
-        ~~~~^~~~~~~~~~~
-        _
+    /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/ethanzhang/Desktop/lumo/Lumo/Preview\ Content/Preview\ Assets.xcassets /Users/ethanzhang/Desktop/lumo/Lumo/Assets.xcassets --compile /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/assetcatalog_dependencies_thinned --output-partial-info-plist /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --include-all-app-icons --accent-color AccentColor --compress-pngs --enable-on-demand-resources YES --filter-for-thinning-device-configuration iPhone17,3 --filter-for-device-os-version 18.5 --development-region en --target-device iphone --minimum-deployment-target 17.5 --platform iphonesimulator
+/* com.apple.actool.compilation-results */
+/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/assetcatalog_generated_info.plist_thinned
+/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/assetcatalog_output/thinned/AppIcon60x60@2x.png
+/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/assetcatalog_output/thinned/AppIcon76x76@2x~ipad.png
+/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/assetcatalog_output/thinned/Assets.car
 
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
 
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/LumoApp.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ ContentView.swift,\ StoreData.swift,\ Browse.swift /Users/ethanzhang/Desktop/lumo/Lumo/ContentView.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreData.swift /Users/ethanzhang/Desktop/lumo/Lumo/Browse.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ContentView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/StoreData.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-/Users/ethanzhang/Desktop/lumo/Lumo/StoreData.swift:43:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
-    let id = UUID() // Required for Identifiable protocol
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/StoreData.swift:43:9: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
-    let id = UUID() // Required for Identifiable protocol
-        ^
-/Users/ethanzhang/Desktop/lumo/Lumo/StoreData.swift:43:9: note: make the property mutable instead
-    let id = UUID() // Required for Identifiable protocol
-    ~~~ ^
-    var
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/Browse.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-/Users/ethanzhang/Desktop/lumo/Lumo/Browse.swift:139:18: warning: 'onChange(of:perform:)' was deprecated in iOS 17.0: Use `onChange` with a two or zero parameter action closure instead.
-                .onChange(of: searchText) { newValue in
-                 ^
-
-SwiftCompile normal arm64 Compiling\ ExploreSections.swift,\ ExploreView.swift,\ GroceryListView.swift,\ StoreMap.swift /Users/ethanzhang/Desktop/lumo/Lumo/ExploreSections.swift /Users/ethanzhang/Desktop/lumo/Lumo/ExploreView.swift /Users/ethanzhang/Desktop/lumo/Lumo/GroceryListView.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreMap.swift (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 Compiling\ ExploreSections.swift,\ ExploreView.swift,\ GroceryListView.swift,\ StoreMap.swift,\ ContentView.swift /Users/ethanzhang/Desktop/lumo/Lumo/ExploreSections.swift /Users/ethanzhang/Desktop/lumo/Lumo/ExploreView.swift /Users/ethanzhang/Desktop/lumo/Lumo/GroceryListView.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreMap.swift /Users/ethanzhang/Desktop/lumo/Lumo/ContentView.swift (in target 'Lumo' from project 'Lumo')
 SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ExploreSections.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
     
@@ -334,9 +195,6 @@ SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ExploreSections.sw
 SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ExploreView.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
     
-/Users/ethanzhang/Desktop/lumo/Lumo/ExploreView.swift:68:17: warning: 'init(destination:isActive:label:)' was deprecated in iOS 16.0: use NavigationLink(value:label:), or navigationDestination(isPresented:destination:), inside a NavigationStack or NavigationSplitView
-                NavigationLink(
-                ^
 
 SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/GroceryListView.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
@@ -346,152 +204,15 @@ SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/StoreMap.swift (in
     cd /Users/ethanzhang/Desktop/lumo
     
 
-SwiftCompile normal arm64 Compiling\ MealPlanManager.swift,\ DealsView.swift,\ DealFiltersView.swift /Users/ethanzhang/Desktop/lumo/Lumo/MealPlanManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/DealsView.swift /Users/ethanzhang/Desktop/lumo/Lumo/DealFiltersView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/MealPlanManager.swift (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ContentView.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
     
 
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/DealsView.swift (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 Compiling\ LoginView.swift,\ Root.swift,\ ShoppingHistoryView.swift,\ GroceryList.swift,\ FlyToCartOverlay.swift /Users/ethanzhang/Desktop/lumo/Lumo/LoginView.swift /Users/ethanzhang/Desktop/lumo/Lumo/Root.swift /Users/ethanzhang/Desktop/lumo/Lumo/ShoppingHistoryView.swift /Users/ethanzhang/Desktop/lumo/Lumo/GroceryList.swift /Users/ethanzhang/Desktop/lumo/Lumo/FlyToCartOverlay.swift (in target 'Lumo' from project 'Lumo')
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/LoginView.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
     
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/DealFiltersView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ TabView.swift,\ StoreSelection.swift,\ DietaryGoalsView.swift /Users/ethanzhang/Desktop/lumo/Lumo/TabView.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreSelection.swift /Users/ethanzhang/Desktop/lumo/Lumo/DietaryGoalsView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/TabView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/StoreSelection.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/DietaryGoalsView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-/Users/ethanzhang/Desktop/lumo/Lumo/DietaryGoalsView.swift:915:28: warning: value 'newValue' was defined but never used; consider replacing with boolean test
-                    if let newValue = Double(updatedCurrent) {
-                       ~~~~^~~~~~~~~~~
-                                                             != nil
-
-SwiftCompile normal arm64 Compiling\ DealDetailView.swift,\ CouponDetailView.swift,\ DealsData.swift /Users/ethanzhang/Desktop/lumo/Lumo/DealDetailView.swift /Users/ethanzhang/Desktop/lumo/Lumo/CouponDetailView.swift /Users/ethanzhang/Desktop/lumo/Lumo/DealsData.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/DealDetailView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/CouponDetailView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/DealsData.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ GeneratedGroceryListView.swift,\ AddMealView.swift,\ ChatbotMealSuggestionCard.swift /Users/ethanzhang/Desktop/lumo/Lumo/GeneratedGroceryListView.swift /Users/ethanzhang/Desktop/lumo/Lumo/AddMealView.swift /Users/ethanzhang/Desktop/lumo/Lumo/ChatbotMealSuggestionCard.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/GeneratedGroceryListView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/AddMealView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ChatbotMealSuggestionCard.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ CreateAccountView.swift,\ ChatbotView.swift,\ ChatMessage.swift /Users/ethanzhang/Desktop/lumo/Lumo/CreateAccountView.swift /Users/ethanzhang/Desktop/lumo/Lumo/ChatbotView.swift /Users/ethanzhang/Desktop/lumo/Lumo/ChatMessage.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/CreateAccountView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ChatbotView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ChatMessage.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftEmitModule normal arm64 Emitting\ module\ for\ Lumo (in target 'Lumo' from project 'Lumo')
-
-EmitSwiftModule normal arm64 (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-/Users/ethanzhang/Desktop/lumo/Lumo/StoreLocationView.swift:118:1: warning: extension declares a conformance of imported type 'CLLocationCoordinate2D' to imported protocol 'Equatable'; this will not behave correctly if the owners of 'CoreLocation' introduce this conformance in the future
-extension CLLocationCoordinate2D: Equatable {
-^
-/Users/ethanzhang/Desktop/lumo/Lumo/StoreLocationView.swift:118:1: note: add '@retroactive' to silence this warning
-extension CLLocationCoordinate2D: Equatable {
-^                                 ~~~~~~~~~
-                                  @retroactive Equatable
-
-SwiftCompile normal arm64 Compiling\ ChatbotEngine.swift,\ ChatResponseViews.swift,\ Recipe.swift /Users/ethanzhang/Desktop/lumo/Lumo/ChatbotEngine.swift /Users/ethanzhang/Desktop/lumo/Lumo/ChatResponseViews.swift /Users/ethanzhang/Desktop/lumo/Lumo/Recipe.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ChatbotEngine.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-/Users/ethanzhang/Desktop/lumo/Lumo/ChatbotEngine.swift:44:13: warning: initialization of immutable value 'confidence' was never used; consider replacing with assignment to '_' or removing it
-        let confidence = intentResult.confidence
-        ~~~~^~~~~~~~~~
-        _
-/Users/ethanzhang/Desktop/lumo/Lumo/ChatbotEngine.swift:46:13: warning: initialization of immutable value 'actionButtons' was never used; consider replacing with assignment to '_' or removing it
-        let actionButtons = [
-        ~~~~^~~~~~~~~~~~~
-        _
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ChatResponseViews.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/Recipe.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ SpoonacularService.swift,\ SpoonacularRecipeView.swift,\ PantryManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularService.swift /Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularRecipeView.swift /Users/ethanzhang/Desktop/lumo/Lumo/PantryManager.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularService.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularRecipeView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-/Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularRecipeView.swift:180:24: warning: value 'error' was defined but never used; consider replacing with boolean test
-                if let error = spoonacularService.lastError {
-                   ~~~~^~~~~~~~
-                                                            != nil
-/Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularRecipeView.swift:196:24: warning: value 'error' was defined but never used; consider replacing with boolean test
-                if let error = spoonacularService.lastError {
-                   ~~~~^~~~~~~~
-                                                            != nil
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/PantryManager.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ BudgetManager.swift,\ CategoryFilterButton.swift,\ SmartSubstitutionsView.swift /Users/ethanzhang/Desktop/lumo/Lumo/BudgetManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/CategoryFilterButton.swift /Users/ethanzhang/Desktop/lumo/Lumo/SmartSubstitutionsView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/BudgetManager.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/CategoryFilterButton.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/SmartSubstitutionsView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ Root.swift,\ ShoppingHistoryView.swift,\ GroceryList.swift /Users/ethanzhang/Desktop/lumo/Lumo/Root.swift /Users/ethanzhang/Desktop/lumo/Lumo/ShoppingHistoryView.swift /Users/ethanzhang/Desktop/lumo/Lumo/GroceryList.swift (in target 'Lumo' from project 'Lumo')
 
 SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/Root.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
@@ -505,139 +226,54 @@ SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/GroceryList.swift 
     cd /Users/ethanzhang/Desktop/lumo
     
 
-SwiftDriverJobDiscovery normal arm64 Compiling ContentView.swift, StoreData.swift, Browse.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 Compiling\ TemplateViews.swift /Users/ethanzhang/Desktop/lumo/Lumo/TemplateViews.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/TemplateViews.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftDriverJobDiscovery normal arm64 Compiling BudgetManager.swift, CategoryFilterButton.swift, SmartSubstitutionsView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 Compiling\ ItemDetailView.swift /Users/ethanzhang/Desktop/lumo/Lumo/ItemDetailView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ItemDetailView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftDriverJobDiscovery normal arm64 Compiling GeneratedGroceryListView.swift, AddMealView.swift, ChatbotMealSuggestionCard.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 Compiling\ StoreLocationView.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreLocationView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/StoreLocationView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-/Users/ethanzhang/Desktop/lumo/Lumo/StoreLocationView.swift:118:1: warning: extension declares a conformance of imported type 'CLLocationCoordinate2D' to imported protocol 'Equatable'; this will not behave correctly if the owners of 'CoreLocation' introduce this conformance in the future
-extension CLLocationCoordinate2D: Equatable {
-^
-/Users/ethanzhang/Desktop/lumo/Lumo/StoreLocationView.swift:118:1: note: add '@retroactive' to silence this warning
-extension CLLocationCoordinate2D: Equatable {
-^                                 ~~~~~~~~~
-                                  @retroactive Equatable
-/Users/ethanzhang/Desktop/lumo/Lumo/StoreLocationView.swift:31:30: warning: 'authorizationStatus()' was deprecated in iOS 14.0
-        if CLLocationManager.authorizationStatus() == .authorizedWhenInUse {
-                             ^
-/Users/ethanzhang/Desktop/lumo/Lumo/StoreLocationView.swift:88:17: warning: 'init(coordinateRegion:interactionModes:showsUserLocation:userTrackingMode:)' was deprecated in iOS 17.0: Use Map initializers that take a MapContentBuilder instead.
-                Map(coordinateRegion: .constant(
-                ^
-/Users/ethanzhang/Desktop/lumo/Lumo/StoreLocationView.swift:110:10: warning: 'onChange(of:perform:)' was deprecated in iOS 17.0: Use `onChange` with a two or zero parameter action closure instead.
-        .onChange(of: locationManager.userLocation) { _ in
-         ^
-
-SwiftDriverJobDiscovery normal arm64 Compiling TemplateViews.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling TabView.swift, StoreSelection.swift, DietaryGoalsView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling ItemDetailView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling StoreLocationView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling MealPlanManager.swift, DealsView.swift, DealFiltersView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling DealDetailView.swift, CouponDetailView.swift, DealsData.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 Compiling\ AuthViewModel.swift /Users/ethanzhang/Desktop/lumo/Lumo/AuthViewModel.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/AuthViewModel.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ SharedListManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/SharedListManager.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/SharedListManager.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ ProfileView.swift,\ FlyToCartAnimationManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/ProfileView.swift /Users/ethanzhang/Desktop/lumo/Lumo/FlyToCartAnimationManager.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ProfileView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-/Users/ethanzhang/Desktop/lumo/Lumo/ProfileView.swift:56:18: warning: 'onChange(of:perform:)' was deprecated in iOS 17.0: Use `onChange` with a two or zero parameter action closure instead.
-                .onChange(of: selectedImage) { newItem in
-                 ^
-/Users/ethanzhang/Desktop/lumo/Lumo/ProfileView.swift:132:22: warning: 'onChange(of:perform:)' was deprecated in iOS 17.0: Use `onChange` with a two or zero parameter action closure instead.
-                    .onChange(of: allergyFiltersEnabled) { newValue in
-                     ^
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/FlyToCartAnimationManager.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ LoginView.swift /Users/ethanzhang/Desktop/lumo/Lumo/LoginView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/LoginView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ AutoFillView.swift /Users/ethanzhang/Desktop/lumo/Lumo/AutoFillView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/AutoFillView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 Compiling\ InventoryData.swift,\ SuggestionEngine.swift /Users/ethanzhang/Desktop/lumo/Lumo/InventoryData.swift /Users/ethanzhang/Desktop/lumo/Lumo/SuggestionEngine.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/InventoryData.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/SuggestionEngine.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftDriverJobDiscovery normal arm64 Compiling Root.swift, ShoppingHistoryView.swift, GroceryList.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 Compiling\ NutritionAnalysisView.swift /Users/ethanzhang/Desktop/lumo/Lumo/NutritionAnalysisView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/NutritionAnalysisView.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftDriverJobDiscovery normal arm64 Compiling AppState.swift, MealPlanningView.swift, LumoApp.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 Compiling\ RecipeDatabase.swift /Users/ethanzhang/Desktop/lumo/Lumo/RecipeDatabase.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/RecipeDatabase.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftDriverJobDiscovery normal arm64 Compiling AuthViewModel.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 Compiling\ GeneratedAssetSymbols.swift /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    
-
-SwiftDriverJobDiscovery normal arm64 Compiling SharedListManager.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 Compiling\ FlyToCartOverlay.swift,\ GroceryItems.swift /Users/ethanzhang/Desktop/lumo/Lumo/FlyToCartOverlay.swift /Users/ethanzhang/Desktop/lumo/Lumo/GroceryItems.swift (in target 'Lumo' from project 'Lumo')
-
 SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/FlyToCartOverlay.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
     
+
+SwiftCompile normal arm64 Compiling\ StoreData.swift,\ Browse.swift,\ AppState.swift,\ MealPlanningView.swift,\ LumoApp.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreData.swift /Users/ethanzhang/Desktop/lumo/Lumo/Browse.swift /Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift /Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift /Users/ethanzhang/Desktop/lumo/Lumo/LumoApp.swift (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/StoreData.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/Browse.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/LumoApp.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 Compiling\ TabView.swift,\ ApiKeyManager.swift,\ GroceryItems.swift,\ StoreSelection.swift /Users/ethanzhang/Desktop/lumo/Lumo/TabView.swift /Users/ethanzhang/Desktop/lumo/Lumo/ApiKeyManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/GroceryItems.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreSelection.swift (in target 'Lumo' from project 'Lumo')
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/ethanzhang/Desktop/lumo/Lumo/ExploreSections.swift /Users/ethanzhang/Desktop/lumo/Lumo/ExploreView.swift /Users/ethanzhang/Desktop/lumo/Lumo/GroceryListView.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreMap.swift /Users/ethanzhang/Desktop/lumo/Lumo/ContentView.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreData.swift /Users/ethanzhang/Desktop/lumo/Lumo/Browse.swift /Users/ethanzhang/Desktop/lumo/Lumo/AppState.swift /Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift /Users/ethanzhang/Desktop/lumo/Lumo/LumoApp.swift /Users/ethanzhang/Desktop/lumo/Lumo/LoginView.swift /Users/ethanzhang/Desktop/lumo/Lumo/Root.swift /Users/ethanzhang/Desktop/lumo/Lumo/ShoppingHistoryView.swift /Users/ethanzhang/Desktop/lumo/Lumo/GroceryList.swift /Users/ethanzhang/Desktop/lumo/Lumo/FlyToCartOverlay.swift -primary-file /Users/ethanzhang/Desktop/lumo/Lumo/TabView.swift -primary-file /Users/ethanzhang/Desktop/lumo/Lumo/ApiKeyManager.swift -primary-file /Users/ethanzhang/Desktop/lumo/Lumo/GroceryItems.swift -primary-file /Users/ethanzhang/Desktop/lumo/Lumo/StoreSelection.swift /Users/ethanzhang/Desktop/lumo/Lumo/DietaryGoalsView.swift /Users/ethanzhang/Desktop/lumo/Lumo/AddMealView.swift /Users/ethanzhang/Desktop/lumo/Lumo/NutritionAnalysisView.swift /Users/ethanzhang/Desktop/lumo/Lumo/GeneratedGroceryListView.swift /Users/ethanzhang/Desktop/lumo/Lumo/MealPlanManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/AuthViewModel.swift /Users/ethanzhang/Desktop/lumo/Lumo/SupbaseManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreFinder.swift /Users/ethanzhang/Desktop/lumo/Lumo/ItemDetailView.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreLocationView.swift /Users/ethanzhang/Desktop/lumo/Lumo/SmartSubstitutionManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/ProfileView.swift /Users/ethanzhang/Desktop/lumo/Lumo/DealsView.swift /Users/ethanzhang/Desktop/lumo/Lumo/DealFiltersView.swift /Users/ethanzhang/Desktop/lumo/Lumo/DealDetailView.swift /Users/ethanzhang/Desktop/lumo/Lumo/CouponDetailView.swift /Users/ethanzhang/Desktop/lumo/Lumo/CreateAccountView.swift /Users/ethanzhang/Desktop/lumo/Lumo/DealsData.swift /Users/ethanzhang/Desktop/lumo/Lumo/FlyToCartAnimationManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/InventoryData.swift /Users/ethanzhang/Desktop/lumo/Lumo/SuggestionEngine.swift /Users/ethanzhang/Desktop/lumo/Lumo/SharedListManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularService.swift /Users/ethanzhang/Desktop/lumo/Lumo/OnboardingView.swift /Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularRecipeView.swift /Users/ethanzhang/Desktop/lumo/Lumo/PantryManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/BudgetManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/CategoryFilterButton.swift /Users/ethanzhang/Desktop/lumo/Lumo/SmartSubstitutionsView.swift /Users/ethanzhang/Desktop/lumo/Lumo/ChatbotView.swift /Users/ethanzhang/Desktop/lumo/Lumo/ChatMessage.swift /Users/ethanzhang/Desktop/lumo/Lumo/ChatbotEngine.swift /Users/ethanzhang/Desktop/lumo/Lumo/ChatResponseViews.swift /Users/ethanzhang/Desktop/lumo/Lumo/Recipe.swift /Users/ethanzhang/Desktop/lumo/Lumo/RecipeDatabase.swift /Users/ethanzhang/Desktop/lumo/Lumo/TemplateViews.swift /Users/ethanzhang/Desktop/lumo/Lumo/AutoFillView.swift /Users/ethanzhang/Desktop/lumo/Lumo/SmartMealPlanGenerator.swift /Users/ethanzhang/Desktop/lumo/Lumo/RouteOptimizationManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreMapView.swift /Users/ethanzhang/Desktop/lumo/Lumo/TurnByTurnNavigationView.swift /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources/GeneratedAssetSymbols.swift -supplementary-output-file-map /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/supplementaryOutputs-4 -emit-localized-strings -emit-localized-strings-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64 -target arm64-apple-ios17.5-simulator -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk -I /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -no-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -module-cache-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -profile-generate -profile-coverage-mapping -swift-version 5 -enforce-exclusivity\=checked -Onone -D DEBUG -serialize-debugging-options -const-gather-protocols-file /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/ethanzhang/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/ethanzhang/Desktop/lumo -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift -enable-anonymous-context-mangled-names -file-compilation-dir /Users/ethanzhang/Desktop/lumo -Xcc -ivfsstatcache -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-generated-files.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-own-target-headers.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo-68368ce3e92784c920e404bc4850370a-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-project-headers.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources-normal/arm64 -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources/arm64 -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources -Xcc -DDEBUG\=1 -module-name Lumo -frontend-parseable-output -disable-clang-spi -target-sdk-version 18.5 -target-sdk-name iphonesimulator18.5 -external-plugin-path /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -external-plugin-path /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/local/lib/swift/host/plugins\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/local/lib/swift/host/plugins -o /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/TabView.o -o /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/ApiKeyManager.o -o /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/GroceryItems.o -o /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/StoreSelection.o -index-unit-output-path /Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/TabView.o -index-unit-output-path /Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/ApiKeyManager.o -index-unit-output-path /Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/GroceryItems.o -index-unit-output-path /Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/StoreSelection.o -index-store-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Index.noindex/DataStore -index-system-modules
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/TabView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+/Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift:17:45: error: cannot find type 'Meal' in scope
+    @State private var showingMealToDelete: Meal?
+                                            ^~~~
+/Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift:20:36: error: cannot find type 'Meal' in scope
+    @State private var mealToEdit: Meal?
+                                   ^~~~
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ApiKeyManager.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+/Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift:17:45: error: cannot find type 'Meal' in scope
+    @State private var showingMealToDelete: Meal?
+                                            ^~~~
+/Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift:20:36: error: cannot find type 'Meal' in scope
+    @State private var mealToEdit: Meal?
+                                   ^~~~
 
 SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/GroceryItems.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
@@ -702,146 +338,136 @@ SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/GroceryItems.swift
     let id = UUID()
     ~~~ ^
     var
+/Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift:17:45: error: cannot find type 'Meal' in scope
+    @State private var showingMealToDelete: Meal?
+                                            ^~~~
+/Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift:20:36: error: cannot find type 'Meal' in scope
+    @State private var mealToEdit: Meal?
+                                   ^~~~
 
-SwiftDriverJobDiscovery normal arm64 Compiling InventoryData.swift, SuggestionEngine.swift (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/StoreSelection.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+/Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift:17:45: error: cannot find type 'Meal' in scope
+    @State private var showingMealToDelete: Meal?
+                                            ^~~~
+/Users/ethanzhang/Desktop/lumo/Lumo/MealPlanningView.swift:20:36: error: cannot find type 'Meal' in scope
+    @State private var mealToEdit: Meal?
+                                   ^~~~
 
-SwiftCompile normal arm64 Compiling\ SmartMealPlanGenerator.swift /Users/ethanzhang/Desktop/lumo/Lumo/SmartMealPlanGenerator.swift (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 Compiling\ RecipeDatabase.swift,\ TemplateViews.swift,\ AutoFillView.swift,\ SmartMealPlanGenerator.swift /Users/ethanzhang/Desktop/lumo/Lumo/RecipeDatabase.swift /Users/ethanzhang/Desktop/lumo/Lumo/TemplateViews.swift /Users/ethanzhang/Desktop/lumo/Lumo/AutoFillView.swift /Users/ethanzhang/Desktop/lumo/Lumo/SmartMealPlanGenerator.swift (in target 'Lumo' from project 'Lumo')
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/RecipeDatabase.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/TemplateViews.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/AutoFillView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
 
 SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/SmartMealPlanGenerator.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
     
-/Users/ethanzhang/Desktop/lumo/Lumo/SmartMealPlanGenerator.swift:263:13: warning: initialization of immutable value 'existingCategories' was never used; consider replacing with assignment to '_' or removing it
-        let existingCategories = existingMeals.compactMap { $0.recipe?.category }
-        ~~~~^~~~~~~~~~~~~~~~~~
-        _
 
-SwiftDriverJobDiscovery normal arm64 Compiling LoginView.swift (in target 'Lumo' from project 'Lumo')
+SwiftEmitModule normal arm64 Emitting\ module\ for\ Lumo (in target 'Lumo' from project 'Lumo')
 
-SwiftCompile normal arm64 Compiling\ StoreFinder.swift,\ SmartSubstitutionManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreFinder.swift /Users/ethanzhang/Desktop/lumo/Lumo/SmartSubstitutionManager.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/StoreFinder.swift (in target 'Lumo' from project 'Lumo')
+EmitSwiftModule normal arm64 (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
     
 
-SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/SmartSubstitutionManager.swift (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 Compiling\ MealPlanManager.swift,\ AuthViewModel.swift,\ ProfileView.swift,\ DealsView.swift /Users/ethanzhang/Desktop/lumo/Lumo/MealPlanManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/AuthViewModel.swift /Users/ethanzhang/Desktop/lumo/Lumo/ProfileView.swift /Users/ethanzhang/Desktop/lumo/Lumo/DealsView.swift (in target 'Lumo' from project 'Lumo')
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/MealPlanManager.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
     
 
-SwiftDriverJobDiscovery normal arm64 Compiling GeneratedAssetSymbols.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling SpoonacularService.swift, SpoonacularRecipeView.swift, PantryManager.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling RecipeDatabase.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling ProfileView.swift, FlyToCartAnimationManager.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling SmartMealPlanGenerator.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling AutoFillView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling FlyToCartOverlay.swift, GroceryItems.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling StoreFinder.swift, SmartSubstitutionManager.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling NutritionAnalysisView.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling CreateAccountView.swift, ChatbotView.swift, ChatMessage.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Compiling ChatbotEngine.swift, ChatResponseViews.swift, Recipe.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriverJobDiscovery normal arm64 Emitting module for Lumo (in target 'Lumo' from project 'Lumo')
-
-SwiftDriver\ Compilation\ Requirements Lumo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Lumo -Onone -enforce-exclusivity\=checked @/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk -target arm64-apple-ios17.5-simulator -g -module-cache-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Index.noindex/DataStore -swift-version 5 -I /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64 -c -j12 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -output-file-map /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/ethanzhang/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo_const_extract_protocols.json -Xcc -iquote -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-generated-files.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-own-target-headers.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo-68368ce3e92784c920e404bc4850370a-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-project-headers.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources-normal/arm64 -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources/arm64 -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo-Swift.h -working-directory /Users/ethanzhang/Desktop/lumo -experimental-emit-module-separately -disable-cmo
-
-SwiftMergeGeneratedHeaders /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources/Lumo-Swift.h /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo-Swift.h (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    builtin-swiftHeaderTool -arch arm64 /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo-Swift.h -o /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources/Lumo-Swift.h
-
-Copy /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.swiftmodule/arm64-apple-ios-simulator.swiftmodule /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.swiftmodule (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.swiftmodule /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.swiftmodule/arm64-apple-ios-simulator.swiftmodule
-
-Copy /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.swiftmodule/arm64-apple-ios-simulator.swiftdoc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.swiftdoc (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.swiftdoc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.swiftmodule/arm64-apple-ios-simulator.swiftdoc
-
-Copy /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.abi.json (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.abi.json /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.swiftmodule/arm64-apple-ios-simulator.abi.json
-
-Copy /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.swiftsourceinfo (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.swiftsourceinfo /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
-
-SwiftDriverJobDiscovery normal arm64 Compiling ExploreSections.swift, ExploreView.swift, GroceryListView.swift, StoreMap.swift (in target 'Lumo' from project 'Lumo')
-
-SwiftDriver\ Compilation Lumo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Lumo -Onone -enforce-exclusivity\=checked @/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk -target arm64-apple-ios17.5-simulator -g -module-cache-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Index.noindex/DataStore -swift-version 5 -I /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64 -c -j12 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -output-file-map /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/ethanzhang/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo_const_extract_protocols.json -Xcc -iquote -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-generated-files.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-own-target-headers.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo-68368ce3e92784c920e404bc4850370a-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-project-headers.hmap -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources-normal/arm64 -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources/arm64 -Xcc -I/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo-Swift.h -working-directory /Users/ethanzhang/Desktop/lumo -experimental-emit-module-separately -disable-cmo
-
-Ld /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Lumo.debug.dylib normal (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.5-simulator -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk -O0 -L/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -filelist /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.LinkFileList -install_name @rpath/Lumo.debug.dylib -Xlinker -rpath -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo_dependency_info.dat -fobjc-link-runtime -fprofile-instr-generate -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.swiftmodule -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Wl,-no_warn_duplicate_libraries -Xlinker -alias -Xlinker _main -Xlinker ___debug_main_executable_dylib_entry_point -Xlinker -no_adhoc_codesign -o /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Lumo.debug.dylib -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/PostgREST.build/Objects-normal/arm64/PostgREST.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/swift-concurrency-extras.build/Debug-iphonesimulator/ConcurrencyExtras.build/Objects-normal/arm64/ConcurrencyExtras.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/swift-http-types.build/Debug-iphonesimulator/HTTPTypes.build/Objects-normal/arm64/HTTPTypes.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/swift-clocks.build/Debug-iphonesimulator/Clocks.build/Objects-normal/arm64/Clocks.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/xctest-dynamic-overlay.build/Debug-iphonesimulator/IssueReporting.build/Objects-normal/arm64/IssueReporting.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/xctest-dynamic-overlay.build/Debug-iphonesimulator/XCTestDynamicOverlay.build/Objects-normal/arm64/XCTestDynamicOverlay.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Helpers.build/Objects-normal/arm64/Helpers.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Functions.build/Objects-normal/arm64/Functions.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Supabase.build/Objects-normal/arm64/Supabase.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Auth.build/Objects-normal/arm64/Auth.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/Realtime.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Storage.build/Objects-normal/arm64/Storage.swiftmodule -Xlinker -add_ast_path -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/swift-crypto.build/Debug-iphonesimulator/Crypto.build/Objects-normal/arm64/Crypto.swiftmodule
-
-ConstructStubExecutorLinkFileList /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-ExecutorLinkFileList-normal-arm64.txt (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    construct-stub-executor-link-file-list /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Lumo.debug.dylib /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor_no_swift_entry_point.a /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor.a --output /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-ExecutorLinkFileList-normal-arm64.txt
-note: Using stub executor library with Swift entry point. (in target 'Lumo' from project 'Lumo')
-
-Ld /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Lumo normal (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.5-simulator -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk -O0 -L/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator -Xlinker -rpath -Xlinker @executable_path -Xlinker -rpath -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/PackageFrameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -e ___debug_blank_executor_main -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_dylib -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-DebugDylibPath-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_instlnm -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-DebugDylibInstallName-normal-arm64.txt -Xlinker -filelist -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo-ExecutorLinkFileList-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo.app-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo.app-Simulated.xcent.der /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Lumo.debug.dylib -Xlinker -no_adhoc_codesign -o /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Lumo
-
-CopySwiftLibs /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Lumo.debug.dylib --scan-folder /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Frameworks --scan-folder /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/PlugIns --scan-folder /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/SystemExtensions --scan-folder /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
-
-ExtractAppIntentsMetadata (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name Lumo --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk --xcode-version 16F6 --platform-family iOS --deployment-target 17.5 --bundle-identifier Pro.Lumo --output /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app --target-triple arm64-apple-ios17.5-simulator --binary-file /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Lumo --dependency-file /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo_dependency_info.dat --stringsdata-file /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.SwiftFileList --metadata-file-list /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo.DependencyMetadataFileList --static-metadata-file-list /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo.DependencyStaticMetadataFileList --swift-const-vals-list /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Objects-normal/arm64/Lumo.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2025-07-14 15:19:26.783 appintentsmetadataprocessor[18072:8706727] Starting appintentsmetadataprocessor export
-2025-07-14 15:19:26.784 appintentsmetadataprocessor[18072:8706727] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
-
-AppIntentsSSUTraining (in target 'Lumo' from project 'Lumo')
-    cd /Users/ethanzhang/Desktop/lumo
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Info.plist --temp-dir-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/ssu --bundle-id Pro.Lumo --product-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app --extracted-metadata-path /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Metadata.appintents --metadata-file-list /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo.DependencyMetadataFileList --archive-ssu-assets
-2025-07-14 15:19:26.798 appintentsnltrainingprocessor[18073:8706728] Parsing options for appintentsnltrainingprocessor
-2025-07-14 15:19:26.799 appintentsnltrainingprocessor[18073:8706728] No AppShortcuts found - Skipping.
-
-CodeSign /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Lumo.debug.dylib (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/AuthViewModel.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
     
-    Signing Identity:     "Sign to Run Locally"
-    
-    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/Lumo.debug.dylib
 
-CodeSign /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/__preview.dylib (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/ProfileView.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
     
-    Signing Identity:     "Sign to Run Locally"
-    
-    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app/__preview.dylib
 
-CodeSign /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/DealsView.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
     
-    Signing Identity:     "Sign to Run Locally"
+
+SwiftCompile normal arm64 Compiling\ DealFiltersView.swift,\ DealDetailView.swift,\ CouponDetailView.swift,\ SharedListManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/DealFiltersView.swift /Users/ethanzhang/Desktop/lumo/Lumo/DealDetailView.swift /Users/ethanzhang/Desktop/lumo/Lumo/CouponDetailView.swift /Users/ethanzhang/Desktop/lumo/Lumo/SharedListManager.swift (in target 'Lumo' from project 'Lumo')
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/DealFiltersView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
     
-    /usr/bin/codesign --force --sign - --entitlements /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/Lumo.app.xcent --timestamp\=none --generate-entitlement-der /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app
 
-RegisterExecutionPolicyException /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/DealDetailView.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
-    builtin-RegisterExecutionPolicyException /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app
+    
 
-Validate /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/CouponDetailView.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
-    builtin-validationUtility /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app -infoplist-subpath Info.plist
+    
 
-Touch /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app (in target 'Lumo' from project 'Lumo')
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/SharedListManager.swift (in target 'Lumo' from project 'Lumo')
     cd /Users/ethanzhang/Desktop/lumo
-    /usr/bin/touch -c /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Products/Debug-iphonesimulator/Lumo.app
+    
 
-** BUILD SUCCEEDED **
+SwiftCompile normal arm64 Compiling\ RouteOptimizationManager.swift,\ StoreMapView.swift,\ TurnByTurnNavigationView.swift,\ GeneratedAssetSymbols.swift /Users/ethanzhang/Desktop/lumo/Lumo/RouteOptimizationManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/StoreMapView.swift /Users/ethanzhang/Desktop/lumo/Lumo/TurnByTurnNavigationView.swift /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'Lumo' from project 'Lumo')
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/RouteOptimizationManager.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/StoreMapView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/TurnByTurnNavigationView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Library/Developer/Xcode/DerivedData/Lumo-dtanwbtidvymrfcnqjacqjqbrhak/Build/Intermediates.noindex/Lumo.build/Debug-iphonesimulator/Lumo.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 Compiling\ SpoonacularService.swift,\ OnboardingView.swift,\ SpoonacularRecipeView.swift,\ PantryManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularService.swift /Users/ethanzhang/Desktop/lumo/Lumo/OnboardingView.swift /Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularRecipeView.swift /Users/ethanzhang/Desktop/lumo/Lumo/PantryManager.swift (in target 'Lumo' from project 'Lumo')
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularService.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/OnboardingView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/SpoonacularRecipeView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/PantryManager.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 Compiling\ DietaryGoalsView.swift,\ AddMealView.swift,\ NutritionAnalysisView.swift,\ GeneratedGroceryListView.swift /Users/ethanzhang/Desktop/lumo/Lumo/DietaryGoalsView.swift /Users/ethanzhang/Desktop/lumo/Lumo/AddMealView.swift /Users/ethanzhang/Desktop/lumo/Lumo/NutritionAnalysisView.swift /Users/ethanzhang/Desktop/lumo/Lumo/GeneratedGroceryListView.swift (in target 'Lumo' from project 'Lumo')
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/DietaryGoalsView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/AddMealView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/NutritionAnalysisView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 /Users/ethanzhang/Desktop/lumo/Lumo/GeneratedGroceryListView.swift (in target 'Lumo' from project 'Lumo')
+    cd /Users/ethanzhang/Desktop/lumo
+    
+
+SwiftCompile normal arm64 Compiling\ BudgetManager.swift,\ CategoryFilterButton.swift,\ SmartSubstitutionsView.swift,\ ChatbotView.swift /Users/ethanzhang/Desktop/lumo/Lumo/BudgetManager.swift /Users/ethanzhang/Desktop/lumo/Lumo/CategoryFilterButton.swift /Users/ethanzhang/Desktop/lumo/Lumo/SmartSubstitutionsView.swift /Users/ethanzhang/Desktop/lumo/Lumo/ChatbotView.swift (in target 'Lumo' from project 'Lumo')
 

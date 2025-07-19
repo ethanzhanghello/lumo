@@ -12,19 +12,32 @@ struct MainTabView: View {
     
     var body: some View {
         TabView {
-            // EXPLORE TAB
-            ExploreView()
-                .tabItem {
-                    Image(systemName: "magnifyingglass")
-                    Text("Explore")
-                }
+            // Explore Tab
+            NavigationStack {
+                ExploreView()
+            }
+            .tabItem {
+                Image(systemName: "magnifyingglass")
+                Text("Explore")
+            }
             
-            // BROWSE TAB
-            //BrowseView()
-             //   .tabItem {
-             //       Image(systemName: "list.bullet")
-            //        Text("Browse")
-            //    }
+            // Store Map Tab
+            NavigationStack {
+                StoreMapView()
+            }
+            .tabItem {
+                Image(systemName: "map.fill")
+                Text("Map")
+            }
+            
+            // Grocery List Tab
+            NavigationStack {
+                GroceryListView()
+            }
+            .tabItem {
+                Image(systemName: "cart")
+                Text("List")
+            }
             
             
             // MEAL PLANNING TAB
@@ -34,23 +47,6 @@ struct MainTabView: View {
                     Text("Meal Plan")
                 }
             
-            // GROCERY LIST TAB: GroceryListView
-            if appState.groceryList.totalItems > 0 {
-                GroceryListView()
-                    .tabItem {
-                        Image(systemName: "list.bullet")
-                        Text("Grocery List")
-                    }
-                    .badge(appState.groceryList.totalItems)
-            } else {
-                GroceryListView()
-                    .tabItem {
-                        Image(systemName: "list.bullet")
-                        Text("Grocery List")
-                    }
-            }
-
-
             
             // AI ASSISTANT TAB
             ChatbotView()

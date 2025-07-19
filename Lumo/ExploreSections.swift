@@ -67,11 +67,14 @@ struct NearbyStoresSection: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(filteredStores) { store in
-                        Button(action: { selectedStore = store }) {
-                            StoreCard(store: store)
-                                .environmentObject(authViewModel)
-                                .environmentObject(appState)
-                        }
+                        StoreCard(
+                            store: store,
+                            isSelected: selectedStore == store,
+                            onSelect: { 
+                                selectedStore = store
+                                appState.selectStore(store)
+                            }
+                        )
                     }
                 }
                 .padding(.horizontal)
@@ -110,102 +113,169 @@ struct StoreTypeFilterButton: View {
 // MARK: - Store Card
 struct StoreCard: View {
     let store: Store
-    @EnvironmentObject var authViewModel: AuthViewModel
+    let isSelected: Bool
+    let onSelect: () -> Void
     @EnvironmentObject var appState: AppState
-    @State private var isLoading = false
-    @State private var heartScale: CGFloat = 1.0
-    
-    var isFavorite: Bool {
-        authViewModel.favoriteStoreIDs.contains(store.id.uuidString)
-    }
+    @State private var storeProducts: [StoreProduct] = []
+    @State private var isLoadingProducts = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Store Image Placeholder
-            ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(store.storeType.color.opacity(0.3))
-                    .frame(width: 160, height: 100)
-                
-                Image(systemName: store.storeType.icon)
-                    .font(.title)
-                    .foregroundColor(store.storeType.color)
-            }
-            
-            // Store Info
-            VStack(alignment: .leading, spacing: 4) {
+        Button(action: onSelect) {
+            VStack(alignment: .leading, spacing: 12) {
+                // Store Header
                 HStack {
-                    Text(store.name)
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .lineLimit(1)
+                    // Store Type Icon
+                    Image(systemName: store.storeType.icon)
+                        .foregroundColor(store.storeType.color)
+                        .font(.title2)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(store.name)
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .fontWeight(.bold)
+                            .lineLimit(1)
+                        
+                        Text(store.storeType.rawValue)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
                     
                     Spacer()
                     
-                    Button(action: {
-                        guard !isLoading else { return }
-                        isLoading = true
-                        withAnimation(.spring(response: 0.2, dampingFraction: 0.4)) {
-                            heartScale = 1.3
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
-                            withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
-                                heartScale = 1.0
-                            }
-                        }
-                        Task {
-                            await authViewModel.toggleFavoriteStore(
-                                store,
-                                fullName: authViewModel.email, // You may want to use the actual full name if available
-                                dietaryFilter: false,
-                                profilePictureURL: authViewModel.profilePictureURL,
-                                allergies: authViewModel.allergies,
-                                preferredCuisines: authViewModel.preferredCuisines,
-                                dietaryRestrictions: authViewModel.dietaryRestrictions
-                            )
-                            isLoading = false
-                        }
-                    }) {
-                        Image(systemName: isFavorite ? "heart.fill" : "heart")
-                            .foregroundColor(isFavorite ? .red : .gray)
+                    if store.isFavorite {
+                        Image(systemName: "heart.fill")
+                            .foregroundColor(.red)
                             .font(.caption)
-                            .scaleEffect(heartScale)
                     }
                 }
                 
-                Text(store.city)
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
-                
-                HStack {
-                    Image(systemName: "clock")
-                        .font(.caption2)
-                        .foregroundColor(.gray)
-                    Text(store.hours)
-                        .font(.caption2)
-                        .foregroundColor(.gray)
-                    
-                    Spacer()
-                    
-                    HStack(spacing: 2) {
-                        Image(systemName: "star.fill")
-                            .font(.caption2)
-                            .foregroundColor(.yellow)
-                        Text(String(format: "%.1f", store.rating))
-                            .font(.caption2)
-                            .foregroundColor(.white)
+                // Store Info
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Image(systemName: "location.fill")
+                            .foregroundColor(.gray)
+                            .font(.caption)
+                        
+                        Text("\(store.city), \(store.state)")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                            .lineLimit(1)
+                        
+                        Spacer()
+                        
+                        Text("2.3 mi")
+                            .font(.caption)
+                            .foregroundColor(Color.lumoGreen)
                     }
+                    
+                    HStack {
+                        Image(systemName: "star.fill")
+                            .foregroundColor(.yellow)
+                            .font(.caption)
+                        
+                        Text("\(store.rating, specifier: "%.1f")")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                        
+                        Spacer()
+                        
+                        Text(store.hours)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                            .lineLimit(1)
+                    }
+                }
+                
+                // Store Database Info
+                if isSelected {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Divider()
+                            .background(Color.gray.opacity(0.3))
+                        
+                        if isLoadingProducts {
+                            HStack {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                                Text("Loading inventory...")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                        } else {
+                            // Store Stats
+                            HStack(spacing: 16) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("\(storeProducts.count)")
+                                        .font(.headline)
+                                        .foregroundColor(Color.lumoGreen)
+                                    Text("Products")
+                                        .font(.caption2)
+                                        .foregroundColor(.gray)
+                                }
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("\(storeProducts.filter { $0.dealType != nil }.count)")
+                                        .font(.headline)
+                                        .foregroundColor(.orange)
+                                    Text("Deals")
+                                        .font(.caption2)
+                                        .foregroundColor(.gray)
+                                }
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("\(storeProducts.filter { $0.stockQuantity <= 5 && $0.stockQuantity > 0 }.count)")
+                                        .font(.headline)
+                                        .foregroundColor(.red)
+                                    Text("Low Stock")
+                                        .font(.caption2)
+                                        .foregroundColor(.gray)
+                                }
+                                
+                                Spacer()
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(16)
+            .background(isSelected ? Color.lumoGreen.opacity(0.1) : Color.gray.opacity(0.1))
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(isSelected ? Color.lumoGreen : Color.gray.opacity(0.3), lineWidth: isSelected ? 2 : 1)
+            )
+        }
+        .onAppear {
+            if isSelected {
+                loadStoreProducts()
+            }
+        }
+        .onChange(of: isSelected) { newValue in
+            if newValue {
+                loadStoreProducts()
+            }
+        }
+    }
+    
+    private func loadStoreProducts() {
+        Task {
+            await MainActor.run {
+                isLoadingProducts = true
+            }
+            
+            do {
+                let products = try await StoreProductService.shared.getStoreProducts(for: store.id)
+                await MainActor.run {
+                    self.storeProducts = products
+                    self.isLoadingProducts = false
+                }
+            } catch {
+                print("Failed to load products for store \(store.name): \(error)")
+                await MainActor.run {
+                    self.isLoadingProducts = false
                 }
             }
         }
-        .frame(width: 160)
-        .padding(12)
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-        )
     }
 }
 
@@ -500,19 +570,40 @@ struct CategoryCard: View {
 struct FeaturedItemsSection: View {
     @EnvironmentObject var appState: AppState
     var selectedCategory: String?
+    @State private var isLoadingFeatured = false
 
-    var featuredItems: [(String, [GroceryItem])]{
-        let all: [(String, [GroceryItem])] = [
-            ("Popular This Week", sampleGroceryItems.filter { $0.name.contains("Organic") || $0.name.contains("Fresh") }),
-            ("Back-to-School Essentials", sampleGroceryItems.filter { $0.name.contains("Office & School") || $0.name.contains("Health/Beauty") }),
-            ("Seasonal Favorites", sampleGroceryItems.filter { $0.name.contains("Seasonal") || $0.name.contains("Holiday") })
+    var featuredCollections: [(String, [StoreProduct])] {
+        guard let selectedStore = appState.selectedStore else {
+            return [("Select Store First", [])]
+        }
+        
+        let storeProducts = appState.currentStoreProducts
+        
+        let collections: [(String, [StoreProduct])] = [
+            ("Flash Deals", storeProducts.filter { $0.dealType != nil }),
+            ("Popular This Week", storeProducts.filter { 
+                let productItem = sampleGroceryItems.first { $0.id == $0.productId }
+                return productItem?.name.contains("Organic") == true || productItem?.name.contains("Fresh") == true
+            }),
+            ("New Arrivals", storeProducts.filter { 
+                Calendar.current.isDateInToday($0.lastUpdated) 
+            }),
+            ("Low Stock Alert", storeProducts.filter { $0.stockQuantity <= 5 && $0.stockQuantity > 0 }),
+            ("Store Exclusives", storeProducts.filter { _ in 
+                selectedStore.storeType == .specialty
+            })
         ]
-        if let cat = selectedCategory {
-            return all.map { (title, items) in
-                (title, items.filter { $0.category == cat })
+        
+        if let category = selectedCategory {
+            return collections.map { (title, products) in
+                let filteredProducts = products.filter { storeProduct in
+                    let productItem = sampleGroceryItems.first { $0.id == storeProduct.productId }
+                    return productItem?.category == category
+                }
+                return (title, filteredProducts)
             }
         } else {
-            return all
+            return collections
         }
     }
     
@@ -527,54 +618,112 @@ struct FeaturedItemsSection: View {
                 
                 Spacer()
                 
-                Button("View All") {
-                    // Navigate to featured items
+                if isLoadingFeatured {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                } else {
+                    Button("View All") {
+                        // Navigate to featured items
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(Color.lumoGreen)
                 }
-                .font(.subheadline)
-                .foregroundColor(Color.lumoGreen)
             }
             .padding(.horizontal)
             
-            // Featured Collections
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(featuredItems, id: \.0) { collection in
-                        if !collection.1.isEmpty {
-                            FeaturedCollectionCard(
-                                title: collection.0,
-                                items: Array(collection.1.prefix(4))
-                            )
+            if appState.selectedStore == nil {
+                // Store Selection Prompt
+                VStack(spacing: 12) {
+                    Text("Select a store to see featured items")
+                        .font(.headline)
+                        .foregroundColor(.gray)
+                    
+                    Text("Choose from nearby stores to view exclusive deals and availability")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+            } else if appState.currentStoreProducts.isEmpty {
+                // Loading State
+                VStack(spacing: 12) {
+                    ProgressView()
+                        .scaleEffect(1.2)
+                    Text("Loading store inventory...")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+            } else {
+                // Featured Collections
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(featuredCollections, id: \.0) { collection in
+                            if !collection.1.isEmpty {
+                                StoreProductCollectionCard(
+                                    title: collection.0,
+                                    storeProducts: Array(collection.1.prefix(4)),
+                                    store: appState.selectedStore!
+                                )
+                            }
                         }
                     }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
+            }
+        }
+        .onAppear {
+            loadFeaturedItems()
+        }
+    }
+    
+    private func loadFeaturedItems() {
+        Task {
+            await MainActor.run {
+                isLoadingFeatured = true
+            }
+            
+            await appState.loadStoreProducts()
+            
+            await MainActor.run {
+                isLoadingFeatured = false
             }
         }
     }
 }
 
-// MARK: - Featured Collection Card
-struct FeaturedCollectionCard: View {
+// MARK: - Store Product Collection Card
+struct StoreProductCollectionCard: View {
     let title: String
-    let items: [GroceryItem]
+    let storeProducts: [StoreProduct]
+    let store: Store
     @EnvironmentObject var appState: AppState
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
+            // Header with store context
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Text("at \(store.name)")
+                    .font(.caption)
+                    .foregroundColor(Color.lumoGreen)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
             
             VStack(spacing: 8) {
-                ForEach(items.prefix(3)) { item in
-                    FeaturedItemRow(item: item)
+                ForEach(storeProducts.prefix(3), id: \.id) { storeProduct in
+                    StoreProductItemRow(storeProduct: storeProduct)
                 }
             }
             .padding(.horizontal, 16)
             
-            Button("View All \(items.count) Items") {
+            Button("View All \(storeProducts.count) Items") {
                 // Navigate to collection
             }
             .font(.caption)
@@ -582,56 +731,95 @@ struct FeaturedCollectionCard: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
         }
-        .frame(width: 200)
+        .frame(width: 220)
         .background(Color.gray.opacity(0.1))
         .cornerRadius(16)
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                .stroke(title == "Flash Deals" ? Color.lumoGreen : Color.gray.opacity(0.3), lineWidth: title == "Flash Deals" ? 2 : 1)
         )
     }
 }
 
-// MARK: - Featured Item Row
-struct FeaturedItemRow: View {
-    let item: GroceryItem
+// MARK: - Store Product Item Row
+struct StoreProductItemRow: View {
+    let storeProduct: StoreProduct
     @EnvironmentObject var appState: AppState
+    
+    var productItem: GroceryItem? {
+        sampleGroceryItems.first { $0.id == storeProduct.productId }
+    }
     
     var body: some View {
         HStack(spacing: 8) {
-            // Item Image Placeholder
-            RoundedRectangle(cornerRadius: 6)
-                .fill(Color.gray.opacity(0.3))
-                .frame(width: 40, height: 40)
-                .overlay(
-                    Image(systemName: "bag.fill")
-                        .foregroundColor(.white.opacity(0.6))
-                        .font(.caption)
-                )
-            
+            // Product Info
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.name)
-                    .font(.caption)
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-                
-                Text("$\(item.price, specifier: "%.2f")")
-                    .font(.caption2)
-                    .foregroundColor(Color.lumoGreen)
+                if let product = productItem {
+                    Text(product.name)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                    
+                    Text(product.brand)
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                        .lineLimit(1)
+                } else {
+                    Text("Product")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
             }
             
             Spacer()
             
-            Button(action: {
-                if let selectedStore = appState.selectedStore {
-                    appState.groceryList.addItem(item, store: selectedStore)
+            // Price & Stock Info
+            VStack(alignment: .trailing, spacing: 2) {
+                HStack(spacing: 4) {
+                    Text("$\(storeProduct.price, specifier: "%.2f")")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(storeProduct.dealType != nil ? Color.lumoGreen : .white)
+                    
+                    if storeProduct.dealType != nil {
+                        Image(systemName: "tag.fill")
+                            .font(.caption2)
+                            .foregroundColor(Color.lumoGreen)
+                    }
                 }
-            }) {
-                Image(systemName: "plus.circle.fill")
-                    .foregroundColor(Color.lumoGreen)
-                    .font(.caption)
+                
+                // Stock indicator
+                HStack(spacing: 4) {
+                    Circle()
+                        .fill(stockColor)
+                        .frame(width: 6, height: 6)
+                    
+                    Text(stockText)
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
             }
         }
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if let product = productItem {
+                appState.addToCart(product)
+            }
+        }
+    }
+    
+    private var stockColor: Color {
+        if !storeProduct.isAvailable { return .red }
+        if storeProduct.stockQuantity <= 5 { return .orange }
+        return .green
+    }
+    
+    private var stockText: String {
+        if !storeProduct.isAvailable { return "Out of Stock" }
+        if storeProduct.stockQuantity <= 5 { return "Low Stock" }
+        return "In Stock"
     }
 }
 

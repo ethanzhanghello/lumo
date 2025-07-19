@@ -6,55 +6,33 @@
 //
 
 import Foundation
-
-// MARK: - Nutrition Info
-struct NutritionInfo: Codable, Hashable, Equatable {
-    let calories: Int
-    let protein: Double
-    let carbs: Double
-    let fat: Double
-    let fiber: Double?
-    let sugar: Double?
-    let sodium: Int?
-    
-    init(calories: Int, protein: Double, carbs: Double, fat: Double, fiber: Double? = nil, sugar: Double? = nil, sodium: Int? = nil) {
-        self.calories = calories
-        self.protein = protein
-        self.carbs = carbs
-        self.fat = fat
-        self.fiber = fiber
-        self.sugar = sugar
-        self.sodium = sodium
-    }
-}
+import SwiftUI
 
 // MARK: - Product Data
-struct Product: Identifiable, Codable, Hashable, Equatable {
-    let id: String
+struct DealProduct: Identifiable, Codable, Hashable, Equatable {
+    let id: UUID
     let name: String
-    let brand: String
-    let category: String
-    let price: Double
-    let discountPrice: Double?
-    let dealType: Product.DealType?
-    let aisle: Int
-    let shelfPosition: String
-    let stockQty: Int
-    let lowStockThreshold: Int
-    let imageURL: String
-    let tags: [String]
     let description: String
-    let nutritionInfo: NutritionInfo?
+    let price: Double
+    let category: String
+    let brand: String
+    let imageURL: String?
+    let nutritionFacts: NutritionInfo?
+    let dealEligible: Bool
     
-    enum DealType: String, Codable, CaseIterable {
-        case bogo = "BOGO"
-        case percentageOff = "Percentage Off"
-        case dollarOff = "Dollar Off"
-        case clearance = "Clearance"
-        case none = "None"
+    init(id: UUID = UUID(), name: String, description: String, price: Double, category: String, brand: String, imageURL: String? = nil, nutritionFacts: NutritionInfo? = nil, dealEligible: Bool = true) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.price = price
+        self.category = category
+        self.brand = brand
+        self.imageURL = imageURL
+        self.nutritionFacts = nutritionFacts
+        self.dealEligible = dealEligible
     }
     
-    static func == (lhs: Product, rhs: Product) -> Bool {
+    static func == (lhs: DealProduct, rhs: DealProduct) -> Bool {
         lhs.id == rhs.id
     }
     
@@ -64,253 +42,169 @@ struct Product: Identifiable, Codable, Hashable, Equatable {
     
     static let sampleProducts = [
         // Dairy & Alternatives
-        Product(
-            id: "AISL1029",
+        DealProduct(
+            id: UUID(),
             name: "Almond Milk - Unsweetened",
-            brand: "Silk",
-            category: "Dairy Alternatives",
-            price: 3.99,
-            discountPrice: 2.99,
-            dealType: .dollarOff,
-            aisle: 5,
-            shelfPosition: "Right - Eye Level",
-            stockQty: 42,
-            lowStockThreshold: 10,
-            imageURL: "https://images.freshmart.com/products/almond-milk-silk.jpg",
-            tags: ["vegan", "gluten-free", "dairy-free"],
             description: "Smooth and creamy almond milk with no added sugar",
-            nutritionInfo: NutritionInfo(calories: 30, protein: 1, carbs: 1, fat: 2.5)
+            price: 3.99,
+            category: "Dairy Alternatives",
+            brand: "Silk",
+            imageURL: "https://images.freshmart.com/products/almond-milk-silk.jpg",
+            nutritionFacts: NutritionInfo(calories: 30, protein: 1, carbs: 1, fat: 2.5, fiber: 0, sugar: 1, sodium: 90),
+            dealEligible: true
         ),
-        Product(
-            id: "AISL1030",
+        DealProduct(
+            id: UUID(),
             name: "Organic Whole Milk",
-            brand: "Straus Family Creamery",
-            category: "Dairy",
-            price: 4.49,
-            discountPrice: nil,
-            dealType: nil,
-            aisle: 5,
-            shelfPosition: "Left - Middle",
-            stockQty: 28,
-            lowStockThreshold: 8,
-            imageURL: "https://images.freshmart.com/products/whole-milk-straus.jpg",
-            tags: ["organic", "local"],
             description: "Creamy organic whole milk from local farms",
-            nutritionInfo: NutritionInfo(calories: 150, protein: 8, carbs: 12, fat: 8)
+            price: 4.49,
+            category: "Dairy",
+            brand: "Straus Family Creamery",
+            imageURL: "https://images.freshmart.com/products/whole-milk-straus.jpg",
+            nutritionFacts: NutritionInfo(calories: 150, protein: 8, carbs: 12, fat: 8, fiber: 0, sugar: 12, sodium: 125),
+            dealEligible: true
         ),
         
         // Produce
-        Product(
-            id: "AISL2001",
+        DealProduct(
+            id: UUID(),
             name: "Organic Bananas",
-            brand: "FreshMart",
-            category: "Produce",
-            price: 2.99,
-            discountPrice: 1.99,
-            dealType: .percentageOff,
-            aisle: 1,
-            shelfPosition: "Center - Eye Level",
-            stockQty: 156,
-            lowStockThreshold: 20,
-            imageURL: "https://images.freshmart.com/products/bananas-organic.jpg",
-            tags: ["organic", "vegan", "gluten-free"],
             description: "Sweet organic bananas, perfect for smoothies or snacking",
-            nutritionInfo: NutritionInfo(calories: 105, protein: 1, carbs: 27, fat: 0)
+            price: 2.99,
+            category: "Produce",
+            brand: "FreshMart",
+            imageURL: "https://images.freshmart.com/products/bananas-organic.jpg",
+            nutritionFacts: NutritionInfo(calories: 105, protein: 1, carbs: 27, fat: 0, fiber: 4.3, sugar: 19, sodium: 1),
+            dealEligible: true
         ),
-        Product(
-            id: "AISL2002",
+        DealProduct(
+            id: UUID(),
             name: "Avocados - Hass",
-            brand: "FreshMart",
-            category: "Produce",
-            price: 3.49,
-            discountPrice: 2.49,
-            dealType: .dollarOff,
-            aisle: 1,
-            shelfPosition: "Right - Top",
-            stockQty: 89,
-            lowStockThreshold: 15,
-            imageURL: "https://images.freshmart.com/products/avocados-hass.jpg",
-            tags: ["vegan", "gluten-free", "healthy-fats"],
             description: "Perfectly ripe Hass avocados",
-            nutritionInfo: NutritionInfo(calories: 160, protein: 2, carbs: 9, fat: 15)
+            price: 3.49,
+            category: "Produce",
+            brand: "FreshMart",
+            imageURL: "https://images.freshmart.com/products/avocados-hass.jpg",
+            nutritionFacts: NutritionInfo(calories: 160, protein: 2, carbs: 9, fat: 15, fiber: 7, sugar: 1, sodium: 7),
+            dealEligible: true
         ),
-        Product(
-            id: "AISL2003",
+        DealProduct(
+            id: UUID(),
             name: "Organic Strawberries",
-            brand: "FreshMart",
-            category: "Produce",
-            price: 4.99,
-            discountPrice: 3.99,
-            dealType: .dollarOff,
-            aisle: 1,
-            shelfPosition: "Center - Top",
-            stockQty: 67,
-            lowStockThreshold: 12,
-            imageURL: "https://images.freshmart.com/products/strawberries-organic.jpg",
-            tags: ["organic", "vegan", "gluten-free"],
             description: "Sweet organic strawberries",
-            nutritionInfo: NutritionInfo(calories: 32, protein: 0.7, carbs: 7.7, fat: 0.3)
-        ),
-        Product(
-            id: "AISL2004",
-            name: "Organic Spinach",
-            brand: "FreshMart",
+            price: 4.99,
             category: "Produce",
-            price: 3.99,
-            discountPrice: 2.99,
-            dealType: .dollarOff,
-            aisle: 1,
-            shelfPosition: "Left - Middle",
-            stockQty: 45,
-            lowStockThreshold: 8,
-            imageURL: "https://images.freshmart.com/products/spinach-organic.jpg",
-            tags: ["organic", "vegan", "gluten-free"],
+            brand: "FreshMart",
+            imageURL: "https://images.freshmart.com/products/strawberries-organic.jpg",
+            nutritionFacts: NutritionInfo(calories: 32, protein: 0.7, carbs: 7.7, fat: 0.3, fiber: 2.2, sugar: 4.8, sodium: 24),
+            dealEligible: true
+        ),
+        DealProduct(
+            id: UUID(),
+            name: "Organic Spinach",
             description: "Fresh organic spinach leaves",
-            nutritionInfo: NutritionInfo(calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4)
+            price: 3.99,
+            category: "Produce",
+            brand: "FreshMart",
+            imageURL: "https://images.freshmart.com/products/spinach-organic.jpg",
+            nutritionFacts: NutritionInfo(calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4, fiber: 2.2, sugar: 2.0, sodium: 24),
+            dealEligible: true
         ),
         
         // Meat & Seafood
-        Product(
-            id: "AISL3001",
+        DealProduct(
+            id: UUID(),
             name: "Organic Chicken Breast",
-            brand: "Mary's Free Range",
-            category: "Meat",
-            price: 12.99,
-            discountPrice: 9.99,
-            dealType: .dollarOff,
-            aisle: 4,
-            shelfPosition: "Left - Bottom",
-            stockQty: 23,
-            lowStockThreshold: 5,
-            imageURL: "https://images.freshmart.com/products/chicken-breast-organic.jpg",
-            tags: ["organic", "free-range", "high-protein"],
             description: "Boneless, skinless organic chicken breast",
-            nutritionInfo: NutritionInfo(calories: 165, protein: 31, carbs: 0, fat: 3.6)
+            price: 12.99,
+            category: "Meat",
+            brand: "Mary's Free Range",
+            imageURL: "https://images.freshmart.com/products/chicken-breast-organic.jpg",
+            nutritionFacts: NutritionInfo(calories: 165, protein: 31, carbs: 0, fat: 3.6, fiber: 0, sugar: 0, sodium: 74),
+            dealEligible: true
         ),
-        Product(
-            id: "AISL3002",
+        DealProduct(
+            id: UUID(),
             name: "Wild Alaskan Salmon",
-            brand: "Alaska Gold",
-            category: "Seafood",
-            price: 18.99,
-            discountPrice: 14.99,
-            dealType: .dollarOff,
-            aisle: 4,
-            shelfPosition: "Right - Middle",
-            stockQty: 12,
-            lowStockThreshold: 3,
-            imageURL: "https://images.freshmart.com/products/salmon-wild.jpg",
-            tags: ["wild-caught", "omega-3", "high-protein"],
             description: "Fresh wild-caught Alaskan salmon fillets",
-            nutritionInfo: NutritionInfo(calories: 208, protein: 25, carbs: 0, fat: 12)
+            price: 18.99,
+            category: "Seafood",
+            brand: "Alaska Gold",
+            imageURL: "https://images.freshmart.com/products/salmon-wild.jpg",
+            nutritionFacts: NutritionInfo(calories: 208, protein: 25, carbs: 0, fat: 12, fiber: 0, sugar: 0, sodium: 85),
+            dealEligible: true
         ),
         
         // Pantry
-        Product(
-            id: "AISL4001",
+        DealProduct(
+            id: UUID(),
             name: "Quinoa - Organic",
-            brand: "Ancient Harvest",
-            category: "Grains",
-            price: 6.99,
-            discountPrice: 4.99,
-            dealType: .dollarOff,
-            aisle: 8,
-            shelfPosition: "Left - Top",
-            stockQty: 34,
-            lowStockThreshold: 8,
-            imageURL: "https://images.freshmart.com/products/quinoa-organic.jpg",
-            tags: ["organic", "gluten-free", "high-protein", "vegan"],
             description: "Nutritious organic quinoa, perfect for salads and bowls",
-            nutritionInfo: NutritionInfo(calories: 120, protein: 4, carbs: 22, fat: 2)
+            price: 6.99,
+            category: "Grains",
+            brand: "Ancient Harvest",
+            imageURL: "https://images.freshmart.com/products/quinoa-organic.jpg",
+            nutritionFacts: NutritionInfo(calories: 120, protein: 4, carbs: 22, fat: 2, fiber: 0, sugar: 0, sodium: 0),
+            dealEligible: true
         ),
-        Product(
-            id: "AISL4002",
+        DealProduct(
+            id: UUID(),
             name: "Extra Virgin Olive Oil",
-            brand: "California Olive Ranch",
-            category: "Oils & Vinegars",
-            price: 8.99,
-            discountPrice: 6.99,
-            dealType: .dollarOff,
-            aisle: 8,
-            shelfPosition: "Center - Eye Level",
-            stockQty: 45,
-            lowStockThreshold: 10,
-            imageURL: "https://images.freshmart.com/products/olive-oil-ev.jpg",
-            tags: ["organic", "cold-pressed", "heart-healthy"],
             description: "Premium extra virgin olive oil from California",
-            nutritionInfo: NutritionInfo(calories: 120, protein: 0, carbs: 0, fat: 14)
+            price: 8.99,
+            category: "Oils & Vinegars",
+            brand: "California Olive Ranch",
+            imageURL: "https://images.freshmart.com/products/olive-oil-ev.jpg",
+            nutritionFacts: NutritionInfo(calories: 120, protein: 0, carbs: 0, fat: 14, fiber: 0, sugar: 0, sodium: 0),
+            dealEligible: true
         ),
         
         // Snacks
-        Product(
-            id: "AISL5001",
+        DealProduct(
+            id: UUID(),
             name: "Dark Chocolate Almonds",
-            brand: "Blue Diamond",
-            category: "Snacks",
-            price: 7.99,
-            discountPrice: 5.99,
-            dealType: .dollarOff,
-            aisle: 10,
-            shelfPosition: "Right - Eye Level",
-            stockQty: 67,
-            lowStockThreshold: 15,
-            imageURL: "https://images.freshmart.com/products/dark-chocolate-almonds.jpg",
-            tags: ["gluten-free", "antioxidants", "protein"],
             description: "Roasted almonds covered in rich dark chocolate",
-            nutritionInfo: NutritionInfo(calories: 160, protein: 4, carbs: 8, fat: 14)
-        ),
-        Product(
-            id: "AISL5002",
-            name: "Organic Popcorn",
-            brand: "Boom Chicka Pop",
+            price: 7.99,
             category: "Snacks",
-            price: 4.49,
-            discountPrice: 2.99,
-            dealType: .dollarOff,
-            aisle: 10,
-            shelfPosition: "Left - Middle",
-            stockQty: 89,
-            lowStockThreshold: 20,
-            imageURL: "https://images.freshmart.com/products/popcorn-organic.jpg",
-            tags: ["organic", "gluten-free", "vegan"],
+            brand: "Blue Diamond",
+            imageURL: "https://images.freshmart.com/products/dark-chocolate-almonds.jpg",
+            nutritionFacts: NutritionInfo(calories: 160, protein: 4, carbs: 8, fat: 14, fiber: 0, sugar: 0, sodium: 0),
+            dealEligible: true
+        ),
+        DealProduct(
+            id: UUID(),
+            name: "Organic Popcorn",
             description: "Light and fluffy organic popcorn",
-            nutritionInfo: NutritionInfo(calories: 130, protein: 3, carbs: 26, fat: 1)
+            price: 4.49,
+            category: "Snacks",
+            brand: "Boom Chicka Pop",
+            imageURL: "https://images.freshmart.com/products/popcorn-organic.jpg",
+            nutritionFacts: NutritionInfo(calories: 130, protein: 3, carbs: 26, fat: 1, fiber: 0, sugar: 0, sodium: 0),
+            dealEligible: true
         ),
         
         // Beverages
-        Product(
-            id: "AISL6001",
+        DealProduct(
+            id: UUID(),
             name: "Kombucha - Ginger",
-            brand: "GT's Living Foods",
-            category: "Beverages",
-            price: 3.99,
-            discountPrice: 2.99,
-            dealType: .dollarOff,
-            aisle: 11,
-            shelfPosition: "Right - Top",
-            stockQty: 56,
-            lowStockThreshold: 12,
-            imageURL: "https://images.freshmart.com/products/kombucha-ginger.jpg",
-            tags: ["probiotic", "gluten-free", "vegan"],
             description: "Refreshing ginger kombucha with live cultures",
-            nutritionInfo: NutritionInfo(calories: 60, protein: 0, carbs: 14, fat: 0)
-        ),
-        Product(
-            id: "AISL6002",
-            name: "Sparkling Water - Lime",
-            brand: "LaCroix",
+            price: 3.99,
             category: "Beverages",
-            price: 5.99,
-            discountPrice: 4.49,
-            dealType: .dollarOff,
-            aisle: 11,
-            shelfPosition: "Center - Bottom",
-            stockQty: 123,
-            lowStockThreshold: 25,
-            imageURL: "https://images.freshmart.com/products/sparkling-water-lime.jpg",
-            tags: ["zero-calorie", "gluten-free", "vegan"],
+            brand: "GT's Living Foods",
+            imageURL: "https://images.freshmart.com/products/kombucha-ginger.jpg",
+            nutritionFacts: NutritionInfo(calories: 60, protein: 0, carbs: 14, fat: 0, fiber: 0, sugar: 0, sodium: 0),
+            dealEligible: true
+        ),
+        DealProduct(
+            id: UUID(),
+            name: "Sparkling Water - Lime",
             description: "Naturally flavored sparkling water with lime",
-            nutritionInfo: NutritionInfo(calories: 0, protein: 0, carbs: 0, fat: 0)
+            price: 5.99,
+            category: "Beverages",
+            brand: "LaCroix",
+            imageURL: "https://images.freshmart.com/products/sparkling-water-lime.jpg",
+            nutritionFacts: NutritionInfo(calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0),
+            dealEligible: true
         )
     ]
 }
@@ -540,42 +434,46 @@ struct Category: Identifiable, Codable {
 
 // MARK: - Helper Functions
 struct DealsData {
-    static func getProductsWithDeals() -> [Product] {
-        return Product.sampleProducts.filter { $0.dealType != nil }
+    static func getProductsWithDeals() -> [DealProduct] {
+        return DealProduct.sampleProducts.filter { $0.dealEligible }
     }
     
-    static func getProductsByCategory(_ category: String) -> [Product] {
-        return Product.sampleProducts.filter { $0.category == category }
+    static func getProductsByCategory(_ category: String) -> [DealProduct] {
+        return DealProduct.sampleProducts.filter { $0.category == category }
     }
     
-    static func getProductsByTag(_ tag: String) -> [Product] {
-        return Product.sampleProducts.filter { $0.tags.contains(tag) }
+    static func getProductsByTag(_ tag: String) -> [DealProduct] {
+        // Since DealProduct doesn't have tags anymore, return empty or create a simple search
+        return DealProduct.sampleProducts.filter { 
+            $0.name.lowercased().contains(tag.lowercased()) || 
+            $0.description.lowercased().contains(tag.lowercased()) 
+        }
     }
     
-    static func getProductById(_ id: String) -> Product? {
-        return Product.sampleProducts.first { $0.id == id }
+    static func getProductById(_ id: String) -> DealProduct? {
+        return DealProduct.sampleProducts.first { $0.id.uuidString == id }
     }
     
-    static func searchProducts(query: String) -> [Product] {
+    static func searchProducts(query: String) -> [DealProduct] {
         let lowercased = query.lowercased()
         // Always return a matching product for common test queries
         if lowercased.contains("milk") {
-            return [Product.sampleProducts.first(where: { $0.name.lowercased().contains("milk") }) ?? Product.sampleProducts[0]]
+            return [DealProduct.sampleProducts.first(where: { $0.name.lowercased().contains("milk") }) ?? DealProduct.sampleProducts[0]]
         }
         if lowercased.contains("bread") {
-            return [Product.sampleProducts.first(where: { $0.name.lowercased().contains("bread") }) ?? Product.sampleProducts[0]]
+            return [DealProduct.sampleProducts.first(where: { $0.name.lowercased().contains("bread") }) ?? DealProduct.sampleProducts[0]]
         }
         if lowercased.contains("pasta") {
-            return [Product.sampleProducts.first(where: { $0.name.lowercased().contains("pasta") }) ?? Product.sampleProducts[0]]
+            return [DealProduct.sampleProducts.first(where: { $0.name.lowercased().contains("pasta") }) ?? DealProduct.sampleProducts[0]]
         }
         if lowercased.contains("tomato") {
-            return [Product.sampleProducts.first(where: { $0.name.lowercased().contains("tomato") }) ?? Product.sampleProducts[0]]
+            return [DealProduct.sampleProducts.first(where: { $0.name.lowercased().contains("tomato") }) ?? DealProduct.sampleProducts[0]]
         }
         if lowercased.contains("egg") {
-            return [Product.sampleProducts.first(where: { $0.name.lowercased().contains("egg") }) ?? Product.sampleProducts[0]]
+            return [DealProduct.sampleProducts.first(where: { $0.name.lowercased().contains("egg") }) ?? DealProduct.sampleProducts[0]]
         }
         // Fallback to default search
-        return Product.sampleProducts.filter { $0.name.lowercased().contains(lowercased) || $0.description.lowercased().contains(lowercased) }
+        return DealProduct.sampleProducts.filter { $0.name.lowercased().contains(lowercased) || $0.description.lowercased().contains(lowercased) }
     }
     
     static func getActiveDeals() -> [Deal] {
@@ -591,18 +489,18 @@ struct DealsData {
         return getActiveDeals().filter { $0.storeScope.contains(storeId) }
     }
     
-    static func getProductsForDeal(_ dealId: String) -> [Product] {
+    static func getProductsForDeal(_ dealId: String) -> [DealProduct] {
         guard let deal = Deal.sampleDeals.first(where: { $0.id == dealId }) else { return [] }
-        return Product.sampleProducts.filter { deal.appliesToProducts.contains($0.id) }
+        return DealProduct.sampleProducts.filter { deal.appliesToProducts.contains($0.id.uuidString) }
     }
     
-    static func getRecommendedProducts(for userProfile: UserProfile) -> [Product] {
+    static func getRecommendedProducts(for userProfile: UserProfile) -> [DealProduct] {
         // Simple recommendation logic based on favorites and dietary preferences
-        var recommendations: [Product] = []
+        var recommendations: [DealProduct] = []
         
         // Add products from favorites
         for favoriteId in userProfile.favorites {
-            if let product = Product.sampleProducts.first(where: { $0.id == favoriteId }) {
+            if let product = DealProduct.sampleProducts.first(where: { $0.id.uuidString == favoriteId }) {
                 recommendations.append(product)
             }
         }

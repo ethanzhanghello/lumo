@@ -14,10 +14,10 @@ struct MealPlanningView: View {
     @State private var showingAutoFill = false
     @State private var showingNutritionAnalysis = false
     @State private var showingGroceryList = false
-    @State private var showingMealToDelete: Meal?
+    @State private var showingMealToDelete: MealPlan.Meal?
     @State private var showingDeleteConfirmation = false
     @State private var showingEditMeal = false
-    @State private var mealToEdit: Meal?
+    @State private var mealToEdit: MealPlan.Meal?
     
     var body: some View {
         ZStack {

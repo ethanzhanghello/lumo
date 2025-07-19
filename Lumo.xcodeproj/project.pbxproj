@@ -80,6 +80,9 @@
 		B0E915F92E0372460036C7AB /* SmartMealPlanGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FE2E0372460036C7AB /* SmartMealPlanGenerator.swift */; };
 		DED54D52CBFA4350A624094F /* AddMealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED54D52CBFA4350A624094E /* AddMealView.swift */; };
 		E4DF74227C624A34BFE53EA0 /* NutritionAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DF74227C624A34BFE53E9F /* NutritionAnalysisView.swift */; };
+		A1B2C3D4E5F6789012345678 /* RouteOptimizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6789012345677 /* RouteOptimizationManager.swift */; };
+		B2C3D4E5F67890123456789A /* StoreMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6789012345679A9 /* StoreMapView.swift */; };
+		C3D4E5F6789012345678901B /* TurnByTurnNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6789012345678901A /* TurnByTurnNavigationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -171,6 +174,9 @@
 		B0E916042E0372460036C7AA /* DietaryGoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DietaryGoalsView.swift; sourceTree = "<group>"; };
 		DED54D52CBFA4350A624094E /* AddMealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMealView.swift; sourceTree = "<group>"; };
 		E4DF74227C624A34BFE53E9F /* NutritionAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionAnalysisView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6789012345677 /* RouteOptimizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteOptimizationManager.swift; sourceTree = "<group>"; };
+		B2C3D4E5F6789012345679A9 /* StoreMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreMapView.swift; sourceTree = "<group>"; };
+		C3D4E5F6789012345678901A /* TurnByTurnNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnByTurnNavigationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -300,6 +306,9 @@
 				DED54D52CBFA4350A624094E /* AddMealView.swift */,
 				E4DF74227C624A34BFE53E9F /* NutritionAnalysisView.swift */,
 				339964DCA19C4740ADEC1D5F /* GeneratedGroceryListView.swift */,
+				A1B2C3D4E5F6789012345677 /* RouteOptimizationManager.swift */,
+				B2C3D4E5F6789012345679A9 /* StoreMapView.swift */,
+				C3D4E5F6789012345678901A /* TurnByTurnNavigationView.swift */,
 				B0E915992E00AC7D0036C7A9 /* Assets.xcassets */,
 				B0E915D22E0372460036C7A9 /* GroceryItems.swift */,
 				B0E915CA2E03182E0036C7A9 /* StoreMap.swift */,
@@ -540,6 +549,9 @@
 				B0E915F52E0372460036C7AB /* TemplateViews.swift in Sources */,
 				B0E915F72E0372460036C7AB /* AutoFillView.swift in Sources */,
 				B0E915F92E0372460036C7AB /* SmartMealPlanGenerator.swift in Sources */,
+				A1B2C3D4E5F6789012345678 /* RouteOptimizationManager.swift in Sources */,
+				B2C3D4E5F67890123456789A /* StoreMapView.swift in Sources */,
+				C3D4E5F6789012345678901B /* TurnByTurnNavigationView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

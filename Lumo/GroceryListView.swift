@@ -24,6 +24,7 @@ struct GroceryListView: View {
     @State private var selectedCategory: String?
     @State private var checkoutStore: Store? = nil
     @State private var showingStorePicker = false
+    @State private var showingStoreMap = false
     
     var body: some View {
         NavigationView {
@@ -71,8 +72,8 @@ struct GroceryListView: View {
                     Text(result.message)
                 }
             }
-            .sheet(isPresented: $showingRoutePreview) {
-                RoutePreviewView().environmentObject(appState)
+            .sheet(isPresented: $showingStoreMap) {
+                StoreMapView().environmentObject(appState)
             }
             .sheet(isPresented: $showingSmartSuggestions) {
                 SmartSuggestionsView().environmentObject(appState)
@@ -183,10 +184,16 @@ struct GroceryListView: View {
                         .background(Color.gray.opacity(0.3))
                         .cornerRadius(8)
                     }
-                    Button(action: { showingRoutePreview = true }) {
+                    Button(action: { 
+                        if appState.selectedStore != nil {
+                            showingStoreMap = true
+                        } else {
+                            showingStorePicker = true
+                        }
+                    }) {
                         HStack {
                             Image(systemName: "map")
-                            Text("Route")
+                            Text("Map Route")
                         }
                         .font(.caption)
                         .foregroundColor(.white)
@@ -208,6 +215,39 @@ struct GroceryListView: View {
                         .cornerRadius(8)
                     }
                 }
+            }
+            
+            // Enhanced Route Preview
+            if let selectedStore = appState.selectedStore {
+                QuickRoutePreview(
+                    groceryList: appState.groceryList,
+                    store: selectedStore
+                )
+            } else {
+                VStack(spacing: 8) {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle")
+                            .foregroundColor(.orange)
+                        Text("Select a store to see route preview")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                    
+                    Button("Choose Store") {
+                        showingStorePicker = true
+                    }
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.orange)
+                    .cornerRadius(8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding()
+                .background(Color.orange.opacity(0.1))
+                .cornerRadius(12)
             }
         }
         .padding(.horizontal)
@@ -760,7 +800,147 @@ struct SuggestionCard: View {
     }
 }
 
+// MARK: - Enhanced Map Integration Components
 
+struct QuickRoutePreview: View {
+    let groceryList: GroceryList
+    let store: Store
+    @StateObject private var routeManager = RouteOptimizationManager.shared
+    @State private var estimatedStats: RouteStats?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Route Preview")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+                
+                if let stats = estimatedStats {
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("\(stats.estimatedTimeMinutes) min")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.blue)
+                        
+                        Text("\(Int(stats.totalDistance))ft")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            
+            if let stats = estimatedStats {
+                VStack(spacing: 8) {
+                    // Route Steps Preview
+                    HStack(spacing: 8) {
+                        ForEach(Array(stats.aisleOrder.enumerated()), id: \.offset) { index, aisleId in
+                            HStack(spacing: 4) {
+                                if index > 0 {
+                                    Image(systemName: "arrow.right")
+                                        .font(.caption2)
+                                        .foregroundColor(.gray)
+                                }
+                                
+                                Text(getAisleName(aisleId))
+                                    .font(.caption2)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.blue.opacity(0.1))
+                                    .foregroundColor(.blue)
+                                    .cornerRadius(4)
+                            }
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding(.horizontal, 4)
+                    
+                    // Route Efficiency Indicator
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                            .font(.caption)
+                        
+                        Text("Optimized for logical shopping order")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        Spacer()
+                        
+                        Text("\(stats.stopsCount) stops")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            } else {
+                HStack {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    
+                    Text("Calculating optimal route...")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+        .onAppear {
+            calculateRoutePreview()
+        }
+        .onChange(of: groceryList.groceryItems) { _ in
+            calculateRoutePreview()
+        }
+    }
+    
+    private func calculateRoutePreview() {
+        Task {
+            do {
+                // Generate a quick route preview without storing it
+                let route = try await routeManager.generateRoute(
+                    for: groceryList,
+                    in: store,
+                    optimizationStrategy: .logical
+                )
+                
+                await MainActor.run {
+                    estimatedStats = RouteStats(
+                        totalDistance: route.totalDistance,
+                        estimatedTimeMinutes: route.estimatedDurationMinutes,
+                        stopsCount: route.waypoints.count,
+                        aisleOrder: route.waypoints.map { $0.aisleId }
+                    )
+                }
+            } catch {
+                print("Failed to calculate route preview: \(error)")
+            }
+        }
+    }
+    
+    private func getAisleName(_ aisleId: String) -> String {
+        switch aisleId {
+        case "PRODUCE": return "Produce"
+        case "MEAT": return "Meat"
+        case "DAIRY": return "Dairy"
+        case "FROZEN": return "Frozen"
+        case "BAKERY": return "Bakery"
+        case "A1": return "Aisle 1"
+        case "A2": return "Aisle 2"
+        case "A3": return "Aisle 3"
+        default: return aisleId
+        }
+    }
+}
+
+struct RouteStats {
+    let totalDistance: Double
+    let estimatedTimeMinutes: Int
+    let stopsCount: Int
+    let aisleOrder: [String]
+}
 
 struct GroceryListView_Previews: PreviewProvider {
     static var previews: some View {
