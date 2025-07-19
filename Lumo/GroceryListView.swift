@@ -358,24 +358,18 @@ struct FlatGroceryListView: View {
     @State private var showingUndoToast = false
     
     var body: some View {
-        List {
-            ForEach(appState.groceryList.groceryItems) { groceryItem in
-                GroceryItemCard(groceryItem: groceryItem)
-                    .listRowBackground(Color.clear)
-                    .swipeActions(edge: .trailing) {
-                        Button(role: .destructive) {
-                            removedItem = groceryItem
-                            appState.groceryList.removeItem(groceryItem.item, store: groceryItem.store)
-                            withAnimation {
-                                showingUndoToast = true
-                            }
-                        } label: {
-                            Label("Remove", systemImage: "trash")
-                        }
-                    }
+        ScrollView {
+            VStack(spacing: 20) { // Increased spacing between cards
+                ForEach(appState.groceryList.groceryItems) { groceryItem in
+                    GroceryItemCard(groceryItem: groceryItem)
+                        .environmentObject(appState)
+                        .padding(.horizontal, 8) // Add horizontal padding
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+                .padding(.bottom, 8)
             }
+            .padding(.top, 8)
         }
-        .listStyle(PlainListStyle())
     }
 }
 
@@ -457,7 +451,7 @@ struct GroceryItemCard: View {
     @State private var isChecked = false
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .center, spacing: 14) {
             // Checkbox
             Button(action: {
                 withAnimation(.spring()) {
@@ -474,68 +468,77 @@ struct GroceryItemCard: View {
             Button(action: {
                 showingItemDetail = true
             }) {
-                HStack(spacing: 12) {
-                    RoundedRectangle(cornerRadius: 8)
+                HStack(alignment: .center, spacing: 10) {
+                    RoundedRectangle(cornerRadius: 10)
                         .fill(Color.gray.opacity(0.3))
-                        .frame(width: 60, height: 60)
+                        .frame(width: 48, height: 48)
                         .overlay(
                             Image(systemName: "bag.fill")
                                 .foregroundColor(.white.opacity(0.6))
+                                .font(.title3)
                         )
-                    
-                    // Item Details
                     VStack(alignment: .leading, spacing: 4) {
                         Text(groceryItem.item.name)
                             .font(.headline)
                             .foregroundColor(.white)
                             .lineLimit(1)
-                            .minimumScaleFactor(0.5)
+                            .truncationMode(.tail)
+                            .fixedSize(horizontal: false, vertical: true)
                             .strikethrough(isChecked)
-                        
                         if !groceryItem.item.brand.isEmpty {
                             Text(groceryItem.item.brand)
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.7))
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
-                        
-                        HStack {
+                        // Horizontal info row for aisle, store, deal
+                        HStack(alignment: .center, spacing: 8) {
                             Text("Aisle \(groceryItem.item.aisle)")
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(.white.opacity(0.6))
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .fixedSize(horizontal: false, vertical: true)
                             Text("•")
                                 .foregroundColor(.white.opacity(0.4))
                             Text(groceryItem.store.name)
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(.lumoGreen)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(minWidth: 60, maxWidth: 120, alignment: .leading)
                             if groceryItem.item.hasDeal {
                                 Text("2 for $5")
-                                    .font(.caption)
+                                    .font(.caption2)
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
                                     .background(Color.orange)
                                     .cornerRadius(4)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Spacer()
                 }
+                .padding(.vertical, 2)
+                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(PlainButtonStyle())
             
-            // Quantity Controls (separate from item details)
+            // Quantity Controls and Price
             VStack(alignment: .trailing, spacing: 8) {
                 HStack(spacing: 8) {
                     Button(action: {
-                        print("Decrement button tapped for \(groceryItem.item.name), current quantity: \(groceryItem.quantity)")
                         animateQuantityChange {
                             if groceryItem.quantity > 1 {
-                                print("Updating quantity from \(groceryItem.quantity) to \(groceryItem.quantity - 1)")
                                 appState.groceryList.updateQuantity(for: groceryItem.item, store: groceryItem.store, to: groceryItem.quantity - 1)
-                            } else {
-                                print("Cannot decrement below 1")
                             }
                         }
                     }) {
@@ -550,14 +553,12 @@ struct GroceryItemCard: View {
                     Text("\(groceryItem.quantity)")
                         .font(.headline)
                         .foregroundColor(.white)
-                        .frame(minWidth: 30)
+                        .frame(minWidth: 28)
                         .offset(y: quantityOffset)
                         .opacity(quantityOpacity)
                     
                     Button(action: {
-                        print("Increment button tapped for \(groceryItem.item.name), current quantity: \(groceryItem.quantity)")
                         animateQuantityChange {
-                            print("Updating quantity from \(groceryItem.quantity) to \(groceryItem.quantity + 1)")
                             appState.groceryList.updateQuantity(for: groceryItem.item, store: groceryItem.store, to: groceryItem.quantity + 1)
                         }
                     }) {
@@ -568,16 +569,16 @@ struct GroceryItemCard: View {
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
-                
                 Text("$\(groceryItem.totalPrice, specifier: "%.2f")")
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundColor(Color.lumoGreen)
             }
+            .frame(minWidth: 70, alignment: .trailing)
         }
-        .padding()
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(12)
+        .padding(14)
+        .background(Color.gray.opacity(0.13))
+        .cornerRadius(14)
         .opacity(isChecked ? 0.6 : 1.0)
         .sheet(isPresented: $showingItemDetail) {
             ItemDetailView(item: groceryItem.item)
