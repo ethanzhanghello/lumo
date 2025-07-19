@@ -29,6 +29,7 @@
 		94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */; };
 		94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */; };
 		94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916042E0372460036C7AA /* DietaryGoalsView.swift */; };
+		B03152C92E2C0947009F9433 /* openai.key in Resources */ = {isa = PBXBuildFile; fileRef = B03152C82E2C093B009F9433 /* openai.key */; };
 		B034DE722E2B47EE0082134F /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE712E2B47EE0082134F /* Auth */; };
 		B034DE742E2B47EE0082134F /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE732E2B47EE0082134F /* Functions */; };
 		B034DE762E2B47EE0082134F /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE752E2B47EE0082134F /* PostgREST */; };
@@ -113,6 +114,7 @@
 		94D66E362E1DF1A1004F3DDB /* SpoonacularService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpoonacularService.swift; sourceTree = "<group>"; };
 		94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartAnimationManager.swift; sourceTree = "<group>"; };
 		94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartOverlay.swift; sourceTree = "<group>"; };
+		B03152C82E2C093B009F9433 /* openai.key */ = {isa = PBXFileReference; lastKnownFileType = text; path = openai.key; sourceTree = "<group>"; };
 		B041F2682E262BED0075EEE0 /* SupbaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupbaseManager.swift; sourceTree = "<group>"; };
 		B041F26A2E262C020075EEE0 /* AuthViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
@@ -262,6 +264,7 @@
 				B0E915C62E00C0440036C7A9 /* StoreData.swift */,
 				B041F2722E263C890075EEE0 /* OnboardingView.swift */,
 				B0E915CC2E0349A30036C7A9 /* AppState.swift */,
+				B03152C82E2C093B009F9433 /* openai.key */,
 				B0E915CE2E035F770036C7A9 /* Root.swift */,
 				B0E915C22E00B7F80036C7A9 /* StoreFinder.swift */,
 				B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */,
@@ -459,6 +462,7 @@
 				94D66E382E1DF1A1004F3DDB /* Preview Assets.xcassets in Resources */,
 				944E8F0E2E1DB40C00BB97F5 /* Preview Assets.xcassets in Resources */,
 				B0E9159A2E00AC7D0036C7A9 /* Assets.xcassets in Resources */,
+				B03152C92E2C0947009F9433 /* openai.key in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

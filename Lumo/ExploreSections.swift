@@ -447,7 +447,12 @@ struct CategoriesSection: View {
         }
         .sheet(isPresented: $showingCategoryStores) {
             if let category = tappedCategory {
-                CategoryStoresView(category: category)
+                ZStack {
+                    Color.black.ignoresSafeArea()
+                    CategoryStoresView(category: category)
+                }
+            } else {
+                Color.black.ignoresSafeArea()
             }
         }
     }

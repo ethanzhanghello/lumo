@@ -43,10 +43,11 @@ struct GroceryListView: View {
                                 items: itemsForStore,
                                 totalPrice: itemsForStore.reduce(0) { $0 + $1.totalPrice }
                             )
+                            let total = itemsForStore.reduce(0) { $0 + $1.totalPrice }
                             checkoutResult = CheckoutResult(
                                 success: true,
-                                message: "Checked out \(itemsForStore.reduce(0) { $0 + $1.quantity }) items from \(store.name) for $\(itemsForStore.reduce(0) { $0 + $1.totalPrice })",
-                                totalCost: itemsForStore.reduce(0) { $0 + $1.totalPrice },
+                                message: "Checked out \(itemsForStore.reduce(0) { $0 + $1.quantity }) items from \(store.name) for $\(String(format: "%.2f", total))",
+                                totalCost: total,
                                 itemCount: itemsForStore.reduce(0) { $0 + $1.quantity }
                             )
                             appState.groceryList.groceryItems.removeAll { $0.store.id == store.id }
@@ -57,7 +58,8 @@ struct GroceryListView: View {
             } message: {
                 if let store = checkoutStore {
                     let itemsForStore = appState.groceryList.groceryItems.filter { $0.store.id == store.id }
-                    Text("Are you sure you want to checkout with \(itemsForStore.reduce(0) { $0 + $1.quantity }) items from \(store.name) for $\(itemsForStore.reduce(0) { $0 + $1.totalPrice }, specifier: "%.2f")?")
+                    let total = itemsForStore.reduce(0) { $0 + $1.totalPrice }
+                    Text("Are you sure you want to checkout with \(itemsForStore.reduce(0) { $0 + $1.quantity }) items from \(store.name) for $\(String(format: "%.2f", total))?")
                 }
             }
             .alert("Order Confirmation", isPresented: $showingOrderConfirmation) {
@@ -339,8 +341,14 @@ struct GroceryListView: View {
     private func addItemFromSearch() {
         if let foundItem = sampleGroceryItems.first(where: { $0.name.lowercased().contains(searchText.lowercased()) }), let store = appState.selectedStore {
             appState.groceryList.addItem(foundItem, store: store)
+            triggerHapticFeedback()
             searchText = ""
         }
+    }
+    
+    private func triggerHapticFeedback() {
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
     }
 }
 
@@ -413,18 +421,17 @@ struct GroupedGroceryListView: View {
                     .padding(.vertical, 4)
                 ) {
                     ForEach(Array(groupedItems[store]!.keys.sorted()), id: \.self) { category in
-                        // Always show category header, even if only one
+                        // Category header is just text, no line
                         Section(header:
                             HStack {
-                                Text(category)
-                                    .font(.headline)
-                                    .foregroundColor(.white)
                                 Spacer()
                                 Text("\(groupedItems[store]![category]?.count ?? 0) items")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
                             .padding(.vertical, 8)
+                            .background(Color.clear)
+                            .listRowInsets(EdgeInsets())
                         ) {
                             ForEach(groupedItems[store]![category] ?? [], id: \.id) { groceryItem in
                                 GroceryItemCard(groceryItem: groceryItem)
@@ -734,6 +741,9 @@ struct SuggestionCard: View {
             Button("Add") {
                 if let selectedStore = appState.selectedStore {
                     appState.groceryList.addItem(item, store: selectedStore)
+                    // Haptic feedback
+                    let generator = UIImpactFeedbackGenerator(style: .medium)
+                    generator.impactOccurred()
                 }
             }
             .font(.caption)

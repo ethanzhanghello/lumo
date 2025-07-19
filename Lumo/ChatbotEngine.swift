@@ -1368,12 +1368,11 @@ class OpenAIService {
     private let baseURL = "https://api.openai.com/v1/chat/completions"
     
     init() {
-        // Try multiple paths to load the API key
         let possiblePaths = [
-            "/Users/ethanzhang/Desktop/lumo/openai.key",  // Absolute path
-            "openai.key",  // Relative to current directory
-            Bundle.main.path(forResource: "openai", ofType: "key") ?? ""  // App bundle
+            Bundle.main.path(forResource: "openai", ofType: "key") ?? "",  // App bundle
+            "openai.key"  // Relative path fallback (e.g., for debugging in simulator)
         ]
+
         
         for path in possiblePaths {
             if let key = try? String(contentsOfFile: path).trimmingCharacters(in: .whitespacesAndNewlines),
