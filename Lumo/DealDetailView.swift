@@ -268,7 +268,7 @@ struct DealDetailView: View {
 
 // MARK: - Deal Product Card
 struct DealProductCard: View {
-    let product: Product
+    let product: DealProduct
     @State private var addedToGroceryList = false
     
     var body: some View {

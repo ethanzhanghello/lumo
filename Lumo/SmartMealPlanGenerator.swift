@@ -105,14 +105,13 @@ class SmartMealPlanGenerator {
         
         return MealPlan(
             date: date,
-            meals: meals,
-            notes: nil
+            meals: meals
         )
     }
     
     // MARK: - Meal Generation Logic
-    private func generateMealsForDay(inputs: AutoFillInputs, dayOffset: Int) -> [MealPlan.Meal] {
-        var meals: [MealPlan.Meal] = []
+    private func generateMealsForDay(inputs: AutoFillInputs, dayOffset: Int) -> [Meal] {
+        var meals: [Meal] = []
         let availableRecipes = filterRecipesForConstraints(inputs: inputs)
         
         // Determine meal types based on meals per day
@@ -132,7 +131,7 @@ class SmartMealPlanGenerator {
         return meals
     }
     
-    private func getMealTypesForDay(mealsPerDay: Int, dayOffset: Int) -> [MealPlan.Meal.MealType] {
+    private func getMealTypesForDay(mealsPerDay: Int, dayOffset: Int) -> [MealType] {
         switch mealsPerDay {
         case 2:
             // For 2 meals, typically breakfast and dinner
@@ -149,11 +148,11 @@ class SmartMealPlanGenerator {
     }
     
     private func generateMeal(
-        type: MealPlan.Meal.MealType,
+        type: MealType,
         availableRecipes: [Recipe],
         inputs: AutoFillInputs,
-        existingMeals: [MealPlan.Meal]
-    ) -> MealPlan.Meal? {
+        existingMeals: [Meal]
+    ) -> Meal? {
         
         // Filter recipes by meal type
         let mealTypeRecipes = filterRecipesByMealType(availableRecipes, type: type)
@@ -186,11 +185,13 @@ class SmartMealPlanGenerator {
             )
         }
         
-        return MealPlan.Meal(
+        return Meal(
+            date: Date(),
             type: type,
+            recipeName: scaledRecipe.name,
+            ingredients: ingredients.map { $0.name },
             recipe: scaledRecipe,
-            customMeal: nil,
-            ingredients: ingredients
+            customMeal: nil
         )
     }
     
@@ -210,7 +211,7 @@ class SmartMealPlanGenerator {
         }
     }
     
-    private func filterRecipesByMealType(_ recipes: [Recipe], type: MealPlan.Meal.MealType) -> [Recipe] {
+    private func filterRecipesByMealType(_ recipes: [Recipe], type: MealType) -> [Recipe] {
         return recipes.filter { recipe in
             switch type {
             case .breakfast:
@@ -239,9 +240,9 @@ class SmartMealPlanGenerator {
             case .dairyFree:
                 if !recipe.dietaryInfo.isDairyFree { return false }
             case .lowCarb:
-                if recipe.nutritionInfo.carbs > 30 { return false }
+                if (recipe.nutritionInfo.carbs ?? 0) > 30 { return false }
             case .highProtein:
-                if recipe.nutritionInfo.protein < 20 { return false }
+                if (recipe.nutritionInfo.protein ?? 0) < 20 { return false }
             case .keto:
                 if !recipe.dietaryInfo.isKeto { return false }
             case .paleo:
@@ -255,12 +256,12 @@ class SmartMealPlanGenerator {
     // MARK: - Variety and Balance Logic
     private func applyVarietyConstraints(
         _ recipes: [Recipe],
-        existingMeals: [MealPlan.Meal],
+        existingMeals: [Meal],
         dayOffset: Int
     ) -> [Recipe] {
         // Simple variety logic: avoid repeating the same recipe type
         let existingRecipeNames = existingMeals.compactMap { $0.recipe?.name }
-        let existingCategories = existingMeals.compactMap { $0.recipe?.category }
+        let _ = existingMeals.compactMap { $0.recipe?.category }
         
         return recipes.filter { recipe in
             // Avoid exact recipe repetition
@@ -310,9 +311,9 @@ class SmartMealPlanGenerator {
         var score = 0.0
         
         // Protein score
-        if recipe.nutritionInfo.protein >= 20 {
+        if (recipe.nutritionInfo.protein ?? 0) >= 20 {
             score += 2.0
-        } else if recipe.nutritionInfo.protein >= 10 {
+        } else if (recipe.nutritionInfo.protein ?? 0) >= 10 {
             score += 1.0
         }
         
@@ -322,10 +323,10 @@ class SmartMealPlanGenerator {
         }
         
         // Balanced macronutrients
-        let totalCalories = Double(recipe.nutritionInfo.calories)
-        let proteinRatio = recipe.nutritionInfo.protein * 4 / totalCalories
-        let carbRatio = recipe.nutritionInfo.carbs * 4 / totalCalories
-        let fatRatio = recipe.nutritionInfo.fat * 9 / totalCalories
+        let totalCalories = Double(recipe.nutritionInfo.calories ?? 0)
+        let proteinRatio = (recipe.nutritionInfo.protein ?? 0) * 4 / totalCalories
+        let carbRatio = (recipe.nutritionInfo.carbs ?? 0) * 4 / totalCalories
+        let fatRatio = (recipe.nutritionInfo.fat ?? 0) * 9 / totalCalories
         
         if proteinRatio >= 0.15 && proteinRatio <= 0.35 {
             score += 1.0
@@ -341,19 +342,21 @@ class SmartMealPlanGenerator {
     }
     
     // MARK: - Fallback Methods
-    private func createCustomMeal(type: MealPlan.Meal.MealType, inputs: AutoFillInputs) -> MealPlan.Meal {
+    private func createCustomMeal(type: MealType, inputs: AutoFillInputs) -> Meal {
         let customMealName = getCustomMealName(type: type, inputs: inputs)
         let ingredients = getDefaultIngredients(type: type, inputs: inputs)
         
-        return MealPlan.Meal(
+        return Meal(
+            date: Date(),
             type: type,
+            recipeName: customMealName,
+            ingredients: ingredients.map { $0.name },
             recipe: nil,
-            customMeal: customMealName,
-            ingredients: ingredients
+            customMeal: customMealName
         )
     }
     
-    private func getCustomMealName(type: MealPlan.Meal.MealType, inputs: AutoFillInputs) -> String {
+    private func getCustomMealName(type: MealType, inputs: AutoFillInputs) -> String {
         switch type {
         case .breakfast:
             return "Healthy Breakfast Bowl"
@@ -366,7 +369,7 @@ class SmartMealPlanGenerator {
         }
     }
     
-    private func getDefaultIngredients(type: MealPlan.Meal.MealType, inputs: AutoFillInputs) -> [GroceryItem] {
+    private func getDefaultIngredients(type: MealType, inputs: AutoFillInputs) -> [GroceryItem] {
         switch type {
         case .breakfast:
             return [

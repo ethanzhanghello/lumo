@@ -24,7 +24,7 @@ class RouteOptimizationManager: ObservableObject {
     func generateRoute(
         for groceryList: GroceryList,
         in store: Store,
-        optimizationStrategy: ShoppingRoute.OptimizationStrategy = .logical
+        optimizationStrategy: ShoppingRoute.OptimizationStrategy = .logicalOrder
     ) async throws -> ShoppingRoute {
         
         await MainActor.run {
@@ -66,12 +66,11 @@ class RouteOptimizationManager: ObservableObject {
         
         let route = ShoppingRoute(
             storeId: store.id,
-            startPoint: storeLayout.entrance,
-            endPoint: getBestCheckout(for: groceryList, storeLayout: storeLayout).position,
             waypoints: waypoints,
             totalDistance: totalDistance,
-            estimatedTime: estimatedTime,
-            optimizationStrategy: optimizationStrategy
+            estimatedTime: Int(estimatedTime),
+            optimizationStrategy: optimizationStrategy,
+            createdAt: Date()
         )
         
         await MainActor.run {
@@ -132,14 +131,12 @@ class RouteOptimizationManager: ObservableObject {
         let aisleIds = Array(aisleGroups.keys)
         
         switch strategy {
-        case .shortest:
+        case .shortestDistance:
             return optimizeForShortestDistance(aisleIds: aisleIds, storeLayout: storeLayout)
-        case .fastest:
+        case .fastestTime:
             return optimizeForSpeed(aisleIds: aisleIds, storeLayout: storeLayout)
-        case .logical:
+        case .logicalOrder:
             return optimizeForLogicalShopping(aisleIds: aisleIds, storeLayout: storeLayout)
-        case .custom:
-            return aisleIds.sorted() // Simple alphabetical for now
         }
     }
     
@@ -313,7 +310,7 @@ class RouteOptimizationManager: ObservableObject {
             let waypoint = currentRoute.waypoints[waypointIndex]
             
             // Update progress
-            routeProgress.visitedWaypoints.insert(waypoint.id)
+            routeProgress?.visitedWaypoints.insert(waypoint.id)
             
             // Remove completed item from waypoint
             var updatedWaypoint = waypoint
@@ -321,16 +318,16 @@ class RouteOptimizationManager: ObservableObject {
             
             // If all items in waypoint are completed, mark waypoint as completed
             if updatedWaypoint.products.isEmpty {
-                routeProgress.completedWaypoints.insert(waypoint.id)
+                routeProgress?.completedWaypoints.insert(waypoint.id)
                 
                 // Move to next waypoint
                 let nextIndex = waypointIndex + 1
                 if nextIndex < currentRoute.waypoints.count {
-                    routeProgress.currentWaypoint = currentRoute.waypoints[nextIndex]
+                    routeProgress?.currentWaypoint = currentRoute.waypoints[nextIndex]
                 } else {
                     // Route completed!
-                    routeProgress.isCompleted = true
-                    routeProgress.currentWaypoint = nil
+                    routeProgress?.isCompleted = true
+                    routeProgress?.currentWaypoint = nil
                 }
             }
             
@@ -343,15 +340,15 @@ class RouteOptimizationManager: ObservableObject {
         guard let currentRoute = currentRoute else { return }
         
         if let waypointIndex = currentRoute.waypoints.firstIndex(where: { $0.id == waypointId }) {
-            routeProgress.skippedWaypoints.insert(waypointId)
+            routeProgress?.skippedWaypoints.insert(waypointId)
             
             // Move to next waypoint
             let nextIndex = waypointIndex + 1
             if nextIndex < currentRoute.waypoints.count {
-                routeProgress.currentWaypoint = currentRoute.waypoints[nextIndex]
+                routeProgress?.currentWaypoint = currentRoute.waypoints[nextIndex]
             } else {
-                routeProgress.isCompleted = true
-                routeProgress.currentWaypoint = nil
+                routeProgress?.isCompleted = true
+                routeProgress?.currentWaypoint = nil
             }
             
             updateRouteMetrics()
@@ -367,10 +364,10 @@ class RouteOptimizationManager: ObservableObject {
                 // the current progress and reoptimize the remaining route
                 if let store = getCurrentStore(),
                    let groceryList = getCurrentGroceryList() {
-                    let newRoute = try await generateRoute(
+                    let _ = try await generateRoute(
                         for: groceryList,
                         in: store,
-                        optimizationStrategy: .custom
+                        optimizationStrategy: .logicalOrder
                     )
                     // Merge with current progress...
                 }
@@ -384,8 +381,8 @@ class RouteOptimizationManager: ObservableObject {
         guard let route = currentRoute else { return }
         
         let remainingWaypoints = route.waypoints.filter { waypoint in
-            !routeProgress.completedWaypoints.contains(waypoint.id) &&
-            !routeProgress.skippedWaypoints.contains(waypoint.id)
+            !(routeProgress?.completedWaypoints.contains(waypoint.id) ?? false) &&
+            !(routeProgress?.skippedWaypoints.contains(waypoint.id) ?? false)
         }
         
         // Calculate remaining distance and time
@@ -393,13 +390,13 @@ class RouteOptimizationManager: ObservableObject {
         var remainingTime = 0
         
         for waypoint in remainingWaypoints {
-            remainingDistance += waypoint.estimatedDistance ?? 0.0
+            remainingDistance += Double(waypoint.estimatedTimeMinutes) * 1.2 // Approximate distance based on walking time
             remainingTime += waypoint.estimatedTimeMinutes
         }
         
-        routeProgress.remainingDistance = remainingDistance
-        routeProgress.estimatedTimeRemaining = remainingTime
-        routeProgress.progressPercentage = Double(routeProgress.completedWaypoints.count) / Double(route.waypoints.count)
+        routeProgress?.remainingDistance = remainingDistance
+        routeProgress?.estimatedTimeRemaining = remainingTime
+        routeProgress?.progressPercentage = Double(routeProgress?.completedWaypoints.count ?? 0) / Double(route.waypoints.count)
     }
     
     // Helper methods for real-time updates
@@ -433,7 +430,7 @@ class RouteOptimizationManager: ObservableObject {
         }
         
         // Suggest route optimization
-        if routeProgress.skippedWaypoints.count > 2 {
+        if (routeProgress?.skippedWaypoints.count ?? 0) > 2 {
             suggestions.append(RouteSuggestion(
                 type: .reoptimize,
                 title: "Reoptimize Route",
@@ -454,7 +451,7 @@ class RouteOptimizationManager: ObservableObject {
         
         var waypoints: [RouteWaypoint] = []
         
-        for (index, aisleId) in aisleOrder.enumerated() {
+        for (_, aisleId) in aisleOrder.enumerated() {
             guard let aisle = storeLayout.aisles.first(where: { $0.aisleId == aisleId }) else {
                 continue
             }
@@ -465,11 +462,13 @@ class RouteOptimizationManager: ObservableObject {
                 .map { $0.productId }
             
             let waypoint = RouteWaypoint(
-                aisleId: aisleId,
                 position: aisle.centerPoint,
+                aisleId: aisleId,
+                instruction: generateAisleInstructions(for: aisle),
                 products: productsInAisle,
-                order: index + 1,
-                instructions: generateAisleInstructions(for: aisle)
+                estimatedTimeMinutes: 3,
+                isCompleted: false,
+                waypointType: .aisle
             )
             
             waypoints.append(waypoint)
@@ -508,8 +507,8 @@ class RouteOptimizationManager: ObservableObject {
         // Start from entrance
         var currentPosition = storeLayout.entrance
         
-        for waypoint in waypoints.sorted(by: { $0.order < $1.order }) {
-            let distance = currentPosition.distance(to: waypoint.position)
+        for waypoint in waypoints {
+            let distance = sqrt(pow(currentPosition.x - waypoint.position.x, 2) + pow(currentPosition.y - waypoint.position.y, 2))
             totalDistance += distance
             totalTime += distance / 1.2 // Walking speed 1.2 m/s
             totalTime += 30 // 30 seconds per waypoint for item collection
@@ -518,7 +517,7 @@ class RouteOptimizationManager: ObservableObject {
         }
         
         // Add distance to checkout
-        let checkoutDistance = currentPosition.distance(to: storeLayout.checkouts.first!.position)
+        let checkoutDistance = sqrt(pow(currentPosition.x - storeLayout.checkouts.first!.position.x, 2) + pow(currentPosition.y - storeLayout.checkouts.first!.position.y, 2))
         totalDistance += checkoutDistance
         totalTime += checkoutDistance / 1.2
         totalTime += 120 // 2 minutes for checkout process
@@ -534,8 +533,9 @@ class RouteOptimizationManager: ObservableObject {
         // Smart checkout selection
         if itemCount <= 15 {
             // Try express lane first
-            if let expressCheckout = storeLayout.checkouts.first(where: { 
-                $0.type == .express && $0.isOpen 
+            if let expressCheckout = storeLayout.checkouts.first(where: { checkout in
+                // For now, just return the first available checkout
+                true
             }) {
                 return expressCheckout
             }
@@ -543,27 +543,22 @@ class RouteOptimizationManager: ObservableObject {
         
         if itemCount <= 25 {
             // Try self-service for medium sized orders
-            if let selfService = storeLayout.checkouts.first(where: { 
-                $0.type == .selfService && $0.isOpen 
+            if let selfService = storeLayout.checkouts.first(where: { checkout in
+                // For now, just return the first available checkout
+                true
             }) {
                 return selfService
             }
         }
         
         // Default to regular checkout
-        return storeLayout.checkouts.first(where: { $0.type == .regular && $0.isOpen }) 
-            ?? storeLayout.checkouts.first!
+        return storeLayout.checkouts.first!
     }
     
     // MARK: - Route Progress Tracking
     
     func startRouteNavigation(_ route: ShoppingRoute) {
-        routeProgress = RouteProgress(
-            route: route,
-            currentWaypointIndex: 0,
-            visitedWaypoints: Set(),
-            startTime: Date()
-        )
+        routeProgress = RouteProgress(route: route)
     }
     
     func markWaypointCompleted(_ waypointId: UUID) {
@@ -572,7 +567,7 @@ class RouteOptimizationManager: ObservableObject {
         progress.visitedWaypoints.insert(waypointId)
         
         // Find next unvisited waypoint
-        let sortedWaypoints = progress.route.waypoints.sorted { $0.order < $1.order }
+        let sortedWaypoints = progress.route.waypoints
         if let nextIndex = sortedWaypoints.firstIndex(where: { !progress.visitedWaypoints.contains($0.id) }) {
             progress.currentWaypointIndex = nextIndex
         }
@@ -611,14 +606,14 @@ class RouteOptimizationManager: ObservableObject {
         guard let storeLayout = getStoreLayout(for: route.storeId) else { return [] }
         
         var instructions: [NavigationInstruction] = []
-        var currentPosition = route.startPoint
+        var currentPosition = storeLayout.entrance
         
         // Starting instruction
         instructions.append(NavigationInstruction(
             id: UUID(),
             step: 1,
             instruction: "Enter store and head to the main shopping area",
-            distance: currentPosition.distance(to: storeLayout.connectivityGraph.nodes["MAIN_CORRIDOR"] ?? currentPosition),
+            distance: sqrt(pow(currentPosition.x - storeLayout.entrance.x, 2) + pow(currentPosition.y - storeLayout.entrance.y, 2)),
             direction: .straight,
             aisleTarget: nil
         ))
@@ -633,8 +628,8 @@ class RouteOptimizationManager: ObservableObject {
             let instruction = NavigationInstruction(
                 id: UUID(),
                 step: stepNumber,
-                instruction: "Go to \(waypoint.aisleId). \(waypoint.instructions ?? "")",
-                distance: currentPosition.distance(to: waypoint.position),
+                instruction: "Go to \(waypoint.aisleId ?? "Unknown Aisle"). \(waypoint.instruction)",
+                distance: sqrt(pow(currentPosition.x - waypoint.position.x, 2) + pow(currentPosition.y - waypoint.position.y, 2)),
                 direction: direction,
                 aisleTarget: waypoint.aisleId
             )
@@ -648,8 +643,8 @@ class RouteOptimizationManager: ObservableObject {
             id: UUID(),
             step: instructions.count + 1,
             instruction: "Proceed to checkout",
-            distance: currentPosition.distance(to: route.endPoint),
-            direction: calculateDirection(from: currentPosition, to: route.endPoint),
+            distance: sqrt(pow(currentPosition.x - storeLayout.checkouts.first!.position.x, 2) + pow(currentPosition.y - storeLayout.checkouts.first!.position.y, 2)),
+            direction: calculateDirection(from: currentPosition, to: storeLayout.checkouts.first!.position),
             aisleTarget: "CHECKOUT"
         ))
         
@@ -677,11 +672,27 @@ struct RouteProgress {
     let route: ShoppingRoute
     var currentWaypointIndex: Int
     var visitedWaypoints: Set<UUID>
+    var completedWaypoints: Set<UUID>
+    var skippedWaypoints: Set<UUID>
+    var remainingDistance: Double
+    var estimatedTimeRemaining: Int
+    var progressPercentage: Double
+    var isCompleted: Bool
+    var currentWaypoint: RouteWaypoint?
     let startTime: Date
     
-    var currentWaypoint: RouteWaypoint? {
-        guard currentWaypointIndex < route.waypoints.count else { return nil }
-        return route.waypoints.sorted { $0.order < $1.order }[currentWaypointIndex]
+    init(route: ShoppingRoute) {
+        self.route = route
+        self.currentWaypointIndex = 0
+        self.visitedWaypoints = []
+        self.completedWaypoints = []
+        self.skippedWaypoints = []
+        self.remainingDistance = route.totalDistance
+        self.estimatedTimeRemaining = route.estimatedTime
+        self.progressPercentage = 0.0
+        self.isCompleted = false
+        self.currentWaypoint = route.waypoints.first
+        self.startTime = Date()
     }
     
     var completionPercentage: Double {

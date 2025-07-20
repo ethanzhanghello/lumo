@@ -47,13 +47,13 @@ struct Recipe: Identifiable, Codable {
         }
         
         let scaledNutrition = NutritionInfo(
-            calories: Int(Double(nutritionInfo.calories) * scaleFactor),
-            protein: nutritionInfo.protein * scaleFactor,
-            carbs: nutritionInfo.carbs * scaleFactor,
-            fat: nutritionInfo.fat * scaleFactor,
-            fiber: (nutritionInfo.fiber ?? 0) * scaleFactor,
-            sugar: (nutritionInfo.sugar ?? 0) * scaleFactor,
-            sodium: Int(Double(nutritionInfo.sodium ?? 0) * scaleFactor)
+            calories: Int(Double(nutritionInfo.calories ?? 0) * scaleFactor),
+            protein: (nutritionInfo.protein ?? 0.0) * scaleFactor,
+            carbs: (nutritionInfo.carbs ?? 0.0) * scaleFactor,
+            fat: (nutritionInfo.fat ?? 0.0) * scaleFactor,
+            fiber: (nutritionInfo.fiber ?? 0.0) * scaleFactor,
+            sugar: (nutritionInfo.sugar ?? 0.0) * scaleFactor,
+            sodium: Double(nutritionInfo.sodium ?? 0.0) * scaleFactor
         )
         
         return Recipe(

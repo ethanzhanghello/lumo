@@ -12,7 +12,7 @@ struct StoreMapView: View {
     @EnvironmentObject var appState: AppState
     @StateObject private var routeManager = RouteOptimizationManager.shared
     @State private var showingRouteOptions = false
-    @State private var selectedOptimization: ShoppingRoute.OptimizationStrategy = .logical
+    @State private var selectedOptimization: ShoppingRoute.OptimizationStrategy = .logicalOrder
     @State private var isGeneratingRoute = false
     @State private var showingNavigation = false
     @State private var routeGenerated = false

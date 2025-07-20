@@ -903,15 +903,15 @@ struct QuickRoutePreview: View {
                 let route = try await routeManager.generateRoute(
                     for: groceryList,
                     in: store,
-                    optimizationStrategy: .logical
+                    optimizationStrategy: .logicalOrder
                 )
                 
                 await MainActor.run {
                     estimatedStats = RouteStats(
                         totalDistance: route.totalDistance,
-                        estimatedTimeMinutes: route.estimatedDurationMinutes,
+                        estimatedTimeMinutes: route.estimatedTime,
                         stopsCount: route.waypoints.count,
-                        aisleOrder: route.waypoints.map { $0.aisleId }
+                        aisleOrder: route.waypoints.map { $0.aisleId ?? "Unknown" }
                     )
                 }
             } catch {

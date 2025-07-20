@@ -437,7 +437,7 @@ struct DealFilterChip: View {
 
 // MARK: - Deal Card Components
 struct PersonalizedDealCard: View {
-    let product: Product
+    let product: DealProduct
     let userProfile: UserProfile
     @State private var isFavorite = false
     
@@ -489,7 +489,7 @@ struct PersonalizedDealCard: View {
                     }
                 }
                 
-                if userProfile.favorites.contains(product.id) {
+                if userProfile.favorites.contains(product.id.uuidString) {
                     Text("Your Favorite")
                         .font(.caption2)
                         .foregroundColor(.orange)
@@ -802,7 +802,7 @@ struct CategoryDealCard: View {
 }
 
 struct InStoreDealCard: View {
-    let product: Product
+    let product: DealProduct
     
     var body: some View {
         HStack(spacing: 12) {
@@ -841,7 +841,7 @@ struct InStoreDealCard: View {
                 }
                 
                 HStack {
-                    Text("Aisle \(product.aisle)")
+                    Text("Category: \(product.category)")
                         .font(.caption2)
                         .foregroundColor(.gray)
                     

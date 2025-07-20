@@ -40,6 +40,12 @@ struct DealProduct: Identifiable, Codable, Hashable, Equatable {
         hasher.combine(id)
     }
     
+    // Computed property for discount price (can be customized based on deals)
+    var discountPrice: Double? {
+        // For now, return a 10% discount if deal eligible
+        return dealEligible ? price * 0.9 : nil
+    }
+    
     static let sampleProducts = [
         // Dairy & Alternatives
         DealProduct(

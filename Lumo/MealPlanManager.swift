@@ -48,6 +48,36 @@ enum MealType: String, CaseIterable, Codable, Identifiable {
 
 
 
+// MARK: - Meal struct (top-level for easy access)
+struct Meal: Identifiable, Codable, Equatable {
+    var id = UUID()
+    var date: Date
+    var type: MealType
+    var recipeName: String
+    var ingredients: [String]
+    var recipe: Recipe?
+    var customMeal: String?
+    var servings: Int
+    var notes: String?
+    var isCompleted: Bool
+    
+    init(date: Date, type: MealType, recipeName: String, ingredients: [String], recipe: Recipe? = nil, customMeal: String? = nil, servings: Int = 1, notes: String? = nil, isCompleted: Bool = false) {
+        self.date = date
+        self.type = type
+        self.recipeName = recipeName
+        self.ingredients = ingredients
+        self.recipe = recipe
+        self.customMeal = customMeal
+        self.servings = servings
+        self.notes = notes
+        self.isCompleted = isCompleted
+    }
+    
+    static func == (lhs: Meal, rhs: Meal) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
 struct MealPlan: Identifiable, Codable {
     let id = UUID()
     var date: Date
@@ -56,37 +86,6 @@ struct MealPlan: Identifiable, Codable {
     init(date: Date, meals: [Meal] = []) {
         self.date = date
         self.meals = meals
-    }
-    
-    struct Meal: Identifiable, Codable, Equatable {
-        typealias MealType = Lumo.MealType
-        
-        var id = UUID()
-        var date: Date
-        var type: MealType
-        var recipeName: String
-        var ingredients: [String]
-        var recipe: Recipe?
-        var customMeal: String?
-        var servings: Int
-        var notes: String?
-        var isCompleted: Bool
-        
-        init(date: Date, type: MealType, recipeName: String, ingredients: [String], recipe: Recipe? = nil, customMeal: String? = nil, servings: Int = 1, notes: String? = nil, isCompleted: Bool = false) {
-            self.date = date
-            self.type = type
-            self.recipeName = recipeName
-            self.ingredients = ingredients
-            self.recipe = recipe
-            self.customMeal = customMeal
-            self.servings = servings
-            self.notes = notes
-            self.isCompleted = isCompleted
-        }
-        
-        static func == (lhs: Meal, rhs: Meal) -> Bool {
-            lhs.id == rhs.id
-        }
     }
 }
 
@@ -338,10 +337,10 @@ class MealPlanManager: ObservableObject {
         for meal in meals {
             if let recipe = meal.recipe {
                 let scaleFactor = Double(meal.servings) / Double(recipe.servings)
-                totalNutrition.calories += Int(Double(recipe.nutritionInfo.calories) * scaleFactor)
-                totalNutrition.protein += recipe.nutritionInfo.protein * scaleFactor
-                totalNutrition.carbs += recipe.nutritionInfo.carbs * scaleFactor
-                totalNutrition.fat += recipe.nutritionInfo.fat * scaleFactor
+                totalNutrition.calories += Int(Double(recipe.nutritionInfo.calories ?? 0) * scaleFactor)
+                totalNutrition.protein += (recipe.nutritionInfo.protein ?? 0.0) * scaleFactor
+                totalNutrition.carbs += (recipe.nutritionInfo.carbs ?? 0.0) * scaleFactor
+                totalNutrition.fat += (recipe.nutritionInfo.fat ?? 0.0) * scaleFactor
                 if let fiber = recipe.nutritionInfo.fiber {
                     totalNutrition.fiber = (totalNutrition.fiber ?? 0) + fiber * scaleFactor
                 }
@@ -479,43 +478,36 @@ class MealPlanManager: ObservableObject {
         for dayOffset in 0..<7 {
             guard let date = calendar.date(byAdding: .day, value: dayOffset, to: today) else { continue }
             
-            let meals: [MealPlan.Meal] = [
-                MealPlan.Meal(
-                    type: .breakfast,
+            let meals: [Meal] = [
+                Meal(
+                    date: date,
+                    type: MealType.breakfast,
+                    recipeName: RecipeDatabase.recipes.first?.name ?? "Healthy Breakfast Bowl",
+                    ingredients: ["Eggs", "Avocado", "Whole Grain Toast"],
                     recipe: RecipeDatabase.recipes.first,
-                    customMeal: "Healthy Breakfast Bowl",
-                    ingredients: [
-                        GroceryItem(name: "Eggs", description: "Fresh eggs", price: 2.99, category: "Dairy", aisle: 5, brand: ""),
-                        GroceryItem(name: "Avocado", description: "Ripe avocado", price: 1.99, category: "Produce", aisle: 1, brand: ""),
-                        GroceryItem(name: "Whole Grain Toast", description: "Healthy bread", price: 3.49, category: "Bakery", aisle: 3, brand: "")
-                    ]
+                    customMeal: "Healthy Breakfast Bowl"
                 ),
-                MealPlan.Meal(
-                    type: .lunch,
+                Meal(
+                    date: date,
+                    type: MealType.lunch,
+                    recipeName: "Fresh Salad with Protein",
+                    ingredients: ["Mixed Greens", "Chicken Breast", "Cherry Tomatoes"],
                     recipe: RecipeDatabase.recipes.first(where: { $0.category == .salad }),
-                    customMeal: "Fresh Salad with Protein",
-                    ingredients: [
-                        GroceryItem(name: "Mixed Greens", description: "Fresh salad greens", price: 2.99, category: "Produce", aisle: 1, brand: ""),
-                        GroceryItem(name: "Chicken Breast", description: "Lean protein", price: 8.97, category: "Meat", aisle: 4, brand: ""),
-                        GroceryItem(name: "Cherry Tomatoes", description: "Fresh tomatoes", price: 3.99, category: "Produce", aisle: 1, brand: "")
-                    ]
+                    customMeal: "Fresh Salad with Protein"
                 ),
-                MealPlan.Meal(
-                    type: .dinner,
+                Meal(
+                    date: date,
+                    type: MealType.dinner,
+                    recipeName: "Balanced Dinner Plate", 
+                    ingredients: ["Salmon Fillet", "Quinoa", "Steamed Broccoli"],
                     recipe: RecipeDatabase.recipes.first(where: { $0.category == .dinner }),
-                    customMeal: "Balanced Dinner Plate",
-                    ingredients: [
-                        GroceryItem(name: "Salmon Fillet", description: "Fresh fish", price: 12.99, category: "Seafood", aisle: 4, brand: ""),
-                        GroceryItem(name: "Brown Rice", description: "Whole grain", price: 2.99, category: "Pantry", aisle: 3, brand: ""),
-                        GroceryItem(name: "Broccoli", description: "Fresh vegetables", price: 2.99, category: "Produce", aisle: 1, brand: "")
-                    ]
+                    customMeal: "Balanced Dinner Plate"
                 )
             ]
             
             let mealPlan = MealPlan(
                 date: date,
-                meals: meals,
-                notes: "Sample meal plan for \(date.formatted(date: .abbreviated, time: .omitted))"
+                meals: meals
             )
             
             samplePlans.append(mealPlan)

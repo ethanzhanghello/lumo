@@ -174,7 +174,7 @@ struct SubstitutionCard: View {
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
                         
-                        Text(substitution.reason)
+                        Text(substitution.reason.rawValue)
                             .font(.caption)
                             .foregroundColor(.lumoGreen)
                     }
@@ -192,27 +192,14 @@ struct SubstitutionCard: View {
                         .cornerRadius(8)
                 }
                 
-                // Alternatives Preview
+                // Alternative Preview
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Alternatives:")
+                    Text("Suggested Alternative:")
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .foregroundColor(.gray)
                     
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 8) {
-                        ForEach(substitution.alternatives.prefix(4), id: \.id) { alternative in
-                            AlternativePreviewCard(item: alternative)
-                        }
-                    }
-                    
-                    if substitution.alternatives.count > 4 {
-                        Text("+ \(substitution.alternatives.count - 4) more")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                    }
+                    AlternativePreviewCard(item: substitution.suggestedItem)
                 }
                 
                 // Action Buttons
@@ -332,7 +319,7 @@ struct SubstitutionDetailView: View {
             AlternativeDetailView(
                 originalItem: substitution.originalItem,
                 alternative: alternative,
-                reason: substitution.reason
+                reason: substitution.reason.rawValue
             )
         }
     }
@@ -388,12 +375,11 @@ struct SubstitutionDetailView: View {
                 .foregroundColor(.white)
             
             LazyVStack(spacing: 12) {
-                ForEach(substitution.alternatives, id: \.id) { alternative in
-                    AlternativeDetailCard(
-                        alternative: alternative,
-                        reason: substitution.reason
-                    ) {
-                        selectedAlternative = alternative
+                AlternativeDetailCard(
+                    alternative: substitution.suggestedItem,
+                    reason: substitution.reason.rawValue
+                ) {
+                        selectedAlternative = substitution.suggestedItem
                     }
                 }
             }
@@ -413,7 +399,7 @@ struct SubstitutionDetailView: View {
                     Image(systemName: "lightbulb")
                         .foregroundColor(.lumoGreen)
                     
-                    Text(substitution.reason)
+                    Text(substitution.reason.rawValue)
                         .font(.subheadline)
                         .foregroundColor(.white)
                     
@@ -522,14 +508,14 @@ struct AlternativeDetailView: View {
             }
             .navigationTitle("Alternative Details")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
+            .toolbar(content: {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
                         dismiss()
                     }
                     .foregroundColor(.lumoGreen)
                 }
-            }
+            })
         }
     }
     

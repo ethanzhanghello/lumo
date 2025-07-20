@@ -63,19 +63,22 @@ class DietaryGoalManager {
                 type: .calories,
                 target: 2000,
                 current: 1850,
-                unit: "kcal"
+                unit: "kcal",
+                isActive: true
             ),
             DietaryGoal(
                 type: .protein,
                 target: 150,
                 current: 95,
-                unit: "g"
+                unit: "g",
+                isActive: true
             ),
             DietaryGoal(
                 type: .fiber,
                 target: 25,
                 current: 18,
-                unit: "g"
+                unit: "g",
+                isActive: true
             )
         ]
     }
@@ -335,6 +338,7 @@ struct DietaryGoal: Identifiable {
     let target: Double
     let current: Double
     let unit: String
+    let isActive: Bool
     
     enum GoalType: String, CaseIterable {
         case calories = "Calories"
@@ -371,4 +375,5 @@ struct MealPlanTemplate: Identifiable {
     let servings: Int
     let estimatedCost: Double
     let tags: [String]
+    let createdAt: Date
 }

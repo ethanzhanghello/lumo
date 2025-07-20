@@ -461,7 +461,7 @@ struct RouteWaypoint: Identifiable, Codable, Hashable {
     let position: Coordinate
     let aisleId: String?
     let instruction: String
-    let products: [UUID] // Product IDs to collect at this waypoint
+    var products: [UUID] // Product IDs to collect at this waypoint
     let estimatedTimeMinutes: Int
     let isCompleted: Bool
     let waypointType: WaypointType

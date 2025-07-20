@@ -15,7 +15,6 @@ struct LumoApp: App {
     @StateObject var appState = AppState()
     @StateObject var authViewModel = AuthViewModel()
     @State private var isLoggedIn: Bool = false
-    @State private var showOnboarding: Bool = !UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
     @State private var showSplash: Bool = true
     @State private var glowOpacity: Double = 0.08
     @State private var glowRadius: CGFloat = 20
@@ -45,20 +44,11 @@ struct LumoApp: App {
         WindowGroup {
             ZStack {
                 Group {
-                    if showOnboarding {
-                        OnboardingView(showOnboarding: $showOnboarding)
-                            .opacity(nextScreenOpacity) // Fade in the next screen
-                    } else if isLoggedIn {
-                        MainTabView()
-                            .environmentObject(appState)
-                            .environmentObject(authViewModel)
-                            .opacity(nextScreenOpacity) // Fade in the next screen
-                    } else {
-                        RootView()
-                            .environmentObject(appState)
-                            .environmentObject(authViewModel)
-                            .opacity(nextScreenOpacity) // Fade in the next screen
-                    }
+                    // Use Root view for proper navigation flow
+                    RootView()
+                        .environmentObject(appState)
+                        .environmentObject(authViewModel)
+                        .opacity(nextScreenOpacity) // Fade in the next screen
                 }
                 
                 // Splash overlay

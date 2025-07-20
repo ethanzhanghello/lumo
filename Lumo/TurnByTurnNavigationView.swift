@@ -52,35 +52,63 @@ struct TurnByTurnNavigationView: View {
                 
                 // Current Step Card with Voice Guidance
                 if let currentStep = currentStep {
-                    EnhancedCurrentStepCard(
-                        instruction: currentStep,
-                        nextInstruction: nextStep,
-                        userLocation: currentUserLocation,
-                        onShowProducts: { showingProductList = true },
-                        onMarkCompleted: { markStepCompleted(currentStep) },
-                        onSkipStep: { skipCurrentStep() }
-                    )
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(currentStep.instruction)
+                            .font(.headline)
+                            .padding()
+                        
+                        HStack {
+                            Button("Show Products") { showingProductList = true }
+                                .buttonStyle(.bordered)
+                            
+                            Button("Mark Complete") { markStepCompleted(currentStep) }
+                                .buttonStyle(.borderedProminent)
+                            
+                            Button("Skip") { skipCurrentStep() }
+                                .buttonStyle(.bordered)
+                        }
+                        .padding(.horizontal)
+                    }
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+                    .padding()
                 }
                 
                 // Real-time Instruction List with Progress
-                EnhancedNavigationInstructionsList(
-                    instructions: navigationInstructions,
-                    currentStep: currentStep,
-                    routeProgress: routeManager.routeProgress,
-                    completedItems: completedItems,
-                    onMarkCompleted: markWaypointCompleted,
-                    onItemCompleted: markItemCompleted
-                )
+                List(navigationInstructions, id: \.id) { instruction in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(instruction.instruction)
+                                .font(.body)
+                            Text("Distance: \(instruction.distance, specifier: "%.1f")m")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        if instruction.id == currentStep?.id {
+                            Image(systemName: "location.fill")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
                 
                 Spacer()
                 
                 // Enhanced Control Buttons
-                EnhancedNavigationControlsView(
-                    onEndNavigation: { showingEndNavigationAlert = true },
-                    onRecalculateRoute: { showingRecalculateAlert = true },
-                    onCurrentLocation: updateUserLocation,
-                    isNavigationActive: routeManager.routeProgress != nil
-                )
+                HStack(spacing: 16) {
+                    Button("End Navigation") { showingEndNavigationAlert = true }
+                        .buttonStyle(.bordered)
+                    
+                    Button("Recalculate") { showingRecalculateAlert = true }
+                        .buttonStyle(.bordered)
+                    
+                    Button("My Location") { updateUserLocation() }
+                        .buttonStyle(.bordered)
+                }
+                .padding()
             }
             .navigationTitle("Navigation")
             .navigationBarTitleDisplayMode(.inline)
@@ -92,12 +120,34 @@ struct TurnByTurnNavigationView: View {
             }
             .sheet(isPresented: $showingProductList) {
                 if let currentStep = currentStep {
-                    EnhancedProductListSheet(
-                        aisleId: currentStep.aisleTarget ?? "",
-                        route: route,
-                        completedItems: $completedItems,
-                        onItemCompleted: markItemCompleted
-                    )
+                    NavigationView {
+                        VStack {
+                            Text("Products for: \(currentStep.aisleTarget ?? "Current Aisle")")
+                                .font(.headline)
+                                .padding()
+                            
+                            List {
+                                ForEach(Array(completedItems.keys), id: \.self) { itemId in
+                                    HStack {
+                                        Text("Product \(itemId)")
+                                        Spacer()
+                                        if completedItems[itemId] == true {
+                                            Image(systemName: "checkmark")
+                                                .foregroundColor(.green)
+                                        } else {
+                                            Button("Complete") {
+                                                markItemCompleted(itemId)
+                                            }
+                                            .buttonStyle(.bordered)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .navigationTitle("Products")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .navigationBarItems(trailing: Button("Done") { showingProductList = false })
+                    }
                 }
             }
             .alert("Route Completed! 🎉", isPresented: $showingRouteCompleted) {
