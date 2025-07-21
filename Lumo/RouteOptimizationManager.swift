@@ -27,6 +27,9 @@ class RouteOptimizationManager: ObservableObject {
         optimizationStrategy: ShoppingRoute.OptimizationStrategy = .logicalOrder
     ) async throws -> ShoppingRoute {
         
+        print("🗺️ Starting route generation for store: \(store.name)")
+        print("🗺️ Grocery list has \(groceryList.groceryItems.count) items")
+        
         await MainActor.run {
             isGeneratingRoute = true
         }
@@ -34,13 +37,23 @@ class RouteOptimizationManager: ObservableObject {
         defer {
             Task { @MainActor in
                 isGeneratingRoute = false
+                print("🗺️ Route generation completed")
             }
+        }
+        
+        // Validate grocery list
+        guard !groceryList.groceryItems.isEmpty else {
+            print("❌ Empty grocery list")
+            throw RouteOptimizationError.invalidGroceryList
         }
         
         // Get store layout
         guard let storeLayout = getStoreLayout(for: store.id) else {
+            print("❌ Store layout not found for store ID: \(store.id)")
             throw RouteOptimizationError.storeLayoutNotFound
         }
+        
+        print("✅ Found store layout with \(storeLayout.aisles.count) aisles")
         
         // Group products by aisle
         let aisleGroups = try groupProductsByAisle(groceryList.groceryItems.map { $0.item }, storeId: store.id)
@@ -52,17 +65,23 @@ class RouteOptimizationManager: ObservableObject {
             strategy: optimizationStrategy
         )
         
+        print("🗺️ Optimized aisle order: \(optimizedAisleOrder)")
+        
         // Generate waypoints
         let waypoints = generateWaypoints(
             from: optimizedAisleOrder,
             storeLayout: storeLayout
         )
         
+        print("🗺️ Generated \(waypoints.count) waypoints")
+        
         // Calculate total distance and time
         let (totalDistance, estimatedTime) = calculateRouteMetrics(
             waypoints: waypoints,
             storeLayout: storeLayout
         )
+        
+        print("🗺️ Route metrics: \(totalDistance)m distance, \(estimatedTime) minutes")
         
         let route = ShoppingRoute(
             storeId: store.id,
@@ -75,6 +94,7 @@ class RouteOptimizationManager: ObservableObject {
         
         await MainActor.run {
             currentRoute = route
+            print("✅ Route successfully generated and stored")
         }
         
         return route
@@ -85,20 +105,23 @@ class RouteOptimizationManager: ObservableObject {
     private func groupProductsByAisle(_ items: [GroceryItem], storeId: UUID) throws -> [String: [GroceryItem]] {
         var aisleGroups: [String: [GroceryItem]] = [:]
         
+        print("🗺️ Grouping \(items.count) items by aisle for store: \(storeId)")
+        
         for item in items {
-            if let location = getProductLocation(productId: item.id, storeId: storeId) {
-                if aisleGroups[location.aisleId] == nil {
-                    aisleGroups[location.aisleId] = []
-                }
-                aisleGroups[location.aisleId]?.append(item)
-            } else {
-                // If no specific location, use category-based mapping
-                let aisleId = mapCategoryToAisle(category: item.category)
-                if aisleGroups[aisleId] == nil {
-                    aisleGroups[aisleId] = []
-                }
-                aisleGroups[aisleId]?.append(item)
+            // Always use category-based mapping since product locations use random UUIDs
+            let aisleId = mapCategoryToAisle(category: item.category)
+            print("🗺️ Mapping \(item.name) (category: \(item.category)) -> aisle: \(aisleId)")
+            
+            if aisleGroups[aisleId] == nil {
+                aisleGroups[aisleId] = []
             }
+            aisleGroups[aisleId]?.append(item)
+        }
+        
+        print("🗺️ Grouped into \(aisleGroups.count) aisles: \(Array(aisleGroups.keys))")
+        
+        if aisleGroups.isEmpty {
+            throw RouteOptimizationError.noProductsFound
         }
         
         return aisleGroups
@@ -106,17 +129,20 @@ class RouteOptimizationManager: ObservableObject {
     
     private func mapCategoryToAisle(category: String) -> String {
         switch category.lowercased() {
-        case "produce": return "PRODUCE"
-        case "meat & seafood": return "MEAT"
-        case "dairy": return "DAIRY"
-        case "frozen": return "FROZEN"
-        case "bakery": return "BAKERY"
-        case "pantry": return "A1"
-        case "snacks": return "A2"
-        case "beverages": return "A2"
-        case "household": return "A3"
-        case "personal care": return "A3"
-        default: return "A1" // Default to pantry aisle
+        case "produce", "fruits", "vegetables": return "PRODUCE"
+        case "meat & seafood", "meat", "seafood", "deli": return "MEAT"
+        case "dairy", "milk", "cheese", "yogurt": return "DAIRY"
+        case "frozen", "frozen foods": return "FROZEN"
+        case "bakery", "bread", "baked goods": return "BAKERY"
+        case "bulk", "bulk foods", "grains", "nuts": return "BULK"
+        case "pantry", "canned goods", "pasta", "rice": return "A1"
+        case "snacks", "chips", "crackers": return "A2"
+        case "beverages", "drinks", "soda", "water", "juice": return "A2"
+        case "household", "cleaning", "paper goods": return "A3"
+        case "personal care", "health", "beauty", "pharmacy": return "A3"
+        default: 
+            print("⚠️ Unknown category '\(category)', defaulting to A1")
+            return "A1" // Default to pantry aisle
         }
     }
     
@@ -516,44 +542,15 @@ class RouteOptimizationManager: ObservableObject {
             currentPosition = waypoint.position
         }
         
-        // Add distance to checkout
-        let checkoutDistance = sqrt(pow(currentPosition.x - storeLayout.checkouts.first!.position.x, 2) + pow(currentPosition.y - storeLayout.checkouts.first!.position.y, 2))
-        totalDistance += checkoutDistance
-        totalTime += checkoutDistance / 1.2
-        totalTime += 120 // 2 minutes for checkout process
+        // Add distance to exit
+        let exitDistance = sqrt(pow(currentPosition.x - storeLayout.exits.first!.x, 2) + pow(currentPosition.y - storeLayout.exits.first!.y, 2))
+        totalDistance += exitDistance
+        totalTime += exitDistance / 1.2
         
         return (totalDistance, totalTime / 60) // Convert to minutes
     }
     
-    // MARK: - Checkout Selection
-    
-    private func getBestCheckout(for groceryList: GroceryList, storeLayout: StoreLayout) -> CheckoutLocation {
-        let itemCount = groceryList.groceryItems.count
-        
-        // Smart checkout selection
-        if itemCount <= 15 {
-            // Try express lane first
-            if let expressCheckout = storeLayout.checkouts.first(where: { checkout in
-                // For now, just return the first available checkout
-                true
-            }) {
-                return expressCheckout
-            }
-        }
-        
-        if itemCount <= 25 {
-            // Try self-service for medium sized orders
-            if let selfService = storeLayout.checkouts.first(where: { checkout in
-                // For now, just return the first available checkout
-                true
-            }) {
-                return selfService
-            }
-        }
-        
-        // Default to regular checkout
-        return storeLayout.checkouts.first!
-    }
+
     
     // MARK: - Route Progress Tracking
     
@@ -638,14 +635,14 @@ class RouteOptimizationManager: ObservableObject {
             currentPosition = waypoint.position
         }
         
-        // Final instruction to checkout
+        // Final instruction to exit
         instructions.append(NavigationInstruction(
             id: UUID(),
             step: instructions.count + 1,
-            instruction: "Proceed to checkout",
-            distance: sqrt(pow(currentPosition.x - storeLayout.checkouts.first!.position.x, 2) + pow(currentPosition.y - storeLayout.checkouts.first!.position.y, 2)),
-            direction: calculateDirection(from: currentPosition, to: storeLayout.checkouts.first!.position),
-            aisleTarget: "CHECKOUT"
+            instruction: "Proceed to store exit",
+            distance: sqrt(pow(currentPosition.x - storeLayout.exits.first!.x, 2) + pow(currentPosition.y - storeLayout.exits.first!.y, 2)),
+            direction: calculateDirection(from: currentPosition, to: storeLayout.exits.first!),
+            aisleTarget: "EXIT"
         ))
         
         return instructions
@@ -734,13 +731,13 @@ enum RouteOptimizationError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .storeLayoutNotFound:
-            return "Store layout not found"
+            return "Store layout not found. Please select a different store or try again."
         case .invalidGroceryList:
-            return "Invalid grocery list"
+            return "Invalid grocery list. Please add items to your list before generating a route."
         case .noProductsFound:
-            return "No products found in store"
+            return "No products found in store. Please add items to your grocery list."
         case .routeGenerationFailed:
-            return "Failed to generate route"
+            return "Failed to generate route. Please try again or contact support."
         }
     }
 } 

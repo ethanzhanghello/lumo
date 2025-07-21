@@ -39,7 +39,7 @@ class AuthViewModel: ObservableObject {
     @Published var email = ""
     @Published var password = ""
     @Published var errorMessage: String?
-    @Published var isAuthenticated = false
+    @Published var isAuthenticated = true  // Set to true to skip login for development
     @Published var profilePictureURL: String?
     @Published var allergies: [String] = []
     @Published var preferredCuisines: [String] = []

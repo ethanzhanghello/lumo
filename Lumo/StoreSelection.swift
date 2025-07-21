@@ -12,7 +12,7 @@ import MapKit // Import MapKit for the Map view
 struct StoreSelectionView: View {
     let stores: [Store]
     @EnvironmentObject var appState: AppState // Keep AppState
-    // Removed @Binding var showStoreSelection: Bool
+    @Environment(\.dismiss) private var dismiss
 
     // State to manage the currently displayed store's index
     @State private var currentStoreIndex: Int = 0
@@ -148,7 +148,7 @@ struct StoreSelectionView: View {
                         print("Selected store: \(currentStore.name)")
                         // This action will trigger the .onReceive in RootView
                         appState.selectedStore = currentStore
-                        // No explicit dismiss or navigation here
+                        dismiss()
                     }) {
                         Text("Select This Store")
                             .font(.headline)

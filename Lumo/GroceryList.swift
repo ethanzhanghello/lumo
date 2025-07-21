@@ -47,8 +47,8 @@ class GroceryList: ObservableObject {
     }
     
     var estimatedTimeMinutes: Int {
-        // Estimate 2 minutes per item plus 5 minutes for checkout
-        return totalItems * 2 + 5
+        // Estimate 2 minutes per item for shopping
+        return totalItems * 2
     }
     
     // MARK: - Initialization
@@ -99,19 +99,10 @@ class GroceryList: ObservableObject {
         groceryItems.removeAll()
     }
     
-    func checkout() -> CheckoutResult {
-        let total = totalCost
-        let itemCount = totalItems
-        
-        // Clear the list after checkout
-        clearAll()
-        
-        return CheckoutResult(
-            success: true,
-            message: "Successfully checked out \(itemCount) items for $\(String(format: "%.2f", total))",
-            totalCost: total,
-            itemCount: itemCount
-        )
+    func saveToHistory() {
+        // Save current list to shopping history
+        // This would integrate with a proper shopping history system
+        print("Saving grocery list with \(totalItems) items to history")
     }
     
     // MARK: - Private Methods
@@ -129,10 +120,9 @@ class GroceryList: ObservableObject {
     }
 }
 
-// MARK: - Checkout Result
-struct CheckoutResult {
+// MARK: - Shopping History Result
+struct SaveListResult {
     let success: Bool
     let message: String
-    let totalCost: Double
     let itemCount: Int
 }

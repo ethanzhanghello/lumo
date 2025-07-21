@@ -620,10 +620,11 @@ struct ChatbotView: View {
         // Enhanced batch planning action
         case .addToCart:
             if let recipe = message.recipe {
-                // Start batch planning workflow
-                batchMeals = []
-                selectedRecipeForPlanning = recipe
-                showBatchPlanningSheet = true
+                // Add recipe ingredients to grocery list
+                addRecipeIngredientsToGroceryList(recipe)
+            } else {
+                // Parse ingredients from AI-generated text and add to grocery list
+                addIngredientsFromTextToGroceryList(message.content)
             }
             
         // Add missing cases
@@ -684,32 +685,134 @@ struct ChatbotView: View {
     }
     
     // MARK: - Action Implementations
-    private func addRecipeIngredientsToList(_ recipe: Recipe) {
+    private func addRecipeIngredientsToGroceryList(_ recipe: Recipe) {
+        guard let store = appState.selectedStore else {
+            showConfirmationToast("Please select a store first!")
+            return
+        }
+        
+        var addedCount = 0
+        
         // Add all recipe ingredients to the grocery list
         for ingredient in recipe.ingredients {
-            _ = GroceryItem(
+            let groceryItem = GroceryItem(
                 name: ingredient.name,
-                description: ingredient.notes ?? "",
+                description: ingredient.notes ?? "From \(recipe.name)",
                 price: ingredient.estimatedPrice,
-                category: "Produce",
+                category: mapIngredientToCategory(ingredient.name),
                 aisle: ingredient.aisle,
                 brand: "",
                 hasDeal: false,
                 dealDescription: nil
             )
+            
+            appState.groceryList.addItem(groceryItem, store: store)
+            addedCount += 1
+        }
+        
+        showConfirmationToast("Added \(addedCount) ingredients to your grocery list!")
+        
+        // Haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+        impactFeedback.impactOccurred()
+    }
+    
+    private func addIngredientsFromTextToGroceryList(_ content: String) {
+        guard let store = appState.selectedStore else {
+            showConfirmationToast("Please select a store first!")
+            return
+        }
+        
+        let ingredients = extractIngredientsFromMessage(content)
+        var addedCount = 0
+        
+        for ingredient in ingredients {
+            let groceryItem = GroceryItem(
+                name: ingredient,
+                description: "From AI meal plan",
+                price: estimateIngredientPrice(ingredient),
+                category: mapIngredientToCategory(ingredient),
+                aisle: mapIngredientToAisle(ingredient),
+                brand: "",
+                hasDeal: false,
+                dealDescription: nil
+            )
+            
+            appState.groceryList.addItem(groceryItem, store: store)
+            addedCount += 1
+        }
+        
+        if addedCount > 0 {
+            showConfirmationToast("Added \(addedCount) ingredients to your grocery list!")
+            
+            // Haptic feedback
+            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+            impactFeedback.impactOccurred()
+        } else {
+            showConfirmationToast("No ingredients found to add.")
+        }
+    }
+    
+    private func mapIngredientToCategory(_ ingredient: String) -> String {
+        let lowercased = ingredient.lowercased()
+        
+        if lowercased.contains("chicken") || lowercased.contains("beef") || lowercased.contains("pork") || lowercased.contains("salmon") || lowercased.contains("fish") || lowercased.contains("meat") {
+            return "Meat & Seafood"
+        } else if lowercased.contains("onion") || lowercased.contains("garlic") || lowercased.contains("tomato") || lowercased.contains("lettuce") || lowercased.contains("pepper") || lowercased.contains("herb") {
+            return "Produce"
+        } else if lowercased.contains("milk") || lowercased.contains("cheese") || lowercased.contains("yogurt") || lowercased.contains("butter") || lowercased.contains("cream") {
+            return "Dairy"
+        } else if lowercased.contains("pasta") || lowercased.contains("rice") || lowercased.contains("bread") || lowercased.contains("flour") {
+            return "Pantry"
+        } else if lowercased.contains("oil") || lowercased.contains("sauce") || lowercased.contains("spice") || lowercased.contains("oregano") || lowercased.contains("salt") || lowercased.contains("pepper") {
+            return "Condiments & Spices"
+        } else {
+            return "Grocery"
+        }
+    }
+    
+    private func mapIngredientToAisle(_ ingredient: String) -> Int {
+        let lowercased = ingredient.lowercased()
+        
+        if lowercased.contains("chicken") || lowercased.contains("beef") || lowercased.contains("pork") || lowercased.contains("salmon") || lowercased.contains("fish") || lowercased.contains("meat") {
+            return 5  // Meat aisle
+        } else if lowercased.contains("onion") || lowercased.contains("garlic") || lowercased.contains("tomato") || lowercased.contains("lettuce") || lowercased.contains("pepper") || lowercased.contains("herb") {
+            return 1  // Produce aisle
+        } else if lowercased.contains("milk") || lowercased.contains("cheese") || lowercased.contains("yogurt") || lowercased.contains("butter") || lowercased.contains("cream") {
+            return 3  // Dairy aisle
+        } else if lowercased.contains("pasta") || lowercased.contains("rice") || lowercased.contains("bread") || lowercased.contains("flour") {
+            return 4  // Pantry aisle
+        } else {
+            return 2  // Default aisle
+        }
+    }
+    
+    private func estimateIngredientPrice(_ ingredient: String) -> Double {
+        let lowercased = ingredient.lowercased()
+        
+        if lowercased.contains("chicken") || lowercased.contains("beef") || lowercased.contains("pork") || lowercased.contains("salmon") || lowercased.contains("fish") || lowercased.contains("meat") {
+            return 8.99  // Meat prices
+        } else if lowercased.contains("cheese") {
+            return 4.99
+        } else if lowercased.contains("pasta") || lowercased.contains("rice") {
+            return 2.49
+        } else if lowercased.contains("sauce") || lowercased.contains("oil") {
+            return 3.99
+        } else {
+            return 2.99  // Default price
         }
     }
     
     private func addProductToList(_ product: Product) {
         _ = GroceryItem(
             name: product.name,
-            description: product.description,
-            price: product.price,
+            description: product.description ?? "No description available",
+            price: product.basePrice,
             category: product.category,
-            aisle: product.aisle,
-            brand: product.brand,
-            hasDeal: product.dealType != nil,
-            dealDescription: product.dealType?.rawValue
+            aisle: 1, // Default aisle since Product doesn't have aisle property
+            brand: product.brand ?? "Generic",
+            hasDeal: false, // Product doesn't have dealType property
+            dealDescription: nil
         )
     }
     
@@ -1359,10 +1462,10 @@ struct NutritionSheet: View {
             Text(recipe.name)
                 .font(.title2)
                 .bold()
-            Text("Calories: \(recipe.nutritionInfo.calories)")
-            Text("Protein: \(recipe.nutritionInfo.protein, specifier: "%.1f")g")
-            Text("Carbs: \(recipe.nutritionInfo.carbs, specifier: "%.1f")g")
-            Text("Fat: \(recipe.nutritionInfo.fat, specifier: "%.1f")g")
+            Text("Calories: \(recipe.nutritionInfo.calories ?? 0)")
+            Text("Protein: \(recipe.nutritionInfo.protein ?? 0.0, specifier: "%.1f")g")
+            Text("Carbs: \(recipe.nutritionInfo.carbs ?? 0.0, specifier: "%.1f")g")
+            Text("Fat: \(recipe.nutritionInfo.fat ?? 0.0, specifier: "%.1f")g")
             if let fiber = recipe.nutritionInfo.fiber {
                 Text("Fiber: \(fiber, specifier: "%.1f")g")
             }
@@ -1403,10 +1506,10 @@ struct ProductNutritionSheet: View {
                                     .foregroundColor(.white)
                                 
                                 VStack(spacing: 8) {
-                                    NutritionRow(label: "Calories", value: "\(nutrition.calories)")
-                                    NutritionRow(label: "Protein", value: String(format: "%.1f", nutrition.protein) + "g")
-                                    NutritionRow(label: "Carbs", value: String(format: "%.1f", nutrition.carbs) + "g")
-                                    NutritionRow(label: "Fat", value: String(format: "%.1f", nutrition.fat) + "g")
+                                    NutritionRow(label: "Calories", value: "\(nutrition.calories ?? 0)")
+                                    NutritionRow(label: "Protein", value: String(format: "%.1f", nutrition.protein ?? 0.0) + "g")
+                                    NutritionRow(label: "Carbs", value: String(format: "%.1f", nutrition.carbs ?? 0.0) + "g")
+                                    NutritionRow(label: "Fat", value: String(format: "%.1f", nutrition.fat ?? 0.0) + "g")
                                     if let fiber = nutrition.fiber {
                                         NutritionRow(label: "Fiber", value: String(format: "%.1f", fiber) + "g")
                                     }
@@ -2170,10 +2273,10 @@ struct RecipeNutritionSheet: View {
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
                             
-                            NutritionRow(label: "Calories", value: "\(nutrition.calories)")
-                            NutritionRow(label: "Protein", value: "\(nutrition.protein)g")
-                            NutritionRow(label: "Carbs", value: "\(nutrition.carbs)g")
-                            NutritionRow(label: "Fat", value: "\(nutrition.fat)g")
+                            NutritionRow(label: "Calories", value: "\(nutrition.calories ?? 0)")
+                            NutritionRow(label: "Protein", value: String(format: "%.1f", nutrition.protein ?? 0.0) + "g")
+                            NutritionRow(label: "Carbs", value: String(format: "%.1f", nutrition.carbs ?? 0.0) + "g")
+                            NutritionRow(label: "Fat", value: String(format: "%.1f", nutrition.fat ?? 0.0) + "g")
                         }
                     }
                     .padding()

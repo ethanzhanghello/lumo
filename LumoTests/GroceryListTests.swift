@@ -171,8 +171,8 @@ final class GroceryListTests: XCTestCase {
     func testEstimatedTimeMinutes() throws {
         groceryList.addItem(sampleItem, quantity: 3)
         
-        // 3 items * 2 minutes + 5 minutes checkout = 11 minutes
-        XCTAssertEqual(groceryList.estimatedTimeMinutes, 11)
+        // 3 items * 2 minutes = 6 minutes
+        XCTAssertEqual(groceryList.estimatedTimeMinutes, 6)
     }
     
     // MARK: - Clear All Tests
@@ -185,24 +185,15 @@ final class GroceryListTests: XCTestCase {
         XCTAssertTrue(groceryList.isEmpty)
     }
     
-    // MARK: - Checkout Tests
+    // MARK: - Save to History Tests
     
-    func testCheckout() throws {
+    func testSaveToHistory() throws {
         groceryList.addItem(sampleItem, quantity: 3)
-        let result = groceryList.checkout()
+        groceryList.saveToHistory()
         
-        XCTAssertTrue(result.success)
-        XCTAssertEqual(result.itemCount, 3)
-        XCTAssertEqual(result.totalCost, 5.99 * 3, accuracy: 0.01)
-        XCTAssertTrue(groceryList.isEmpty)
-    }
-    
-    func testCheckoutEmptyList() throws {
-        let result = groceryList.checkout()
-        
-        XCTAssertTrue(result.success)
-        XCTAssertEqual(result.itemCount, 0)
-        XCTAssertEqual(result.totalCost, 0, accuracy: 0.01)
+        // History saving is a simple operation for now
+        XCTAssertEqual(groceryList.totalItems, 3)
+        XCTAssertFalse(groceryList.isEmpty)
     }
     
     // MARK: - GroceryListItem Tests

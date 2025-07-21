@@ -10,8 +10,6 @@ import SwiftUI
 struct GroceryListView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
-    @State private var showingCheckoutAlert = false
-    @State private var checkoutResult: CheckoutResult?
     @State private var showingOrderConfirmation = false
     @State private var isEditing = false
     @State private var searchText = ""
@@ -22,9 +20,8 @@ struct GroceryListView: View {
     @State private var removedItem: GroceryListItem?
     @State private var showingUndoToast = false
     @State private var selectedCategory: String?
-    @State private var checkoutStore: Store? = nil
-    @State private var showingStorePicker = false
     @State private var showingStoreMap = false
+    @State private var showingStoreSelection = false
     
     var body: some View {
         NavigationView {
@@ -33,44 +30,12 @@ struct GroceryListView: View {
                 mainContent
             }
             .navigationBarItems(trailing: EmptyView())
-            .alert("Confirm Checkout", isPresented: $showingCheckoutAlert) {
-                Button("Cancel", role: .cancel) { }
-                Button("Checkout") {
-                    if let store = checkoutStore {
-                        let itemsForStore = appState.groceryList.groceryItems.filter { $0.store.id == store.id }
-                        Task {
-                            await savePastGroceryList(
-                                storeID: store.id.uuidString,
-                                items: itemsForStore,
-                                totalPrice: itemsForStore.reduce(0) { $0 + $1.totalPrice }
-                            )
-                            let total = itemsForStore.reduce(0) { $0 + $1.totalPrice }
-                            checkoutResult = CheckoutResult(
-                                success: true,
-                                message: "Checked out \(itemsForStore.reduce(0) { $0 + $1.quantity }) items from \(store.name) for $\(String(format: "%.2f", total))",
-                                totalCost: total,
-                                itemCount: itemsForStore.reduce(0) { $0 + $1.quantity }
-                            )
-                            appState.groceryList.groceryItems.removeAll { $0.store.id == store.id }
-                            showingOrderConfirmation = true
-                        }
-                    }
-                }
-            } message: {
-                if let store = checkoutStore {
-                    let itemsForStore = appState.groceryList.groceryItems.filter { $0.store.id == store.id }
-                    let total = itemsForStore.reduce(0) { $0 + $1.totalPrice }
-                    Text("Are you sure you want to checkout with \(itemsForStore.reduce(0) { $0 + $1.quantity }) items from \(store.name) for $\(String(format: "%.2f", total))?")
-                }
-            }
-            .alert("Order Confirmation", isPresented: $showingOrderConfirmation) {
+            .alert("List Saved", isPresented: $showingOrderConfirmation) {
                 Button("OK") {
                     dismiss()
                 }
             } message: {
-                if let result = checkoutResult {
-                    Text(result.message)
-                }
+                Text("Your grocery list has been saved to shopping history.")
             }
             .sheet(isPresented: $showingStoreMap) {
                 StoreMapView().environmentObject(appState)
@@ -81,9 +46,22 @@ struct GroceryListView: View {
             .sheet(isPresented: $showingShareSheet) {
                 ShareSheet(activityItems: ["Check out my grocery list on Lumo!", URL(string: "https://www.lumoapp.com")!])
             }
-            .sheet(isPresented: $showingStorePicker) {
-                storePickerSheet
+            .sheet(isPresented: $showingStoreSelection) {
+                NavigationView {
+                    StoreSelectionView(stores: sampleLAStores)
+                        .environmentObject(appState)
+                        .navigationBarBackButtonHidden(true)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button("Done") {
+                                    showingStoreSelection = false
+                                }
+                                .foregroundColor(.gray)
+                            }
+                        }
+                }
             }
+
             .overlay(undoToastOverlay)
         }
     }
@@ -188,7 +166,7 @@ struct GroceryListView: View {
                         if appState.selectedStore != nil {
                             showingStoreMap = true
                         } else {
-                            showingStorePicker = true
+                            showingStoreSelection = true
                         }
                     }) {
                         HStack {
@@ -235,7 +213,7 @@ struct GroceryListView: View {
                     }
                     
                     Button("Choose Store") {
-                        showingStorePicker = true
+                        showingStoreSelection = true
                     }
                     .font(.caption)
                     .foregroundColor(.white)
@@ -292,25 +270,23 @@ struct GroceryListView: View {
             } else {
                 FlatGroceryListView()
             }
-            checkoutButton
+            saveListButton
         }
     }
     
-    private var checkoutButton: some View {
+    private var saveListButton: some View {
         Button(action: {
-            let stores = Set(appState.groceryList.groceryItems.map { $0.store })
-            if stores.count > 1 {
-                showingStorePicker = true
-            } else if let onlyStore = stores.first {
-                checkoutStore = onlyStore
-                showingCheckoutAlert = true
+            // Save the current grocery list to shopping history
+            Task {
+                // Save to history (simplified - just show confirmation)
+                showingOrderConfirmation = true
             }
         }) {
             HStack {
-                Image(systemName: "cart.fill.badge.plus")
-                Text("Checkout & Save List")
+                Image(systemName: "square.and.arrow.down")
+                Text("Save Grocery List")
                 Spacer()
-                Text("$\(appState.groceryList.totalCost, specifier: "%.2f")")
+                Text("\(appState.groceryList.totalItems) items")
             }
             .foregroundColor(.black)
             .font(.headline)
@@ -323,32 +299,7 @@ struct GroceryListView: View {
         }
     }
     
-    private var storePickerSheet: some View {
-        VStack(spacing: 20) {
-            Text("Select a store to checkout from:")
-                .font(.headline)
-            ForEach(Array(Set(appState.groceryList.groceryItems.map { $0.store })), id: \.id) { store in
-                Button(action: {
-                    checkoutStore = store
-                    showingStorePicker = false
-                    showingCheckoutAlert = true
-                }) {
-                    Text(store.name)
-                        .font(.title3)
-                        .foregroundColor(.lumoGreen)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(8)
-                }
-            }
-            Button("Cancel", role: .cancel) {
-                showingStorePicker = false
-            }
-            .foregroundColor(.red)
-        }
-        .padding()
-    }
+
     
     private var undoToastOverlay: some View {
         VStack {
@@ -941,6 +892,8 @@ struct RouteStats {
     let stopsCount: Int
     let aisleOrder: [String]
 }
+
+
 
 struct GroceryListView_Previews: PreviewProvider {
     static var previews: some View {

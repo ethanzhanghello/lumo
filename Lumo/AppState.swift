@@ -326,6 +326,20 @@ class AppState: ObservableObject {
         return currentStoreProducts.contains { $0.productId == item.id }
     }
     
+    // MARK: - Favorites Management
+    func addRecipeToFavorites(_ recipe: Recipe) {
+        // For now, we'll store recipes as a mock implementation
+        // In a real app, you'd have a favoriteRecipes array
+        print("Added recipe \(recipe.name) to favorites")
+    }
+    
+    func addProductToFavorites(_ product: Product) {
+        if !favoriteProducts.contains(where: { $0.id == product.id }) {
+            favoriteProducts.append(product)
+            print("Added product \(product.name) to favorites")
+        }
+    }
+    
     func estimateMealPlanCost() -> Double {
         return Double.random(in: 45...120)
     }

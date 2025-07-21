@@ -337,144 +337,39 @@ struct ModernProductCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // Product Header
-            HStack(spacing: 16) {
-                // Product Image
-                AsyncImage(url: URL(string: product.imageURL)) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(
-                                LinearGradient(
-                                    colors: [.blue.opacity(0.3), .purple.opacity(0.2)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                        
-                        Image(systemName: "cube.box")
-                            .font(.system(size: 24, weight: .medium))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                }
-                .frame(width: 80, height: 80)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-                
-                VStack(alignment: .leading, spacing: 8) {
+            // Simple Product Card
+            HStack {
+                VStack(alignment: .leading) {
                     Text(product.name)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.headline)
                         .foregroundColor(.white)
-                        .lineLimit(2)
-                    
-                    Text(product.brand)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.white.opacity(0.7))
-                    
-                    // Price
-                    HStack(spacing: 8) {
-                        Text("$\(String(format: "%.2f", product.price))")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.green)
-                        
-                        if let discountPrice = product.discountPrice {
-                            Text("$\(String(format: "%.2f", discountPrice))")
-                                .font(.system(size: 12, weight: .medium))
-                                .strikethrough()
-                                .foregroundColor(.white.opacity(0.5))
-                        }
-                    }
+                    Text(product.brand ?? "Generic")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                    Text("$\(String(format: "%.2f", product.basePrice))")
+                        .font(.subheadline)
+                        .foregroundColor(.green)
                 }
-                
                 Spacer()
-                
-                VStack(alignment: .trailing, spacing: 8) {
-                    // Aisle Badge
-                    Text("A\(product.aisle)")
-                        .font(.system(size: 12, weight: .bold))
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule()
-                                .fill(Color.blue.opacity(0.2))
-                                .overlay(
-                                    Capsule()
-                                        .stroke(Color.blue.opacity(0.3), lineWidth: 1)
-                                )
-                        )
-                        .foregroundColor(.blue)
-                    
-                    // Deal Badge
-                    if product.dealType != nil {
-                        Text("DEAL")
-                            .font(.system(size: 10, weight: .bold))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(
-                                Capsule()
-                                    .fill(Color.red.opacity(0.2))
-                                    .overlay(
-                                        Capsule()
-                                            .stroke(Color.red.opacity(0.3), lineWidth: 1)
-                                    )
-                            )
-                            .foregroundColor(.red)
+            }
+            
+            // Simple action buttons
+            HStack {
+                ForEach(actionButtons, id: \.id) { button in
+                    Button(button.title) {
+                        onAction(button.action)
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
                 }
-            }
-            
-            // Product Details
-            VStack(alignment: .leading, spacing: 12) {
-                if !product.description.isEmpty {
-                    Text(product.description)
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(.white.opacity(0.8))
-                        .lineLimit(3)
-                }
-                
-                // Category and Brand Info
-                HStack(spacing: 16) {
-                    ProductInfoBadge(icon: "tag", text: product.category)
-                    ProductInfoBadge(icon: "building.2", text: product.brand)
-                }
-            }
-            
-            // Action Buttons
-            ModernActionButtonsView(buttons: actionButtons) { action in
-                onAction(action)
-            }
+                         }
         }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.08),
-                            Color.white.opacity(0.03)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
-        .opacity(showContent ? 1 : 0)
-        .offset(y: showContent ? 0 : 20)
-        .onAppear {
-            withAnimation(.easeOut(duration: 0.5).delay(0.2)) {
-                showContent = true
-            }
-        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
     }
 }
 

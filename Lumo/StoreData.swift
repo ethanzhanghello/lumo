@@ -480,6 +480,106 @@ struct RouteWaypoint: Identifiable, Codable, Hashable {
 // MARK: - Sample Store Layouts for YOUR Existing Stores
 
 let sampleStoreLayouts: [StoreLayout] = [
+    // Lumo Downtown LA - Main Store
+    StoreLayout(
+        storeId: UUID(uuidString: "94D35934-26DF-4109-9634-54CA3DEAB9A0")!, // Lumo Downtown LA
+        entrance: Coordinate(x: 2.0, y: 0.0),
+        exits: [
+            Coordinate(x: 2.0, y: 0.0),   // Main entrance/exit
+            Coordinate(x: 48.0, y: 0.0)   // Secondary exit
+        ],
+        checkouts: [
+            CheckoutLocation(position: Coordinate(x: 40.0, y: 4.0), type: .regular, maxItems: nil),
+            CheckoutLocation(position: Coordinate(x: 42.0, y: 4.0), type: .regular, maxItems: nil),
+            CheckoutLocation(position: Coordinate(x: 44.0, y: 4.0), type: .express, maxItems: 15),
+            CheckoutLocation(position: Coordinate(x: 46.0, y: 4.0), type: .selfService, maxItems: nil)
+        ],
+        aisles: [
+            // Produce Section
+            Aisle(aisleId: "PRODUCE", name: "Fresh Produce", 
+                  bounds: [Coordinate(x: 4, y: 6), Coordinate(x: 18, y: 6), Coordinate(x: 18, y: 12), Coordinate(x: 4, y: 12)],
+                  centerPoint: Coordinate(x: 11, y: 9), category: .produce,
+                  subSections: [
+                      AisleSubSection(name: "Fruits", position: Coordinate(x: 7, y: 8), side: .left),
+                      AisleSubSection(name: "Vegetables", position: Coordinate(x: 11, y: 8), side: .center),
+                      AisleSubSection(name: "Organic", position: Coordinate(x: 15, y: 8), side: .right)
+                  ]),
+            
+            // Dairy Section
+            Aisle(aisleId: "DAIRY", name: "Dairy & Eggs",
+                  bounds: [Coordinate(x: 20, y: 6), Coordinate(x: 34, y: 6), Coordinate(x: 34, y: 12), Coordinate(x: 20, y: 12)],
+                  centerPoint: Coordinate(x: 27, y: 9), category: .dairy,
+                  subSections: [
+                      AisleSubSection(name: "Milk & Yogurt", position: Coordinate(x: 24, y: 9), side: .center),
+                      AisleSubSection(name: "Cheese", position: Coordinate(x: 30, y: 9), side: .center)
+                  ]),
+            
+            // Meat & Seafood
+            Aisle(aisleId: "MEAT", name: "Meat & Seafood",
+                  bounds: [Coordinate(x: 36, y: 6), Coordinate(x: 50, y: 6), Coordinate(x: 50, y: 12), Coordinate(x: 36, y: 12)],
+                  centerPoint: Coordinate(x: 43, y: 9), category: .meat,
+                  subSections: [
+                      AisleSubSection(name: "Fresh Meat", position: Coordinate(x: 40, y: 9), side: .center),
+                      AisleSubSection(name: "Seafood", position: Coordinate(x: 46, y: 9), side: .center)
+                  ]),
+            
+            // Pantry Aisles
+            Aisle(aisleId: "A1", name: "Aisle 1 - Pantry Staples",
+                  bounds: [Coordinate(x: 4, y: 14), Coordinate(x: 18, y: 14), Coordinate(x: 18, y: 20), Coordinate(x: 4, y: 20)],
+                  centerPoint: Coordinate(x: 11, y: 17), category: .pantry,
+                  subSections: [
+                      AisleSubSection(name: "Canned Goods", position: Coordinate(x: 7, y: 17), side: .left),
+                      AisleSubSection(name: "Pasta & Rice", position: Coordinate(x: 11, y: 17), side: .center),
+                      AisleSubSection(name: "Sauces", position: Coordinate(x: 15, y: 17), side: .right)
+                  ]),
+            
+            Aisle(aisleId: "A2", name: "Aisle 2 - Snacks & Beverages",
+                  bounds: [Coordinate(x: 20, y: 14), Coordinate(x: 34, y: 14), Coordinate(x: 34, y: 20), Coordinate(x: 20, y: 20)],
+                  centerPoint: Coordinate(x: 27, y: 17), category: .snacks,
+                  subSections: [
+                      AisleSubSection(name: "Snacks", position: Coordinate(x: 24, y: 17), side: .center),
+                      AisleSubSection(name: "Beverages", position: Coordinate(x: 30, y: 17), side: .center)
+                  ]),
+            
+            Aisle(aisleId: "A3", name: "Aisle 3 - Household & Personal Care",
+                  bounds: [Coordinate(x: 36, y: 14), Coordinate(x: 50, y: 14), Coordinate(x: 50, y: 20), Coordinate(x: 36, y: 20)],
+                  centerPoint: Coordinate(x: 43, y: 17), category: .household,
+                  subSections: [
+                      AisleSubSection(name: "Cleaning", position: Coordinate(x: 40, y: 17), side: .center),
+                      AisleSubSection(name: "Personal Care", position: Coordinate(x: 46, y: 17), side: .center)
+                  ]),
+            
+            // Frozen Section
+            Aisle(aisleId: "FROZEN", name: "Frozen Foods",
+                  bounds: [Coordinate(x: 4, y: 22), Coordinate(x: 25, y: 22), Coordinate(x: 25, y: 28), Coordinate(x: 4, y: 28)],
+                  centerPoint: Coordinate(x: 14, y: 25), category: .frozen,
+                  subSections: [
+                      AisleSubSection(name: "Frozen Meals", position: Coordinate(x: 10, y: 25), side: .center),
+                      AisleSubSection(name: "Ice Cream", position: Coordinate(x: 20, y: 25), side: .center)
+                  ]),
+            
+            // Bakery
+            Aisle(aisleId: "BAKERY", name: "Fresh Bakery",
+                  bounds: [Coordinate(x: 27, y: 22), Coordinate(x: 50, y: 22), Coordinate(x: 50, y: 28), Coordinate(x: 27, y: 28)],
+                  centerPoint: Coordinate(x: 38, y: 25), category: .bakery,
+                  subSections: [
+                      AisleSubSection(name: "Fresh Bread", position: Coordinate(x: 32, y: 25), side: .center),
+                      AisleSubSection(name: "Pastries", position: Coordinate(x: 44, y: 25), side: .center)
+                  ])
+        ],
+        connectivityGraph: ConnectivityGraph(
+            nodes: [
+                ConnectivityNode(position: Coordinate(x: 2.0, y: 0.0), nodeType: .entrance, connectedAisles: ["PRODUCE"]),
+                ConnectivityNode(position: Coordinate(x: 11, y: 9), nodeType: .aisleEntry, connectedAisles: ["PRODUCE"]),
+                ConnectivityNode(position: Coordinate(x: 27, y: 9), nodeType: .aisleEntry, connectedAisles: ["DAIRY"]),
+                ConnectivityNode(position: Coordinate(x: 43, y: 9), nodeType: .aisleEntry, connectedAisles: ["MEAT"]),
+                ConnectivityNode(position: Coordinate(x: 42, y: 4), nodeType: .checkout, connectedAisles: [])
+            ],
+            edges: []
+        ),
+        mapDimensions: MapDimensions(width: 60.0, height: 35.0)
+    ),
+    
     // Berkeley Bowl - Large Organic Grocery Store
     StoreLayout(
         storeId: UUID(uuidString: "87782BFC-4087-4E8E-834F-79386FCB064E")!, // Berkeley Bowl

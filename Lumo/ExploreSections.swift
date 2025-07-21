@@ -581,8 +581,8 @@ struct FeaturedItemsSection: View {
         
         let collections: [(String, [StoreProduct])] = [
             ("Flash Deals", storeProducts.filter { $0.dealType != nil }),
-            ("Popular This Week", storeProducts.filter { 
-                let productItem = sampleGroceryItems.first { $0.id == $0.productId }
+            ("Popular This Week", storeProducts.filter { storeProduct in
+                let productItem = sampleGroceryItems.first { $0.id == storeProduct.productId }
                 return productItem?.name.contains("Organic") == true || productItem?.name.contains("Fresh") == true
             }),
             ("New Arrivals", storeProducts.filter { 

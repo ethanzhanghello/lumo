@@ -19,51 +19,43 @@ struct AutoFillView: View {
     @State private var replaceExistingMeals = false // New option
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Custom Header
-            HStack {
-                Button("Cancel") {
-                    dismiss()
+        NavigationView {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Main Content
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            // Day Selection
+                            daySelectionSection
+                            
+                            // Preferences
+                            preferencesSection
+                            
+                            // Generate Button
+                            generateButton
+                            
+                            // Bottom spacing for safe scrolling
+                            Color.clear.frame(height: 20)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
+                    }
                 }
-                .foregroundColor(.gray)
-                
-                Spacer()
-                
-                Text("Auto-Fill Week")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                
-                Spacer()
-                
-                Color.clear.frame(width: 60)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(Color.black)
-            
-            // Main Content
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Day Selection
-                    daySelectionSection
-                    
-                    // Preferences
-                    preferencesSection
-                    
-                    // Generate Button
-                    generateButton
-                    
-                    // Bottom spacing for safe scrolling
-                    Color.clear.frame(height: 20)
+            .navigationTitle("Auto-Fill Week")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden()
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundColor(.gray)
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
             }
-            .background(Color.black)
         }
-        .background(Color.black)
-        .ignoresSafeArea()
         .sheet(isPresented: $showingPreview) {
             AutoFillPreviewView(meals: generatedMeals, weekStart: weekStartDate) {
                 applyAutoFill()
