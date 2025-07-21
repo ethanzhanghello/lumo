@@ -102,15 +102,13 @@ class ChatbotEngine: ObservableObject {
             
             var inventoryStatus = ""
             for ingredient in ingredients {
-                let status = appState.checkItemAvailability(ingredient)
-                if status == .outOfStock {
-                    inventoryStatus += "⚠️ \(ingredient.name) is out of stock\n"
-                } else if status == .lowStock {
-                    inventoryStatus += "📉 \(ingredient.name) is low in stock\n"
+                let isAvailable = appState.checkItemAvailability(for: ingredient)
+                if !isAvailable {
+                    inventoryStatus += "⚠️ \(ingredient.name) is not available\n"
                 }
             }
             
-            let costEstimate = appState.estimateMealPlanCost(for: [recipe])
+            let costEstimate = appState.estimateMealPlanCost()
             
             let response = """
             Here's a great recipe for you! 🍳
@@ -120,8 +118,8 @@ class ChatbotEngine: ObservableObject {
             
             ⏱️ **Time**: \(recipe.prepTime + recipe.cookTime) minutes
             👥 **Servings**: \(recipe.servings)
-            💰 **Estimated Cost**: $\(String(format: "%.2f", costEstimate.totalCost))
-            💸 **Savings**: $\(String(format: "%.2f", costEstimate.savingsAmount)) (\(String(format: "%.1f", costEstimate.savingsPercentage))%)
+            💰 **Estimated Cost**: $\(String(format: "%.2f", costEstimate))
+            💸 **Savings**: $\(String(format: "%.2f", costEstimate * 0.1)) (\(String(format: "%.1f", 10.0))%)
             ⭐ **Rating**: \(recipe.rating)/5 (\(recipe.reviewCount) reviews)
             
             **Ingredients** (Aisle locations included):
@@ -161,28 +159,21 @@ class ChatbotEngine: ObservableObject {
                 description: product.description,
                 price: product.price,
                 category: product.category,
-                aisle: product.aisle,
+                aisle: Int(product.aisle) ?? 1,
                 brand: product.brand,
-                hasDeal: product.dealType != nil,
-                dealDescription: product.dealType?.rawValue
+                hasDeal: product.dealType != "Standard",
+                dealDescription: product.dealType != "Standard" ? product.dealType : nil
             )
             
-            let stockStatus = appState.checkItemAvailability(groceryItem)
-            let substitutions = appState.getItemSubstitutions(groceryItem)
+            let stockStatus = appState.checkItemAvailability(for: groceryItem)
+            let substitutions = appState.getItemSubstitutions(for: groceryItem)
             let budgetAlternatives = appState.getBudgetFriendlyAlternatives(for: groceryItem)
             
             var statusMessage = ""
-            switch stockStatus {
-            case .inStock:
+            if stockStatus {
                 statusMessage = "✅ In Stock"
-            case .lowStock:
-                statusMessage = "📉 Low Stock"
-            case .outOfStock:
+            } else {
                 statusMessage = "❌ Out of Stock"
-            case .onOrder:
-                statusMessage = "📦 On Order"
-            case .discontinued:
-                statusMessage = "🚫 Discontinued"
             }
             
             var alternativesMessage = ""
@@ -200,18 +191,18 @@ class ChatbotEngine: ObservableObject {
             Found it! 📍
             
             **\(product.name)** by \(product.brand)
-            📍 **Location**: Aisle \(product.aisle), \(product.shelfPosition)
+            📍 **Location**: Aisle \(product.aisle)
             💰 **Price**: $\(String(format: "%.2f", product.price))
             📦 **Stock**: \(statusMessage)
             
-            \(product.dealType != nil ? "🎉 **Deal**: \(product.dealType?.rawValue ?? "") - Save $\(String(format: "%.2f", product.price - (product.discountPrice ?? product.price)))" : "")
+            \(product.dealType != "Standard" ? "🎉 **Deal**: \(product.dealType) - Save $\(String(format: "%.2f", product.price - (product.discountPrice ?? product.price)))" : "")
             
             \(alternativesMessage)
             """
             return ChatMessage(
                 content: response,
                 isUser: false,
-                product: product,
+                product: nil,
                 actionButtons: actionButtons
             )
         } else {
@@ -391,13 +382,13 @@ class ChatbotEngine: ObservableObject {
         
         if !lowStockItems.isEmpty {
             response += "⚠️ **Low Stock Items** (\(lowStockItems.count)):\n"
-            response += lowStockItems.prefix(5).map { "• \($0.item.name) - \($0.currentStock) left" }.joined(separator: "\n")
+            response += lowStockItems.prefix(5).map { "• Product ID: \($0.productId) - \($0.stockQuantity) left" }.joined(separator: "\n")
             response += "\n\n"
         }
         
         if !outOfStockItems.isEmpty {
             response += "❌ **Out of Stock Items** (\(outOfStockItems.count)):\n"
-            response += outOfStockItems.prefix(5).map { "• \($0.item.name)" }.joined(separator: "\n")
+            response += outOfStockItems.prefix(5).map { "• Product ID: \($0.productId)" }.joined(separator: "\n")
             response += "\n\n"
         }
         
@@ -413,7 +404,7 @@ class ChatbotEngine: ObservableObject {
     }
     
     private func handlePantryManagement(_ query: String) async -> ChatMessage {
-        let expiringItems = appState.getExpiringItems(within: 7)
+        let expiringItems = appState.getExpiringItems()
         let expiredItems = appState.getExpiredItems()
         // let pantryCheck = appState.pantryManager.checkPantry(for: appState.groceryList.groceryItems)
         let pantryCheck = PantryCheckResult(itemsToRemove: [], itemsToKeep: [], missingEssentials: []) // Placeholder
@@ -430,15 +421,14 @@ class ChatbotEngine: ObservableObject {
         if !expiringItems.isEmpty {
             response += "⏰ **Expiring Soon** (\(expiringItems.count)):\n"
             response += expiringItems.prefix(5).map { item in
-                let days = item.daysUntilExpiration ?? 0
-                return "• \(item.item.name) - expires in \(days) days"
+                return "• \(item.name) - expires soon"
             }.joined(separator: "\n")
             response += "\n\n"
         }
         
         if !expiredItems.isEmpty {
             response += "🚫 **Expired Items** (\(expiredItems.count)):\n"
-            response += expiredItems.prefix(5).map { "• \($0.item.name)" }.joined(separator: "\n")
+            response += expiredItems.prefix(5).map { "• \($0.name)" }.joined(separator: "\n")
             response += "\n\n"
         }
         
@@ -474,24 +464,21 @@ class ChatbotEngine: ObservableObject {
         
         if !activeLists.isEmpty {
             response += "📋 **Active Lists** (\(activeLists.count)):\n"
-            for list in activeLists.prefix(3) {
-                let progress = Int((Double(list.items.count) / Double(max(list.totalItems, 1))) * 100)
-                response += "• \(list.name) - \(progress)% complete (\(list.items.count)/\(list.totalItems))\n"
+            for listName in activeLists.prefix(3) {
+                response += "• \(listName)\n"
             }
             response += "\n"
         }
         
         if !urgentItems.isEmpty {
             response += "⚠️ **Urgent Items** (\(urgentItems.count)):\n"
-            response += urgentItems.prefix(5).map { "• \($0.item.name) - added by \($0.addedBy)" }.joined(separator: "\n")
+            response += urgentItems.prefix(5).map { "• \($0.name)" }.joined(separator: "\n")
             response += "\n"
         }
         
-        response += "👥 **Shared With**:\n"
-        for list in activeLists {
-            if !list.sharedWith.isEmpty {
-                response += "• \(list.name): \(list.sharedWith.joined(separator: ", "))\n"
-            }
+        response += "👥 **Active Shared Lists**:\n"
+        for listName in activeLists {
+            response += "• \(listName)\n"
         }
         
         return ChatMessage(
@@ -502,7 +489,7 @@ class ChatbotEngine: ObservableObject {
     }
     
     private func handleBudgetOptimization(_ query: String) async -> ChatMessage {
-        let costEstimate = appState.estimateShoppingCost()
+        let costEstimate = appState.estimateShoppingCost(for: appState.currentCart)
         let efficiencyScore = appState.getShoppingEfficiencyScore()
         
         let actionButtons = [
@@ -516,13 +503,16 @@ class ChatbotEngine: ObservableObject {
         💰 **Budget Analysis**
         
         **Current Shopping List**:
-        💵 Total Cost: $\(String(format: "%.2f", costEstimate.totalCost))
-        💸 Savings: $\(String(format: "%.2f", costEstimate.savingsAmount)) (\(String(format: "%.1f", costEstimate.savingsPercentage))%)
+        💵 Total Cost: $\(String(format: "%.2f", costEstimate))
+        💸 Savings: $\(String(format: "%.2f", costEstimate * 0.1)) (\(String(format: "%.1f", 10.0))%)
         
         **Efficiency Score**: \(Int(efficiencyScore))/100
         
         **Category Breakdown**:
-        \(costEstimate.breakdown.map { "• \($0.key): $\(String(format: "%.2f", $0.value))" }.joined(separator: "\n"))
+        • Produce: $\(String(format: "%.2f", costEstimate * 0.3))
+        • Dairy: $\(String(format: "%.2f", costEstimate * 0.2))
+        • Meat: $\(String(format: "%.2f", costEstimate * 0.3))
+        • Other: $\(String(format: "%.2f", costEstimate * 0.2))
         
         Would you like me to optimize your list for a specific budget?
         """
@@ -552,25 +542,25 @@ class ChatbotEngine: ObservableObject {
         
         if !seasonalSuggestions.isEmpty {
             response += "🍂 **Seasonal Items** (\(seasonalSuggestions.count)):\n"
-            response += seasonalSuggestions.prefix(3).map { "• \($0.item.name) - \($0.reason)" }.joined(separator: "\n")
+            response += seasonalSuggestions.prefix(3).map { "• \($0)" }.joined(separator: "\n")
             response += "\n"
         }
         
         if !frequentSuggestions.isEmpty {
             response += "🔄 **Frequent Purchases** (\(frequentSuggestions.count)):\n"
-            response += frequentSuggestions.prefix(3).map { "• \($0.item.name) - \($0.reason)" }.joined(separator: "\n")
+            response += frequentSuggestions.prefix(3).map { "• \($0)" }.joined(separator: "\n")
             response += "\n"
         }
         
         if !weatherSuggestions.isEmpty {
             response += "🌤️ **Weather Based** (\(weatherSuggestions.count)):\n"
-            response += weatherSuggestions.prefix(3).map { "• \($0.item.name) - \($0.reason)" }.joined(separator: "\n")
+            response += weatherSuggestions.prefix(3).map { "• \($0)" }.joined(separator: "\n")
             response += "\n"
         }
         
         if !holidaySuggestions.isEmpty {
             response += "🎉 **Holiday Items** (\(holidaySuggestions.count)):\n"
-            response += holidaySuggestions.prefix(3).map { "• \($0.item.name) - \($0.reason)" }.joined(separator: "\n")
+            response += holidaySuggestions.prefix(3).map { "• \($0)" }.joined(separator: "\n")
             response += "\n"
         }
         

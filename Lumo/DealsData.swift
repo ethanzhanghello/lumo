@@ -19,8 +19,10 @@ struct DealProduct: Identifiable, Codable, Hashable, Equatable {
     let imageURL: String?
     let nutritionFacts: NutritionInfo?
     let dealEligible: Bool
+    let aisle: String
+    let dealType: String
     
-    init(id: UUID = UUID(), name: String, description: String, price: Double, category: String, brand: String, imageURL: String? = nil, nutritionFacts: NutritionInfo? = nil, dealEligible: Bool = true) {
+    init(id: UUID = UUID(), name: String, description: String, price: Double, category: String, brand: String, imageURL: String? = nil, nutritionFacts: NutritionInfo? = nil, dealEligible: Bool = true, aisle: String = "General", dealType: String = "Standard") {
         self.id = id
         self.name = name
         self.description = description
@@ -30,6 +32,8 @@ struct DealProduct: Identifiable, Codable, Hashable, Equatable {
         self.imageURL = imageURL
         self.nutritionFacts = nutritionFacts
         self.dealEligible = dealEligible
+        self.aisle = aisle
+        self.dealType = dealType
     }
     
     static func == (lhs: DealProduct, rhs: DealProduct) -> Bool {

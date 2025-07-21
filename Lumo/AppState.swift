@@ -319,6 +319,101 @@ class AppState: ObservableObject {
             "Try organic apples - they're 20% off this week"
         ]
     }
+    
+    // MARK: - ChatBot Support Methods
+    
+    func checkItemAvailability(for item: GroceryItem) -> Bool {
+        return currentStoreProducts.contains { $0.productId == item.id }
+    }
+    
+    func estimateMealPlanCost() -> Double {
+        return Double.random(in: 45...120)
+    }
+    
+    func getItemSubstitutions(for item: GroceryItem) -> [GroceryItem] {
+        // Return similar items from the same category
+        return sampleGroceryItems.filter { $0.category == item.category && $0.id != item.id }.prefix(3).map { $0 }
+    }
+    
+    func getBudgetFriendlyAlternatives(for item: GroceryItem) -> [GroceryItem] {
+        // Return cheaper alternatives
+        return sampleGroceryItems.filter { $0.category == item.category && $0.price < item.price }.prefix(3).map { $0 }
+    }
+    
+    func getLowStockAlerts() -> [StoreProduct] {
+        return lowStockAlerts
+    }
+    
+    func getOutOfStockAlerts() -> [StoreProduct] {
+        return currentStoreProducts.filter { $0.stockQuantity == 0 }
+    }
+    
+    func getExpiringItems() -> [GroceryItem] {
+        // Return items expiring soon (mock data)
+        return sampleGroceryItems.prefix(2).map { $0 }
+    }
+    
+    func getExpiredItems() -> [GroceryItem] {
+        // Return expired items (mock data)
+        return sampleGroceryItems.prefix(1).map { $0 }
+    }
+    
+    func getActiveSharedLists() -> [String] {
+        return ["Family Grocery List", "Weekend BBQ", "Office Supplies"]
+    }
+    
+    func getUrgentSharedItems() -> [GroceryItem] {
+        return sampleGroceryItems.prefix(3).map { $0 }
+    }
+    
+    func estimateShoppingCost(for items: [GroceryItem]) -> Double {
+        return items.reduce(0) { $0 + $1.price }
+    }
+    
+    func getShoppingEfficiencyScore() -> Double {
+        return Double.random(in: 0.7...1.0)
+    }
+    
+    func getSeasonalSuggestions() -> [String] {
+        let month = Calendar.current.component(.month, from: Date())
+        switch month {
+        case 12, 1, 2:
+            return ["Hot chocolate", "Winter vegetables", "Citrus fruits"]
+        case 3, 4, 5:
+            return ["Fresh herbs", "Spring vegetables", "Strawberries"]
+        case 6, 7, 8:
+            return ["BBQ supplies", "Summer fruits", "Ice cream"]
+        default:
+            return ["Apples", "Pumpkin", "Root vegetables"]
+        }
+    }
+    
+    func getFrequentSuggestions() -> [String] {
+        return ["Milk", "Bread", "Eggs", "Bananas", "Chicken"]
+    }
+    
+    func getWeatherBasedSuggestions() -> [String] {
+        // Mock weather-based suggestions
+        return ["Soup ingredients", "Hot drinks", "Comfort food"]
+    }
+    
+    func getHolidaySuggestions() -> [String] {
+        let calendar = Calendar.current
+        let today = Date()
+        let month = calendar.component(.month, from: today)
+        let day = calendar.component(.day, from: today)
+        
+        switch (month, day) {
+        case (10, 25...31):
+            return ["Pumpkins", "Candy", "Halloween decorations"]
+        case (12, 20...31):
+            return ["Turkey", "Cranberries", "Holiday cookies"]
+        case (2, 10...14):
+            return ["Chocolate", "Flowers", "Valentine's treats"]
+        default:
+            return ["Party supplies", "Special occasion items"]
+        }
+    }
 }
 
 // MARK: - Supporting Data Models

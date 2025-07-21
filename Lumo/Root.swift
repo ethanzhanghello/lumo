@@ -11,6 +11,7 @@ struct RootView: View {
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var showOnboarding = !UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
+    @State private var navigationPath = NavigationPath()
     
     var body: some View {
         Group {
@@ -21,15 +22,12 @@ struct RootView: View {
                     .environmentObject(appState)
                     .environmentObject(authViewModel)
             } else {
-                LoginView()
+                LoginView(navigationPath: $navigationPath)
                     .environmentObject(authViewModel)
             }
         }
         .onAppear {
-            // Check authentication status on appear
-            Task {
-                await authViewModel.checkAuthStatus()
-            }
+            // Authentication status is automatically managed by AuthViewModel
         }
     }
 }

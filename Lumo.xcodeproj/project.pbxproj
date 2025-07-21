@@ -26,7 +26,7 @@
 		94F8C4482E18C9AE005A09D9 /* MealPlanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FA2E0372460036C7AA /* MealPlanManager.swift */; };
 		94F8C4492E18C9E3005A09D9 /* MealPlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FC2E0372460036C7AA /* MealPlanningView.swift */; };
 		94F8C44A2E18C9E6005A09D9 /* SmartSubstitutionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FE2E0372460036C7AA /* SmartSubstitutionManager.swift */; };
-		94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */; };
+
 		94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */; };
 		94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916042E0372460036C7AA /* DietaryGoalsView.swift */; };
 		B034DE722E2B47EE0082134F /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE712E2B47EE0082134F /* Auth */; };
@@ -169,7 +169,7 @@
 		B0E915FC2E0372460036C7AB /* AutoFillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoFillView.swift; sourceTree = "<group>"; };
 		B0E915FE2E0372460036C7AA /* SmartSubstitutionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartSubstitutionManager.swift; sourceTree = "<group>"; };
 		B0E915FE2E0372460036C7AB /* SmartMealPlanGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartMealPlanGenerator.swift; sourceTree = "<group>"; };
-		B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartSubstitutionsView.swift; sourceTree = "<group>"; };
+
 		B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingHistoryView.swift; sourceTree = "<group>"; };
 		B0E916042E0372460036C7AA /* DietaryGoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DietaryGoalsView.swift; sourceTree = "<group>"; };
 		DED54D52CBFA4350A624094E /* AddMealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMealView.swift; sourceTree = "<group>"; };
@@ -300,7 +300,6 @@
 				B0E915FA2E0372460036C7AA /* MealPlanManager.swift */,
 				B0E915FC2E0372460036C7AA /* MealPlanningView.swift */,
 				B0E915FE2E0372460036C7AA /* SmartSubstitutionManager.swift */,
-				B0E916002E0372460036C7AA /* SmartSubstitutionsView.swift */,
 				B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */,
 				B0E916042E0372460036C7AA /* DietaryGoalsView.swift */,
 				DED54D52CBFA4350A624094E /* AddMealView.swift */,
@@ -539,7 +538,6 @@
 				944E8F0C2E1DB40C00BB97F5 /* PantryManager.swift in Sources */,
 				944E8F0D2E1DB40C00BB97F5 /* BudgetManager.swift in Sources */,
 				B0E915E82E0372460036C7AA /* CategoryFilterButton.swift in Sources */,
-				94F8C44B2E18C9EA005A09D9 /* SmartSubstitutionsView.swift in Sources */,
 				B0E915E92E0372460036C7AA /* ChatbotView.swift in Sources */,
 				B0E915EB2E0372460036C7AA /* ChatMessage.swift in Sources */,
 				B0E915ED2E0372460036C7AA /* ChatbotEngine.swift in Sources */,
