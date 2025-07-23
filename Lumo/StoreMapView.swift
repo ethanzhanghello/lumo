@@ -17,96 +17,61 @@ struct StoreMapView: View {
     @State private var showingNavigation = false
     @State private var routeGenerated = false
     @State private var showingItemChecklist = false
-    @State private var currentUserLocation = Coordinate(x: 2.0, y: 0.0) // Start at entrance
+    @State private var currentUserLocation = Coordinate(x: 12.0, y: 18.0) // Fake user location, center-ish
     @State private var showingSuggestions = false
     @State private var routeSuggestions: [RouteSuggestion] = []
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
+        ZStack {
+            Color.black.ignoresSafeArea()
             VStack(spacing: 0) {
+                // Camera View (top)
+                CameraPlaceholderView()
+                    .frame(height: 220)
+                    .clipShape(RoundedRectangle(cornerRadius: 0))
+                    .overlay(
+                        HStack {
+                            Spacer()
+                            // Dismiss (X) button
+                            Button(action: { dismiss() }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.white)
+                                    .font(.title)
+                                    .padding()
+                            }
+                        }, alignment: .topTrailing
+                    )
+                
+                // Map View (bottom)
                 if let store = appState.selectedStore,
                    let storeLayout = getStoreLayout(for: store.id) {
-                    
-                    // Progress Header (when route is active)
-                    if routeGenerated, let route = routeManager.currentRoute {
-                        RouteProgressHeader(
-                            route: route,
-                            progress: routeManager.routeProgress ?? RouteProgress(route: route),
-                            onShowChecklist: { showingItemChecklist = true },
-                            onShowSuggestions: { 
-                                updateSuggestions(for: storeLayout)
-                                showingSuggestions = true 
-                            }
-                        )
-                    }
-                    
-                    // Map Container with Enhanced Visualization
                     GeometryReader { geometry in
-                        EnhancedStoreLayoutMapView(
-                            storeLayout: storeLayout,
-                            route: routeManager.currentRoute,
-                            routeProgress: routeManager.routeProgress,
-                            userLocation: currentUserLocation,
-                            mapSize: geometry.size,
-                            onLocationUpdate: updateUserLocation
-                        )
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 32)
+                                .fill(Color.white)
+                                .shadow(radius: 12)
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                                .position(x: geometry.size.width/2, y: geometry.size.height/2)
+                            StoreMapPanZoomView(
+                                storeLayout: storeLayout,
+                                route: routeManager.currentRoute,
+                                routeProgress: routeManager.routeProgress,
+                                userLocation: currentUserLocation,
+                                mapSize: geometry.size,
+                                onLocationUpdate: updateUserLocation,
+                                products: StoreProductService.shared.products
+                            )
+                            .environmentObject(appState)
+                            .clipShape(RoundedRectangle(cornerRadius: 32))
+                        }
                     }
-                    
-                    // Real-time Navigation Controls
-                    if routeGenerated {
-                        RealTimeNavigationControls(
-                            route: routeManager.currentRoute,
-                            progress: routeManager.routeProgress,
-                            onCompleteItem: completeItem,
-                            onSkipWaypoint: skipWaypoint,
-                            onReoptimize: reoptimizeRoute
-                        )
-                    } else {
-                        // Initial Route Controls
-                        RouteControlsView(
-                            store: store,
-                            isGeneratingRoute: $isGeneratingRoute,
-                            showingRouteOptions: $showingRouteOptions,
-                            showingNavigation: $showingNavigation,
-                            routeGenerated: $routeGenerated,
-                            selectedOptimization: $selectedOptimization
-                        )
-                    }
-                    
                 } else {
                     StoreSelectionPromptView()
                 }
             }
-            .navigationTitle("Store Map")
-            .navigationBarTitleDisplayMode(.large)
-            .sheet(isPresented: $showingRouteOptions) {
-                RouteOptionsSheet(
-                    selectedOptimization: $selectedOptimization,
-                    onGenerateRoute: generateRoute
-                )
-            }
-            .sheet(isPresented: $showingNavigation) {
-                NavigationView {
-                    if let route = routeManager.currentRoute {
-                        TurnByTurnNavigationView(route: route)
-                    }
-                }
-            }
-            .sheet(isPresented: $showingItemChecklist) {
-                ItemChecklistSheet(
-                    groceryList: appState.groceryList,
-                    route: routeManager.currentRoute,
-                    progress: routeManager.routeProgress,
-                    onCompleteItem: completeItem
-                )
-            }
-            .sheet(isPresented: $showingSuggestions) {
-                RouteSuggestionsSheet(
-                    suggestions: routeSuggestions,
-                    onAcceptSuggestion: acceptSuggestion
-                )
-            }
         }
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     // MARK: - Enhanced Route Functions
@@ -229,6 +194,400 @@ struct StoreMapView: View {
     
     private func getStoreLayout(for storeId: UUID) -> StoreLayout? {
         return sampleStoreLayouts.first { $0.storeId == storeId }
+    }
+}
+
+// Camera placeholder (replace with real camera view if needed)
+struct CameraPlaceholderView: View {
+    var body: some View {
+        ZStack {
+            Color.black
+            Image(systemName: "video")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 60, height: 60)
+                .foregroundColor(.gray)
+            Text("Camera Preview")
+                .foregroundColor(.white.opacity(0.7))
+                .font(.headline)
+                .padding(.top, 80)
+        }
+    }
+}
+
+// Pan/Zoom Map with navigation-style UI
+struct StoreMapPanZoomView: View {
+    let storeLayout: StoreLayout
+    let route: ShoppingRoute?
+    let routeProgress: RouteProgress?
+    // userLocation is now a @State so we can move it
+    @State var userLocation: Coordinate
+    let mapSize: CGSize
+    let onLocationUpdate: (Coordinate) -> Void
+    let products: [Product]
+    @EnvironmentObject var appState: AppState
+    
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
+    @State private var scale: CGFloat = 1.5 // Start zoomed in
+    @State private var lastScale: CGFloat = 1.5
+    @State private var checkedProductIds: Set<UUID> = []
+    @State private var showRouteComplete: Bool = false
+    @Namespace private var checklistNamespace
+    
+    // Helper: Find the current target waypoint (next stop)
+    private var currentTargetWaypoint: RouteWaypoint? {
+        route?.waypoints.first(where: { $0.id == routeProgress?.currentWaypoint?.id }) ?? route?.waypoints.first
+    }
+    // Helper: Is this aisle the target?
+    private func isTargetAisle(_ aisle: Aisle) -> Bool {
+        guard let target = currentTargetWaypoint else { return false }
+        return aisle.aisleId == target.aisleId
+    }
+    // Helper: Destination label for the blue pill
+    private func destinationLabel(for waypoint: RouteWaypoint) -> String {
+        if let productId = waypoint.products.first, let product = products.first(where: { $0.id == productId }) {
+            return "to " + product.name
+        } else if let aisleId = waypoint.aisleId {
+            return "to " + aisleId.capitalized
+        } else {
+            return "to Destination"
+        }
+    }
+    // Helper: Get the aisle for a productId
+    private func aisleForProduct(_ productId: UUID) -> Aisle? {
+        for aisle in storeLayout.aisles {
+            if let waypoint = route?.waypoints.first(where: { $0.aisleId == aisle.aisleId }), waypoint.products.contains(productId) {
+                return aisle
+            }
+        }
+        return nil
+    }
+    // Helper: Move user location to the aisle of the next item
+    private func moveUserToNextItemAisle() {
+        if let nextItem = appState.groceryList.groceryItems.first, let aisle = aisleForProduct(nextItem.item.id) {
+            userLocation = aisle.centerPoint
+        }
+    }
+    // Helper: Advance to next waypoint or show complete
+    private func advanceToNextWaypointOrComplete() {
+        if appState.groceryList.groceryItems.isEmpty {
+            showRouteComplete = true
+        } else {
+            moveUserToNextItemAisle()
+        }
+    }
+    
+    var body: some View {
+        ZStack {
+            // White map background with rounded corners
+            RoundedRectangle(cornerRadius: 32)
+                .fill(Color.white)
+                .shadow(radius: 12)
+                .frame(width: mapSize.width, height: mapSize.height)
+                .position(x: mapSize.width/2, y: mapSize.height/2)
+            
+            // Map Content
+            ZStack {
+                // Arrange aisles in a grid layout with spacing and color-coding
+                let grid = AisleGridLayout(aisles: storeLayout.aisles, scale: scale)
+                ForEach(grid.gridAisles, id: \.aisle.id) { gridAisle in
+                    GridAisleView(
+                        gridAisle: gridAisle,
+                        isTarget: isTargetAisle(gridAisle.aisle),
+                        isOnRoute: route?.waypoints.contains { $0.aisleId == gridAisle.aisle.aisleId } ?? false
+                    )
+                }
+                // Blue Dotted Route Path
+                if let route = route {
+                    ForEach(Array(route.waypoints.enumerated()), id: \.element.id) { index, waypoint in
+                        if index < route.waypoints.count - 1 {
+                            let nextWaypoint = route.waypoints[index + 1]
+                            NavigationRouteSegmentView(
+                                from: waypoint.position,
+                                to: nextWaypoint.position,
+                                scale: scale
+                            )
+                        }
+                    }
+                }
+                // User Location as Large Blue Arrow with White Border, to the left of the grid
+                if let firstAisle = grid.gridAisles.first {
+                    UserArrowIndicator(location: Coordinate(x: Double(firstAisle.rect.minX / scale - 40), y: Double(firstAisle.rect.midY / scale)), scale: scale, large: true)
+                }
+            }
+            .offset(offset)
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        offset = CGSize(width: lastOffset.width + value.translation.width, height: lastOffset.height + value.translation.height)
+                    }
+                    .onEnded { value in
+                        lastOffset = offset
+                    }
+            )
+            .gesture(
+                MagnificationGesture()
+                    .onChanged { value in
+                        scale = lastScale * value
+                    }
+                    .onEnded { value in
+                        lastScale = scale
+                    }
+            )
+            // Floating blue pill at the top for destination
+            if let target = currentTargetWaypoint {
+                VStack {
+                    HStack {
+                        Spacer()
+                        Text(destinationLabel(for: target))
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 10)
+                            .background(Color.blue)
+                            .cornerRadius(22)
+                            .shadow(radius: 6)
+                        Spacer()
+                    }
+                    .padding(.top, 24)
+                    Spacer()
+                }
+            }
+            // Floating vertical checklist on the right for ALL grocery list items
+            VStack(alignment: .trailing, spacing: 16) {
+                ForEach(appState.groceryList.groceryItems, id: \.item.id) { groceryItem in
+                    HStack(spacing: 8) {
+                        Button(action: {
+                            withAnimation(.spring()) {
+                                checkedProductIds.insert(groceryItem.item.id)
+                                // Remove item from grocery list when checked
+                                if let idx = appState.groceryList.groceryItems.firstIndex(where: { $0.item.id == groceryItem.item.id }) {
+                                    appState.groceryList.groceryItems.remove(at: idx)
+                                }
+                                // If all checked, advance to next item or show complete
+                                if appState.groceryList.groceryItems.isEmpty {
+                                    advanceToNextWaypointOrComplete()
+                                } else {
+                                    moveUserToNextItemAisle()
+                                }
+                            }
+                        }) {
+                            Image(systemName: checkedProductIds.contains(groceryItem.item.id) ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(checkedProductIds.contains(groceryItem.item.id) ? .blue : .gray)
+                                .font(.title2)
+                        }
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text(groceryItem.item.name)
+                                .font(.body)
+                                .foregroundColor(.black)
+                            Text("Qty: \(groceryItem.quantity)")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                        .frame(maxWidth: 120, alignment: .trailing)
+                    }
+                    .padding(8)
+                    .background(Color.white.opacity(0.95))
+                    .cornerRadius(12)
+                    .shadow(radius: 2)
+                    .matchedGeometryEffect(id: groceryItem.item.id, in: checklistNamespace)
+                }
+                Spacer()
+            }
+            .padding(.top, 80)
+            .padding(.trailing, 12)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            // Floating Target Label at Bottom (unchanged, but now shows current product/location)
+            if let target = currentTargetWaypoint {
+                VStack {
+                    Spacer()
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            if let productId = target.products.first, let product = products.first(where: { $0.id == productId }) {
+                                Text(product.name)
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                            } else {
+                                Text("Target Item")
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                            }
+                            Text(target.instruction)
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                        }
+                        Spacer()
+                        Button(action: { /* More actions here */ }) {
+                            Image(systemName: "ellipsis.circle")
+                                .font(.title2)
+                                .foregroundColor(.black)
+                        }
+                    }
+                    .padding()
+                    .background(Color.white.opacity(0.95))
+                    .cornerRadius(16)
+                    .shadow(radius: 8)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 24)
+                }
+            }
+            // Route Complete Overlay
+            if showRouteComplete {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Text("🎉 Route Complete!")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundColor(.blue)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(24)
+                            .shadow(radius: 12)
+                        Spacer()
+                    }
+                    Spacer()
+                }
+                .background(Color.black.opacity(0.3).ignoresSafeArea())
+            }
+        }
+    }
+}
+
+// Grid layout helper for aisles
+struct AisleGridLayout {
+    struct GridAisle {
+        let aisle: Aisle
+        let row: Int
+        let col: Int
+        let rect: CGRect
+    }
+    let gridAisles: [GridAisle]
+    init(aisles: [Aisle], scale: CGFloat) {
+        // For demo: arrange aisles in a grid, 4 per row
+        let aislesPerRow = 4
+        let spacing: CGFloat = 32 * scale
+        let blockWidth: CGFloat = 60 * scale
+        let blockHeight: CGFloat = 40 * scale
+        var grid: [GridAisle] = []
+        for (i, aisle) in aisles.enumerated() {
+            let row = i / aislesPerRow
+            let col = i % aislesPerRow
+            let x = CGFloat(col) * (blockWidth + spacing) + blockWidth/2 + spacing
+            let y = CGFloat(row) * (blockHeight + spacing) + blockHeight/2 + spacing
+            let rect = CGRect(x: x, y: y, width: blockWidth, height: blockHeight)
+            grid.append(GridAisle(aisle: aisle, row: row, col: col, rect: rect))
+        }
+        self.gridAisles = grid
+    }
+}
+
+// Grid aisle view for map
+struct GridAisleView: View {
+    let gridAisle: AisleGridLayout.GridAisle
+    let isTarget: Bool
+    let isOnRoute: Bool
+    var body: some View {
+        RoundedRectangle(cornerRadius: 14)
+            .fill(isTarget ? Color.blue.opacity(0.18) : (isOnRoute ? Color.purple.opacity(0.18) : Color.gray.opacity(0.10)))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(isTarget ? Color.blue : (isOnRoute ? Color.purple : Color.gray.opacity(0.4)), lineWidth: isTarget ? 4 : 2)
+            )
+            .frame(width: gridAisle.rect.width, height: gridAisle.rect.height)
+            .position(x: gridAisle.rect.midX, y: gridAisle.rect.midY)
+            .overlay(
+                Text(gridAisle.aisle.aisleId)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(isTarget ? .blue : .black)
+                    .shadow(color: .white, radius: 2)
+                    .position(x: gridAisle.rect.midX, y: gridAisle.rect.midY)
+            )
+    }
+}
+
+// Modern aisle view for navigation-style map, with spacing
+struct ModernAisleView: View {
+    let aisle: Aisle
+    let scale: CGFloat
+    let isTarget: Bool
+    let isOnRoute: Bool
+    let index: Int // for spacing
+    var body: some View {
+        let bounds = aisle.bounds
+        let minX = bounds.map { $0.x }.min() ?? 0
+        let minY = bounds.map { $0.y }.min() ?? 0
+        let maxX = bounds.map { $0.x }.max() ?? 0
+        let maxY = bounds.map { $0.y }.max() ?? 0
+        let width = (maxX - minX) * scale * 0.85 // shrink for spacing
+        let height = (maxY - minY) * scale * 0.85
+        let spacing: CGFloat = 18 * scale // add spacing between aisles
+        let centerX = (minX + maxX) / 2 * scale + CGFloat(index % 3) * spacing // stagger for demo
+        let centerY = (minY + maxY) / 2 * scale + CGFloat(index / 3) * spacing
+        return RoundedRectangle(cornerRadius: 18)
+            .fill(isTarget ? Color.blue.opacity(0.18) : Color.purple.opacity(0.10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(isTarget ? Color.blue : Color.purple.opacity(0.4), lineWidth: isTarget ? 4 : 2)
+            )
+            .frame(width: width, height: height)
+            .position(x: centerX, y: centerY)
+            .overlay(
+                Text(aisle.name)
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundColor(isTarget ? .blue : .black)
+                    .shadow(color: .white, radius: 2)
+                    .position(x: centerX, y: centerY)
+            )
+    }
+}
+
+// Blue dotted navigation route segment for the map
+struct NavigationRouteSegmentView: View {
+    let from: Coordinate
+    let to: Coordinate
+    let scale: CGFloat
+    var body: some View {
+        Path { path in
+            path.move(to: CGPoint(x: from.x * scale, y: from.y * scale))
+            path.addLine(to: CGPoint(x: to.x * scale, y: to.y * scale))
+        }
+        .stroke(style: StrokeStyle(lineWidth: 7, lineCap: .round, dash: [10, 8]))
+        .foregroundColor(.blue)
+        .shadow(color: .blue.opacity(0.4), radius: 8)
+    }
+}
+
+// User arrow with white border and larger size
+struct UserArrowIndicator: View {
+    let location: Coordinate
+    let scale: CGFloat
+    let large: Bool
+    var body: some View {
+        // Arrow shape
+        Path { path in
+            path.move(to: CGPoint(x: 0, y: -20))
+            path.addLine(to: CGPoint(x: 14, y: 18))
+            path.addLine(to: CGPoint(x: 0, y: 10))
+            path.addLine(to: CGPoint(x: -14, y: 18))
+            path.closeSubpath()
+        }
+        .fill(Color.blue)
+        .overlay(
+            Path { path in
+                path.move(to: CGPoint(x: 0, y: -20))
+                path.addLine(to: CGPoint(x: 14, y: 18))
+                path.addLine(to: CGPoint(x: 0, y: 10))
+                path.addLine(to: CGPoint(x: -14, y: 18))
+                path.closeSubpath()
+            }
+            .stroke(Color.white, lineWidth: 4)
+        )
+        .frame(width: large ? 48 : 32, height: large ? 48 : 32)
+        .shadow(color: .blue.opacity(0.5), radius: 8)
+        .position(x: location.x * scale, y: location.y * scale)
     }
 }
 

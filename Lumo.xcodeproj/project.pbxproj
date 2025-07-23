@@ -26,9 +26,9 @@
 		94F8C4482E18C9AE005A09D9 /* MealPlanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FA2E0372460036C7AA /* MealPlanManager.swift */; };
 		94F8C4492E18C9E3005A09D9 /* MealPlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FC2E0372460036C7AA /* MealPlanningView.swift */; };
 		94F8C44A2E18C9E6005A09D9 /* SmartSubstitutionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FE2E0372460036C7AA /* SmartSubstitutionManager.swift */; };
-
 		94F8C44C2E18C9ED005A09D9 /* ShoppingHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */; };
 		94F8C44D2E18C9F0005A09D9 /* DietaryGoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E916042E0372460036C7AA /* DietaryGoalsView.swift */; };
+		A1B2C3D4E5F6789012345678 /* RouteOptimizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6789012345677 /* RouteOptimizationManager.swift */; };
 		B034DE722E2B47EE0082134F /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE712E2B47EE0082134F /* Auth */; };
 		B034DE742E2B47EE0082134F /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE732E2B47EE0082134F /* Functions */; };
 		B034DE762E2B47EE0082134F /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = B034DE752E2B47EE0082134F /* PostgREST */; };
@@ -54,7 +54,6 @@
 		B0E915C52E00BA300036C7A9 /* TabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915C42E00BA300036C7A9 /* TabView.swift */; };
 		B0E915C72E00C0450036C7A9 /* StoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915C62E00C0440036C7A9 /* StoreData.swift */; };
 		B0E915C92E00C0D60036C7A9 /* StoreSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915C82E00C0D60036C7A9 /* StoreSelection.swift */; };
-		B0E915CB2E03182E0036C7A9 /* StoreMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915CA2E03182E0036C7A9 /* StoreMap.swift */; };
 		B0E915CD2E0349A30036C7A9 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915CC2E0349A30036C7A9 /* AppState.swift */; };
 		B0E915CF2E035F770036C7A9 /* Root.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915CE2E035F770036C7A9 /* Root.swift */; };
 		B0E915D12E0369E50036C7A9 /* Browse.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915D02E0369E50036C7A9 /* Browse.swift */; };
@@ -78,11 +77,10 @@
 		B0E915F72E0372460036C7AA /* ChatbotUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915F82E0372460036C7AA /* ChatbotUITests.swift */; };
 		B0E915F72E0372460036C7AB /* AutoFillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FC2E0372460036C7AB /* AutoFillView.swift */; };
 		B0E915F92E0372460036C7AB /* SmartMealPlanGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E915FE2E0372460036C7AB /* SmartMealPlanGenerator.swift */; };
-		DED54D52CBFA4350A624094F /* AddMealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED54D52CBFA4350A624094E /* AddMealView.swift */; };
-		E4DF74227C624A34BFE53EA0 /* NutritionAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DF74227C624A34BFE53E9F /* NutritionAnalysisView.swift */; };
-		A1B2C3D4E5F6789012345678 /* RouteOptimizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6789012345677 /* RouteOptimizationManager.swift */; };
 		B2C3D4E5F67890123456789A /* StoreMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6789012345679A9 /* StoreMapView.swift */; };
 		C3D4E5F6789012345678901B /* TurnByTurnNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6789012345678901A /* TurnByTurnNavigationView.swift */; };
+		DED54D52CBFA4350A624094F /* AddMealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED54D52CBFA4350A624094E /* AddMealView.swift */; };
+		E4DF74227C624A34BFE53EA0 /* NutritionAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DF74227C624A34BFE53E9F /* NutritionAnalysisView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,6 +114,7 @@
 		94D66E362E1DF1A1004F3DDB /* SpoonacularService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpoonacularService.swift; sourceTree = "<group>"; };
 		94F8C4442E18C8E2005A09D9 /* FlyToCartAnimationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartAnimationManager.swift; sourceTree = "<group>"; };
 		94F8C4462E18C8EA005A09D9 /* FlyToCartOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyToCartOverlay.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6789012345677 /* RouteOptimizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteOptimizationManager.swift; sourceTree = "<group>"; };
 		B041F2682E262BED0075EEE0 /* SupbaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupbaseManager.swift; sourceTree = "<group>"; };
 		B041F26A2E262C020075EEE0 /* AuthViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		B041F26C2E262CE50075EEE0 /* CreateAccountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
@@ -139,7 +138,6 @@
 		B0E915C42E00BA300036C7A9 /* TabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabView.swift; sourceTree = "<group>"; };
 		B0E915C62E00C0440036C7A9 /* StoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreData.swift; sourceTree = "<group>"; };
 		B0E915C82E00C0D60036C7A9 /* StoreSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreSelection.swift; sourceTree = "<group>"; };
-		B0E915CA2E03182E0036C7A9 /* StoreMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreMap.swift; sourceTree = "<group>"; };
 		B0E915CC2E0349A30036C7A9 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		B0E915CE2E035F770036C7A9 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
 		B0E915D02E0369E50036C7A9 /* Browse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Browse.swift; sourceTree = "<group>"; };
@@ -169,14 +167,12 @@
 		B0E915FC2E0372460036C7AB /* AutoFillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoFillView.swift; sourceTree = "<group>"; };
 		B0E915FE2E0372460036C7AA /* SmartSubstitutionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartSubstitutionManager.swift; sourceTree = "<group>"; };
 		B0E915FE2E0372460036C7AB /* SmartMealPlanGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartMealPlanGenerator.swift; sourceTree = "<group>"; };
-
 		B0E916022E0372460036C7AA /* ShoppingHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingHistoryView.swift; sourceTree = "<group>"; };
 		B0E916042E0372460036C7AA /* DietaryGoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DietaryGoalsView.swift; sourceTree = "<group>"; };
-		DED54D52CBFA4350A624094E /* AddMealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMealView.swift; sourceTree = "<group>"; };
-		E4DF74227C624A34BFE53E9F /* NutritionAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionAnalysisView.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F6789012345677 /* RouteOptimizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteOptimizationManager.swift; sourceTree = "<group>"; };
 		B2C3D4E5F6789012345679A9 /* StoreMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreMapView.swift; sourceTree = "<group>"; };
 		C3D4E5F6789012345678901A /* TurnByTurnNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnByTurnNavigationView.swift; sourceTree = "<group>"; };
+		DED54D52CBFA4350A624094E /* AddMealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMealView.swift; sourceTree = "<group>"; };
+		E4DF74227C624A34BFE53E9F /* NutritionAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionAnalysisView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -310,7 +306,6 @@
 				C3D4E5F6789012345678901A /* TurnByTurnNavigationView.swift */,
 				B0E915992E00AC7D0036C7A9 /* Assets.xcassets */,
 				B0E915D22E0372460036C7A9 /* GroceryItems.swift */,
-				B0E915CA2E03182E0036C7A9 /* StoreMap.swift */,
 				B0E9159B2E00AC7D0036C7A9 /* Lumo.entitlements */,
 				B0E9159C2E00AC7D0036C7A9 /* Preview Content */,
 				B0E915E72E0372460036C7AA /* CategoryFilterButton.swift */,
@@ -494,7 +489,6 @@
 				940BE0BB2E1494FD00DC7316 /* ExploreSections.swift in Sources */,
 				940BE0BA2E1494F900DC7316 /* ExploreView.swift in Sources */,
 				940BE0B92E1494F600DC7316 /* GroceryListView.swift in Sources */,
-				B0E915CB2E03182E0036C7A9 /* StoreMap.swift in Sources */,
 				B0E915982E00AC7C0036C7A9 /* ContentView.swift in Sources */,
 				B0E915C72E00C0450036C7A9 /* StoreData.swift in Sources */,
 				B0E915D12E0369E50036C7A9 /* Browse.swift in Sources */,

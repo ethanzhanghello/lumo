@@ -21,14 +21,7 @@ struct MainTabView: View {
                 Text("Explore")
             }
             
-            // Store Map Tab
-            NavigationStack {
-                StoreMapView()
-            }
-            .tabItem {
-                Image(systemName: "map.fill")
-                Text("Map")
-            }
+
             
             // Grocery List Tab
             NavigationStack {
@@ -65,6 +58,9 @@ struct MainTabView: View {
         .accentColor(Color.lumoGreen)
         .environmentObject(appState)
     }
+}
+extension Color {
+    static let lumoGreen = Color(hex: "#00F0C0")
 }
 
 struct MainTabView_Previews: PreviewProvider {
