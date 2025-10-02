@@ -15,6 +15,7 @@ class ChatbotEngine: ObservableObject {
     
     private let openAIService = OpenAIService()
     private let intentRecognizer = IntentRecognizer()
+    private let spoonacularService = SpoonacularService.shared
     let appState: AppState // Make this accessible
     
     init(appState: AppState) {
@@ -45,11 +46,12 @@ class ChatbotEngine: ObservableObject {
         
         let actionButtons = [
             ChatActionButton(title: "Add to List", action: .addToList, icon: "plus.circle"),
-            ChatActionButton(title: "Show Aisle", action: .showAisle, icon: "location"),
             ChatActionButton(title: "Scale Recipe", action: .scaleRecipe, icon: "arrow.up.arrow.down"),
             ChatActionButton(title: "Find Alternatives", action: .findAlternatives, icon: "arrow.triangle.2.circlepath"),
             ChatActionButton(title: "Add to Favorites", action: .addToFavorites, icon: "heart"),
-            ChatActionButton(title: "Check Pantry", action: .pantryCheck, icon: "cabinet")
+            ChatActionButton(title: "Check Pantry", action: .pantryCheck, icon: "cabinet"),
+            ChatActionButton(title: "View List", action: .addItemToList, icon: "list.bullet"),
+            ChatActionButton(title: "Start Route", action: .addItemToList, icon: "map")
         ]
         
         switch primaryIntent {
@@ -63,8 +65,6 @@ class ChatbotEngine: ObservableObject {
             return await handleListManagement(content)
         case .mealPlanning:
             return await handleMealPlanning(content)
-        case .storeInfo:
-            return await handleStoreInfo(content)
         case .dietaryFilter:
             return await handleDietaryFilter(content)
         case .inventoryCheck:
@@ -82,16 +82,1036 @@ class ChatbotEngine: ObservableObject {
         }
     }
     
+    // MARK: - Enhanced Intent Handlers for Spec Implementation
+    
+    // Grocery List Management
+    private func handleAddItemToList(_ query: String) async -> ChatMessage {
+        // Parse item name, quantity, unit from query
+        let components = parseItemFromQuery(query)
+        let itemName = components.name
+        let quantity = components.quantity
+        let unit = components.unit
+        
+        guard let store = appState.selectedStore else {
+            return ChatMessage(
+                content: "Please select a store first to add items to your grocery list.",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Choose Store", action: .addItemToList, icon: "storefront")
+                ]
+            )
+        }
+        
+        // Create grocery item
+        let groceryItem = GroceryItem(
+            name: itemName,
+            description: "Added via chatbot",
+            price: estimateItemPrice(itemName),
+            category: mapItemToCategory(itemName),
+            aisle: mapItemToAisle(itemName),
+            brand: "",
+            hasDeal: false,
+            dealDescription: nil
+        )
+        
+        // Add to list
+        appState.groceryList.addItem(groceryItem, store: store)
+        
+        let response = """
+        ✅ Added **\(quantity) \(unit) \(itemName)** to your grocery list!
+        
+        📍 **Location**: Aisle \(groceryItem.aisle)
+        💰 **Estimated Price**: $\(String(format: "%.2f", groceryItem.price))
+        
+        Your list now has \(appState.groceryList.totalItems) items.
+        """
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: [
+                ChatActionButton(title: "View List", action: .addItemToList, icon: "list.bullet"),
+                ChatActionButton(title: "Add More", action: .addItemToList, icon: "plus.circle")
+            ]
+        )
+    }
+    
+    private func handleRemoveItemFromList(_ query: String) async -> ChatMessage {
+        let itemName = extractItemName(query)
+        let removedItems = appState.groceryList.removeItem(named: itemName)
+        
+        if removedItems > 0 {
+            let response = """
+            ✅ Removed **\(itemName)** from your grocery list.
+            
+            Your list now has \(appState.groceryList.totalItems) items.
+            """
+            
+            return ChatMessage(
+                content: response,
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Undo", action: .removeItemFromList, icon: "arrow.uturn.backward"),
+                    ChatActionButton(title: "View List", action: .addItemToList, icon: "list.bullet")
+                ]
+            )
+        } else {
+            return ChatMessage(
+                content: "❌ **\(itemName)** not found in your grocery list.",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "View List", action: .addItemToList, icon: "list.bullet")
+                ]
+            )
+        }
+    }
+    
+    private func handleUpdateItemQty(_ query: String) async -> ChatMessage {
+        let components = parseQuantityUpdate(query)
+        let itemName = components.name
+        let newQuantity = components.quantity
+        
+        let success = appState.groceryList.updateQuantity(for: itemName, to: newQuantity)
+        
+        if success {
+            let response = """
+            ✅ Updated **\(itemName)** quantity to **\(newQuantity)**.
+            
+            Your list now has \(appState.groceryList.totalItems) items.
+            """
+            
+            return ChatMessage(
+                content: response,
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "View List", action: .addItemToList, icon: "list.bullet")
+                ]
+            )
+        } else {
+            return ChatMessage(
+                content: "❌ **\(itemName)** not found in your grocery list.",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "View List", action: .addItemToList, icon: "list.bullet")
+                ]
+            )
+        }
+    }
+    
+    private func handleAddRecipeToList(_ query: String) async -> ChatMessage {
+        let recipeName = extractRecipeName(query)
+        let servings = extractServings(query) ?? 4
+        
+        // Use Spoonacular API to search for recipe
+        let recipes = await spoonacularService.searchRecipes(
+            query: recipeName,
+            number: 1,
+            addRecipeInformation: true,
+            addRecipeNutrition: true
+        )
+        
+        guard let recipe = recipes.first else {
+            return ChatMessage(
+                content: "❌ Recipe **\(recipeName)** not found. Try searching for a different recipe.",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Search Recipes", action: .recipeSearch, icon: "magnifyingglass")
+                ]
+            )
+        }
+        
+        guard let store = appState.selectedStore else {
+            return ChatMessage(
+                content: "Please select a store first to add recipe ingredients to your grocery list.",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Choose Store", action: .addRecipeToList, icon: "storefront")
+                ]
+            )
+        }
+        
+        // Scale recipe ingredients for servings and normalize
+        let scaleFactor = Double(servings) / Double(recipe.servings)
+        var ingredientItems: [(name: String, quantity: Int, unit: String, notes: String)] = []
+        
+        for ingredient in recipe.ingredients {
+            let scaledAmount = ingredient.amount * scaleFactor
+            let normalizedIngredient = normalizeIngredient(
+                name: ingredient.name,
+                amount: scaledAmount,
+                unit: ingredient.unit ?? "item",
+                notes: "From \(recipe.name)"
+            )
+            ingredientItems.append(normalizedIngredient)
+        }
+        
+        // Deduplicate ingredients
+        let deduplicatedItems = deduplicateIngredients(ingredientItems)
+        
+        // Add to grocery list
+        var addedCount = 0
+        for item in deduplicatedItems {
+            let groceryItem = GroceryItem(
+                name: item.name,
+                description: item.notes,
+                price: estimateIngredientPrice(item.name),
+                category: mapIngredientToCategory(item.name),
+                aisle: mapIngredientToAisle(item.name),
+                brand: "",
+                hasDeal: false,
+                dealDescription: nil
+            )
+            
+            appState.groceryList.addItem(groceryItem, store: store, quantity: item.quantity)
+            addedCount += 1
+        }
+        
+        let response = """
+        ✅ Added **\(recipe.name)** ingredients to your grocery list!
+        
+        📊 **Servings**: \(servings)
+        🛒 **Items Added**: \(addedCount) ingredients
+        💰 **Estimated Cost**: $\(String(format: "%.2f", Double(addedCount) * 3.50))
+        
+        Your list now has \(appState.groceryList.totalItems) items.
+        """
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: [
+                ChatActionButton(title: "View List", action: .addItemToList, icon: "list.bullet"),
+                ChatActionButton(title: "Start Route", action: .addItemToList, icon: "map")
+            ]
+        )
+    }
+    
+    // Meal Planning
+    private func handlePlanSingleMeal(_ query: String) async -> ChatMessage {
+        let components = parseMealPlanQuery(query)
+        let date = components.date ?? Date()
+        let mealType = components.mealType ?? "dinner"
+        let recipeName = components.recipeName
+        
+        // Use Spoonacular API to search for recipe
+        let recipes = await spoonacularService.searchRecipes(
+            query: recipeName,
+            number: 1,
+            addRecipeInformation: true,
+            addRecipeNutrition: true
+        )
+        
+        guard let recipe = recipes.first else {
+            return ChatMessage(
+                content: "❌ Recipe **\(recipeName)** not found. Try searching for a different recipe.",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Search Recipes", action: .recipeSearch, icon: "magnifyingglass")
+                ]
+            )
+        }
+        
+        // Add meal to meal plan
+        let meal = Meal(
+            id: UUID(),
+            name: recipe.name,
+            recipe: recipe,
+            servings: components.servings ?? recipe.servings,
+            notes: components.notes
+        )
+        
+        appState.mealPlanManager.addMeal(meal, to: date, mealType: mealType)
+        
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        
+        let response = """
+        ✅ Added **\(recipe.name)** to your meal plan!
+        
+        📅 **Date**: \(formatter.string(from: date))
+        🍽️ **Meal**: \(mealType.capitalized)
+        👥 **Servings**: \(meal.servings)
+        ⏱️ **Prep Time**: \(recipe.prepTime + recipe.cookTime) minutes
+        """
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: [
+                ChatActionButton(title: "Open Meal Plan", action: .showMealPlan, icon: "calendar"),
+                ChatActionButton(title: "Add Ingredients", action: .addRecipeToList, icon: "plus.circle")
+            ]
+        )
+    }
+    
+    private func handlePlanWeekAutofill(_ query: String) async -> ChatMessage {
+        let components = parseWeekAutofillQuery(query)
+        let weekStart = components.weekStart ?? getCurrentWeekStart()
+        let constraints = components.constraints
+        
+        // Generate meal plan using OpenAI
+        let aiResponse = await openAIService.generateMealPlan(
+            constraints: constraints,
+            weekStart: weekStart
+        )
+        
+        let response = """
+        🗓️ **Weekly Meal Plan Generated**
+        
+        📅 **Week of**: \(formatDate(weekStart))
+        👥 **People**: \(constraints.people ?? 2)
+        🕒 **Max Time**: \(constraints.timePerMeal ?? 60) minutes
+        💰 **Budget**: $\(constraints.budget ?? 100) per week
+        🥗 **Diet**: \(constraints.diet?.joined(separator: ", ") ?? "No restrictions")
+        
+        \(aiResponse)
+        
+        Would you like me to apply this plan to your calendar and add ingredients to your grocery list?
+        """
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: [
+                ChatActionButton(title: "Preview Plan", action: .planWeekAutofill, icon: "eye"),
+                ChatActionButton(title: "Apply to Calendar", action: .planWeekAutofill, icon: "calendar.badge.plus")
+            ]
+        )
+    }
+    
+    private func handleShowMealPlan(_ query: String) async -> ChatMessage {
+        let date = extractDate(query) ?? Date()
+        let isWeekView = query.lowercased().contains("week")
+        
+        if isWeekView {
+            let weekStart = getWeekStart(for: date)
+            let weekPlan = appState.mealPlanManager.getWeekPlan(starting: weekStart)
+            
+            let response = formatWeekMealPlan(weekPlan, weekStart: weekStart)
+            
+            return ChatMessage(
+                content: response,
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Open Meal Plan", action: .showMealPlan, icon: "calendar"),
+                    ChatActionButton(title: "Add Ingredients", action: .addRecipeToList, icon: "plus.circle")
+                ]
+            )
+        } else {
+            let dayPlan = appState.mealPlanManager.getDayPlan(for: date)
+            
+            let response = formatDayMealPlan(dayPlan, date: date)
+            
+            return ChatMessage(
+                content: response,
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Open Meal Plan", action: .showMealPlan, icon: "calendar"),
+                    ChatActionButton(title: "Add/Swap Meal", action: .planSingleMeal, icon: "plus.circle")
+                ]
+            )
+        }
+    }
+    
+    // Nutrition Analysis
+    private func handleNutritionRecipe(_ query: String) async -> ChatMessage {
+        let recipeName = extractRecipeName(query)
+        let servings = extractServings(query) ?? 4
+        
+        // Use Spoonacular API to search for recipe
+        let recipes = await spoonacularService.searchRecipes(
+            query: recipeName,
+            number: 1,
+            addRecipeInformation: true,
+            addRecipeNutrition: true
+        )
+        
+        guard let recipe = recipes.first else {
+            return ChatMessage(
+                content: "❌ Recipe **\(recipeName)** not found.",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Search Recipes", action: .recipeSearch, icon: "magnifyingglass")
+                ]
+            )
+        }
+        
+        // Get nutrition data from Spoonacular
+        let nutritionData = await getRecipeNutrition(recipe: recipe, servings: servings)
+        
+        let response = """
+        📊 **Nutrition for \(recipe.name)** (\(servings) servings)
+        
+        🔥 **Calories**: \(nutritionData.calories) per serving
+        🥩 **Protein**: \(String(format: "%.1f", nutritionData.protein))g
+        🍞 **Carbs**: \(String(format: "%.1f", nutritionData.carbs))g
+        🧈 **Fat**: \(String(format: "%.1f", nutritionData.fat))g
+        🌾 **Fiber**: \(String(format: "%.1f", nutritionData.fiber ?? 0))g
+        🍯 **Sugar**: \(String(format: "%.1f", nutritionData.sugar ?? 0))g
+        🧂 **Sodium**: \(nutritionData.sodium ?? 0)mg
+        """
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: [
+                ChatActionButton(title: "Add to List", action: .addRecipeToList, icon: "plus.circle"),
+                ChatActionButton(title: "Add to Meal Plan", action: .planSingleMeal, icon: "calendar")
+            ]
+        )
+    }
+    
+    // Recipe Search
+    private func handleRecipeSearch(_ query: String) async -> ChatMessage {
+        let searchQuery = extractSearchQuery(query)
+        let constraints = parseRecipeConstraints(query)
+        
+        // Use Spoonacular API to search recipes with constraints
+        let recipes = await spoonacularService.searchRecipes(
+            query: searchQuery,
+            diet: constraints.diet?.first,
+            maxReadyTime: constraints.maxTime,
+            number: 3,
+            addRecipeInformation: true,
+            addRecipeNutrition: true
+        )
+        
+        let filteredRecipes = filterRecipesByConstraints(recipes, constraints: constraints)
+        
+        if filteredRecipes.isEmpty {
+            return ChatMessage(
+                content: "❌ No recipes found matching your criteria. Try adjusting your search terms or constraints.",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Search Again", action: .recipeSearch, icon: "magnifyingglass")
+                ]
+            )
+        }
+        
+        let topRecipe = filteredRecipes.first!
+        let response = """
+        🔍 **Recipe Search Results**
+        
+        **\(topRecipe.name)**
+        \(topRecipe.description)
+        
+        ⏱️ **Time**: \(topRecipe.prepTime + topRecipe.cookTime) minutes
+        👥 **Servings**: \(topRecipe.servings)
+        ⭐ **Rating**: \(topRecipe.rating)/5
+        💰 **Cost**: ~$\(String(format: "%.2f", estimateRecipeCost(topRecipe)))
+        
+        Found \(filteredRecipes.count) matching recipes.
+        """
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            recipe: topRecipe,
+            actionButtons: [
+                ChatActionButton(title: "Add to List", action: .addRecipeToList, icon: "plus.circle"),
+                ChatActionButton(title: "Plan Meal", action: .planSingleMeal, icon: "calendar"),
+                ChatActionButton(title: "See Nutrition", action: .nutritionRecipe, icon: "chart.bar")
+            ]
+        )
+    }
+    
+    // Leftovers
+    private func handleLeftovers(_ query: String) async -> ChatMessage {
+        let availableIngredients = extractIngredients(query)
+        
+        if availableIngredients.isEmpty {
+            return ChatMessage(
+                content: "Please specify what ingredients you have available. For example: 'What can I make with chicken, rice, and vegetables?'",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Check Pantry", action: .pantryCheck, icon: "cabinet")
+                ]
+            )
+        }
+        
+        // Use Spoonacular API to find recipes by ingredients
+        let recipes = await spoonacularService.findRecipesByIngredients(
+            ingredients: availableIngredients,
+            ranking: 2,
+            ignorePantry: true
+        )
+        
+        if recipes.isEmpty {
+            return ChatMessage(
+                content: "❌ No recipes found with those ingredients. Try adding more common ingredients or check your spelling.",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Try Again", action: .leftovers, icon: "arrow.clockwise")
+                ]
+            )
+        }
+        
+        let topRecipe = recipes.first!
+        let response = """
+        🍽️ **Meal Ideas with Available Ingredients**
+        
+        **Available**: \(availableIngredients.joined(separator: ", "))
+        
+        **Top Match**: \(topRecipe.name)
+        ⏱️ **Time**: \(topRecipe.totalTime) minutes
+        👥 **Servings**: \(topRecipe.servings)
+        ⭐ **Rating**: \(String(format: "%.1f", topRecipe.rating))/5
+        
+        Found \(recipes.count) matching recipes.
+        """
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            recipe: topRecipe,
+            actionButtons: [
+                ChatActionButton(title: "Add to List", action: .addRecipeToList, icon: "plus.circle"),
+                ChatActionButton(title: "Plan Meal", action: .planSingleMeal, icon: "calendar")
+            ]
+        )
+    }
+    
+    // Navigation/Routing
+    private func handleStartRoute(_ query: String) async -> ChatMessage {
+        guard let store = appState.selectedStore else {
+            return ChatMessage(
+                content: "Please select a store first to start your route.",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Choose Store", action: .startRoute, icon: "storefront")
+                ]
+            )
+        }
+        
+        let groceryItems = appState.groceryList.groceryItems
+        if groceryItems.isEmpty {
+            return ChatMessage(
+                content: "Your grocery list is empty. Add some items first to start your route.",
+                isUser: false,
+                actionButtons: [
+                    ChatActionButton(title: "Add Items", action: .addItemToList, icon: "plus.circle")
+                ]
+            )
+        }
+        
+        // Generate route using RouteOptimizationManager
+        let routeManager = RouteOptimizationManager()
+        let route = routeManager.generateOptimalRoute(for: appState.groceryList, storeLayout: store.layout)
+        
+        let estimatedTime = appState.groceryList.estimatedTimeMinutes
+        let totalItems = appState.groceryList.totalItems
+        
+        let response = """
+        🗺️ **Route Ready!**
+        
+        📍 **Store**: \(store.name)
+        🛒 **Items**: \(totalItems) items
+        ⏱️ **ETA**: ~\(estimatedTime) minutes
+        📏 **Distance**: ~\(String(format: "%.1f", route.totalDistance)) meters
+        
+        Your optimized shopping route is ready to begin!
+        """
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: [
+                ChatActionButton(title: "View Map", action: .startRoute, icon: "map"),
+                ChatActionButton(title: "Mark Items Done", action: .startRoute, icon: "checkmark.circle")
+            ]
+        )
+    }
+    
+    // MARK: - Helper Functions for Spec Implementation
+    
+    private func parseItemFromQuery(_ query: String) -> (name: String, quantity: Int, unit: String) {
+        let words = query.lowercased().components(separatedBy: .whitespaces)
+        var quantity = 1
+        var unit = "item"
+        var name = query
+        
+        // Extract quantity
+        for (index, word) in words.enumerated() {
+            if let qty = Int(word) {
+                quantity = qty
+                if index + 1 < words.count {
+                    unit = words[index + 1]
+                    // Remove quantity and unit from name
+                    let remainingWords = words.dropFirst(index + 2)
+                    name = remainingWords.joined(separator: " ")
+                } else {
+                    let remainingWords = words.dropFirst(index + 1)
+                    name = remainingWords.joined(separator: " ")
+                }
+                break
+            }
+        }
+        
+        return (name: name, quantity: quantity, unit: unit)
+    }
+    
+    private func extractItemName(_ query: String) -> String {
+        let words = query.lowercased().components(separatedBy: .whitespaces)
+        let removeWords = ["remove", "delete", "from", "my", "grocery", "list", "shopping"]
+        let filteredWords = words.filter { !removeWords.contains($0) }
+        return filteredWords.joined(separator: " ")
+    }
+    
+    private func parseQuantityUpdate(_ query: String) -> (name: String, quantity: Int) {
+        let words = query.lowercased().components(separatedBy: .whitespaces)
+        var quantity = 1
+        var name = query
+        
+        for (index, word) in words.enumerated() {
+            if let qty = Int(word) {
+                quantity = qty
+                let remainingWords = words.dropFirst(index + 1)
+                name = remainingWords.joined(separator: " ")
+                break
+            }
+        }
+        
+        return (name: name, quantity: quantity)
+    }
+    
+    private func extractRecipeName(_ query: String) -> String {
+        let words = query.lowercased().components(separatedBy: .whitespaces)
+        let removeWords = ["add", "recipe", "to", "list", "plan", "meal", "for", "servings"]
+        let filteredWords = words.filter { !removeWords.contains($0) }
+        return filteredWords.joined(separator: " ")
+    }
+    
+    private func extractServings(_ query: String) -> Int? {
+        let words = query.lowercased().components(separatedBy: .whitespaces)
+        for (index, word) in words.enumerated() {
+            if word == "servings" && index > 0 {
+                return Int(words[index - 1])
+            }
+            if let servings = Int(word), index + 1 < words.count && words[index + 1] == "servings" {
+                return servings
+            }
+        }
+        return nil
+    }
+    
+    private func parseMealPlanQuery(_ query: String) -> (date: Date?, mealType: String?, recipeName: String, servings: Int?, notes: String?) {
+        let words = query.lowercased().components(separatedBy: .whitespaces)
+        var date: Date?
+        var mealType: String?
+        var recipeName = query
+        var servings: Int?
+        var notes: String?
+        
+        // Extract meal type
+        let mealTypes = ["breakfast", "lunch", "dinner", "snack"]
+        for type in mealTypes {
+            if words.contains(type) {
+                mealType = type
+                break
+            }
+        }
+        
+        // Extract date
+        if words.contains("tomorrow") {
+            date = Calendar.current.date(byAdding: .day, value: 1, to: Date())
+        } else if words.contains("today") {
+            date = Date()
+        }
+        
+        // Extract servings
+        servings = extractServings(query)
+        
+        // Clean recipe name
+        let removeWords = ["add", "plan", "meal", "for", "tomorrow", "today", "breakfast", "lunch", "dinner", "snack"]
+        let filteredWords = words.filter { !removeWords.contains($0) }
+        recipeName = filteredWords.joined(separator: " ")
+        
+        return (date: date, mealType: mealType, recipeName: recipeName, servings: servings, notes: notes)
+    }
+    
+    private func parseWeekAutofillQuery(_ query: String) -> (weekStart: Date?, constraints: MealPlanConstraints) {
+        let words = query.lowercased().components(separatedBy: .whitespaces)
+        var weekStart: Date?
+        var constraints = MealPlanConstraints()
+        
+        // Extract week start
+        if words.contains("next") && words.contains("week") {
+            weekStart = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: getCurrentWeekStart())
+        } else if words.contains("this") && words.contains("week") {
+            weekStart = getCurrentWeekStart()
+        }
+        
+        // Extract constraints
+        for (index, word) in words.enumerated() {
+            if word == "people" && index > 0 {
+                constraints.people = Int(words[index - 1])
+            }
+            if word == "minutes" && index > 0 {
+                constraints.timePerMeal = Int(words[index - 1])
+            }
+            if word == "dollars" || word == "$" && index > 0 {
+                constraints.budget = Double(words[index - 1])
+            }
+        }
+        
+        // Extract dietary restrictions
+        let diets = ["vegetarian", "vegan", "gluten-free", "keto", "paleo", "dairy-free"]
+        constraints.diet = diets.filter { words.contains($0) }
+        
+        return (weekStart: weekStart, constraints: constraints)
+    }
+    
+    private func extractDate(_ query: String) -> Date? {
+        let words = query.lowercased().components(separatedBy: .whitespaces)
+        
+        if words.contains("today") {
+            return Date()
+        } else if words.contains("tomorrow") {
+            return Calendar.current.date(byAdding: .day, value: 1, to: Date())
+        } else if words.contains("yesterday") {
+            return Calendar.current.date(byAdding: .day, value: -1, to: Date())
+        }
+        
+        return nil
+    }
+    
+    private func extractSearchQuery(_ query: String) -> String {
+        let words = query.lowercased().components(separatedBy: .whitespaces)
+        let removeWords = ["find", "search", "recipes", "for", "with", "that", "are"]
+        let filteredWords = words.filter { !removeWords.contains($0) }
+        return filteredWords.joined(separator: " ")
+    }
+    
+    private func parseRecipeConstraints(_ query: String) -> RecipeConstraints {
+        let words = query.lowercased().components(separatedBy: .whitespaces)
+        var constraints = RecipeConstraints()
+        
+        // Extract time constraints
+        for (index, word) in words.enumerated() {
+            if word == "minutes" && index > 0 {
+                constraints.maxTime = Int(words[index - 1])
+            }
+        }
+        
+        // Extract dietary constraints
+        let diets = ["vegetarian", "vegan", "gluten-free", "keto", "paleo", "dairy-free"]
+        constraints.diet = diets.filter { words.contains($0) }
+        
+        // Extract calorie constraints
+        for (index, word) in words.enumerated() {
+            if word == "calories" && index > 0 {
+                constraints.maxCalories = Int(words[index - 1])
+            }
+        }
+        
+        return constraints
+    }
+    
+    private func extractIngredients(_ query: String) -> [String] {
+        let words = query.lowercased().components(separatedBy: .whitespaces)
+        let removeWords = ["what", "can", "i", "make", "with", "using", "have", "available"]
+        let filteredWords = words.filter { !removeWords.contains($0) }
+        
+        // Split by common separators
+        let ingredientsText = filteredWords.joined(separator: " ")
+        let ingredients = ingredientsText.components(separatedBy: CharacterSet(charactersIn: ",;"))
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        
+        return ingredients
+    }
+    
+    private func getCurrentWeekStart() -> Date {
+        let calendar = Calendar.current
+        let today = Date()
+        let weekday = calendar.component(.weekday, from: today)
+        let daysFromMonday = (weekday + 5) % 7 // Convert Sunday=1 to Monday=0
+        return calendar.date(byAdding: .day, value: -daysFromMonday, to: today) ?? today
+    }
+    
+    private func getWeekStart(for date: Date) -> Date {
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: date)
+        let daysFromMonday = (weekday + 5) % 7
+        return calendar.date(byAdding: .day, value: -daysFromMonday, to: date) ?? date
+    }
+    
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: date)
+    }
+    
+    private func formatWeekMealPlan(_ weekPlan: [MealPlan], weekStart: Date) -> String {
+        var response = "📅 **Weekly Meal Plan** (Week of \(formatDate(weekStart)))\n\n"
+        
+        for (index, dayPlan) in weekPlan.enumerated() {
+            let dayDate = Calendar.current.date(byAdding: .day, value: index, to: weekStart) ?? weekStart
+            let dayName = DateFormatter().weekdaySymbols[Calendar.current.component(.weekday, from: dayDate) - 1]
+            
+            response += "**\(dayName)** (\(formatDate(dayDate))):\n"
+            if dayPlan.meals.isEmpty {
+                response += "  No meals planned\n"
+            } else {
+                for meal in dayPlan.meals {
+                    response += "  • \(meal.name) (\(meal.servings) servings)\n"
+                }
+            }
+            response += "\n"
+        }
+        
+        return response
+    }
+    
+    private func formatDayMealPlan(_ dayPlan: MealPlan?, date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .full
+        
+        if let plan = dayPlan, !plan.meals.isEmpty {
+            var response = "📅 **Meal Plan for \(formatter.string(from: date))**\n\n"
+            
+            for meal in plan.meals {
+                response += "🍽️ **\(meal.name)**\n"
+                response += "   👥 Servings: \(meal.servings)\n"
+                if let notes = meal.notes {
+                    response += "   📝 Notes: \(notes)\n"
+                }
+                response += "\n"
+            }
+            
+            return response
+        } else {
+            return "📅 **No meals planned for \(formatter.string(from: date))**\n\nWould you like to add some meals?"
+        }
+    }
+    
+    private func estimateItemPrice(_ itemName: String) -> Double {
+        // Simple price estimation based on item type
+        let name = itemName.lowercased()
+        if name.contains("organic") { return 4.99 }
+        if name.contains("meat") || name.contains("chicken") || name.contains("beef") { return 8.99 }
+        if name.contains("fish") || name.contains("salmon") { return 12.99 }
+        if name.contains("cheese") || name.contains("dairy") { return 5.99 }
+        if name.contains("bread") || name.contains("pasta") { return 3.99 }
+        if name.contains("vegetable") || name.contains("fruit") { return 2.99 }
+        return 3.99 // Default price
+    }
+    
+    private func estimateIngredientPrice(_ ingredient: String) -> Double {
+        return estimateItemPrice(ingredient)
+    }
+    
+    private func estimateRecipeCost(_ recipe: Recipe) -> Double {
+        return Double(recipe.ingredients.count) * 3.50
+    }
+    
+    private func mapItemToCategory(_ itemName: String) -> String {
+        let name = itemName.lowercased()
+        if name.contains("meat") || name.contains("chicken") || name.contains("beef") || name.contains("fish") { return "Meat & Seafood" }
+        if name.contains("dairy") || name.contains("cheese") || name.contains("milk") { return "Dairy" }
+        if name.contains("vegetable") || name.contains("fruit") { return "Produce" }
+        if name.contains("bread") || name.contains("pasta") || name.contains("grain") { return "Bakery" }
+        if name.contains("canned") || name.contains("jar") { return "Canned Goods" }
+        if name.contains("frozen") { return "Frozen Foods" }
+        return "General"
+    }
+    
+    private func mapItemToAisle(_ itemName: String) -> Int {
+        let name = itemName.lowercased()
+        if name.contains("meat") || name.contains("chicken") || name.contains("beef") || name.contains("fish") { return 5 }
+        if name.contains("dairy") || name.contains("cheese") || name.contains("milk") { return 8 }
+        if name.contains("vegetable") || name.contains("fruit") { return 1 }
+        if name.contains("bread") || name.contains("pasta") || name.contains("grain") { return 4 }
+        if name.contains("canned") || name.contains("jar") { return 7 }
+        if name.contains("frozen") { return 12 }
+        return 3 // Default aisle
+    }
+    
+    private func mapIngredientToCategory(_ ingredient: String) -> String {
+        return mapItemToCategory(ingredient)
+    }
+    
+    private func mapIngredientToAisle(_ ingredient: String) -> Int {
+        return mapItemToAisle(ingredient)
+    }
+    
+    private func filterRecipesByConstraints(_ recipes: [Recipe], constraints: RecipeConstraints) -> [Recipe] {
+        return recipes.filter { recipe in
+            // Filter by time
+            if let maxTime = constraints.maxTime {
+                if recipe.prepTime + recipe.cookTime > maxTime {
+                    return false
+                }
+            }
+            
+            // Filter by dietary restrictions
+            if let diet = constraints.diet, !diet.isEmpty {
+                let recipeTags = recipe.tags.map { $0.lowercased() }
+                let hasMatchingDiet = diet.contains { dietType in
+                    recipeTags.contains { $0.contains(dietType) }
+                }
+                if !hasMatchingDiet {
+                    return false
+                }
+            }
+            
+            return true
+        }
+    }
+    
+    private func getRecipeNutrition(recipe: Recipe, servings: Int) async -> NutritionData {
+        // Get detailed recipe information with nutrition from Spoonacular
+        if let detailedRecipe = await spoonacularService.getRecipeDetails(id: recipe.id) {
+            // Use Spoonacular nutrition data if available
+            if let nutrition = detailedRecipe.nutrition {
+                return NutritionData(
+                    calories: Int(nutrition.calories),
+                    protein: nutrition.protein,
+                    carbs: nutrition.carbs,
+                    fat: nutrition.fat,
+                    fiber: nutrition.fiber,
+                    sugar: nutrition.sugar,
+                    sodium: Int(nutrition.sodium)
+                )
+            }
+        }
+        
+        // Fallback to estimated values
+        return NutritionData(
+            calories: 350,
+            protein: 25.0,
+            carbs: 30.0,
+            fat: 15.0,
+            fiber: 5.0,
+            sugar: 8.0,
+            sodium: 600
+        )
+    }
+    
+    // MARK: - Ingredient Normalization & Deduplication
+    
+    private func normalizeIngredient(name: String, amount: Double, unit: String, notes: String) -> (name: String, quantity: Int, unit: String, notes: String) {
+        // Normalize ingredient name (remove extra descriptors, convert to singular)
+        let normalizedName = normalizeIngredientName(name)
+        
+        // Normalize quantity (round to reasonable values)
+        let normalizedQuantity = normalizeQuantity(amount)
+        
+        // Normalize unit
+        let normalizedUnit = normalizeUnit(unit)
+        
+        return (name: normalizedName, quantity: normalizedQuantity, unit: normalizedUnit, notes: notes)
+    }
+    
+    private func normalizeIngredientName(_ name: String) -> String {
+        let name = name.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Remove common descriptors
+        let descriptors = ["fresh", "diced", "chopped", "sliced", "minced", "grated", "crushed", "dried", "frozen", "canned", "organic", "large", "medium", "small"]
+        var normalizedName = name
+        
+        for descriptor in descriptors {
+            normalizedName = normalizedName.replacingOccurrences(of: descriptor, with: "")
+        }
+        
+        // Convert to singular
+        if normalizedName.hasSuffix("s") && normalizedName.count > 3 {
+            normalizedName = String(normalizedName.dropLast())
+        }
+        
+        return normalizedName.trimmingCharacters(in: .whitespacesAndNewlines).capitalized
+    }
+    
+    private func normalizeQuantity(_ amount: Double) -> Int {
+        // Round to reasonable quantities
+        if amount < 0.5 {
+            return 1
+        } else if amount < 1.5 {
+            return 1
+        } else if amount < 2.5 {
+            return 2
+        } else if amount < 3.5 {
+            return 3
+        } else {
+            return Int(round(amount))
+        }
+    }
+    
+    private func normalizeUnit(_ unit: String) -> String {
+        let unit = unit.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Standardize common units
+        switch unit {
+        case "cup", "cups", "c":
+            return "cup"
+        case "tablespoon", "tablespoons", "tbsp", "tbs":
+            return "tbsp"
+        case "teaspoon", "teaspoons", "tsp":
+            return "tsp"
+        case "pound", "pounds", "lb", "lbs":
+            return "lb"
+        case "ounce", "ounces", "oz":
+            return "oz"
+        case "clove", "cloves":
+            return "clove"
+        case "piece", "pieces":
+            return "piece"
+        case "item", "items", "", "none":
+            return "item"
+        default:
+            return unit
+        }
+    }
+    
+    private func deduplicateIngredients(_ ingredients: [(name: String, quantity: Int, unit: String, notes: String)]) -> [(name: String, quantity: Int, unit: String, notes: String)] {
+        var deduplicated: [(name: String, quantity: Int, unit: String, notes: String)] = []
+        var seenIngredients: [String: Int] = [:]
+        
+        for ingredient in ingredients {
+            let key = "\(ingredient.name)_\(ingredient.unit)"
+            
+            if let existingIndex = seenIngredients[key] {
+                // Merge quantities
+                deduplicated[existingIndex].quantity += ingredient.quantity
+                deduplicated[existingIndex].notes += "; \(ingredient.notes)"
+            } else {
+                // Add new ingredient
+                deduplicated.append(ingredient)
+                seenIngredients[key] = deduplicated.count - 1
+            }
+        }
+        
+        return deduplicated
+    }
+}
+
+// MARK: - Supporting Data Structures for Spec Implementation
+
+struct MealPlanConstraints {
+    var people: Int?
+    var timePerMeal: Int?
+    var budget: Double?
+    var diet: [String]?
+    var intolerances: [String]?
+}
+
+struct RecipeConstraints {
+    var maxTime: Int?
+    var diet: [String]?
+    var maxCalories: Int?
+}
+    
     // MARK: - Enhanced Intent Handlers
     private func handleRecipeRequest(_ query: String) async -> ChatMessage {
         let recipes = RecipeDatabase.searchRecipes(query: query)
         let actionButtons = [
             ChatActionButton(title: "Add to List", action: .addToList, icon: "plus.circle"),
-            ChatActionButton(title: "Show Aisle", action: .showAisle, icon: "location"),
             ChatActionButton(title: "Scale Recipe", action: .scaleRecipe, icon: "arrow.up.arrow.down"),
             ChatActionButton(title: "Find Alternatives", action: .findAlternatives, icon: "arrow.triangle.2.circlepath"),
             ChatActionButton(title: "Add to Favorites", action: .addToFavorites, icon: "heart"),
-            ChatActionButton(title: "Check Pantry", action: .pantryCheck, icon: "cabinet")
+            ChatActionButton(title: "Check Pantry", action: .pantryCheck, icon: "cabinet"),
+            ChatActionButton(title: "View List", action: .addItemToList, icon: "list.bullet"),
+            ChatActionButton(title: "Start Route", action: .addItemToList, icon: "map")
         ]
         
         if let recipe = recipes.first {
@@ -328,29 +1348,6 @@ class ChatbotEngine: ObservableObject {
         )
     }
     
-    private func handleStoreInfo(_ query: String) async -> ChatMessage {
-        let store = sampleLAStores.first
-        let actionButtons = [
-            ChatActionButton(title: "Store Hours", action: .storeInfo, icon: "clock"),
-            ChatActionButton(title: "Store Map", action: .navigateTo, icon: "map"),
-            ChatActionButton(title: "Find Section", action: .findInStore, icon: "location")
-        ]
-        let response = """
-        **\(store?.name ?? "Lumo Store")** Information 🏪
-        
-        📍 **Address**: \(store?.address ?? ""), \(store?.city ?? "") \(store?.state ?? "") \(store?.zip ?? "")
-        📞 **Phone**: \(store?.phone ?? "")
-        🕒 **Hours**: \(store?.hours ?? "")
-        ⭐ **Rating**: \(store?.rating ?? 0)/5
-        
-        I can help you find specific sections, check store hours, or navigate to different areas of the store!
-        """
-        return ChatMessage(
-            content: response,
-            isUser: false,
-            actionButtons: actionButtons
-        )
-    }
     
     private func handleDietaryFilter(_ query: String) async -> ChatMessage {
         let actionButtons = [
@@ -592,7 +1589,6 @@ class IntentRecognizer {
         case dealSearch
         case listManagement
         case mealPlanning
-        case storeInfo
         case dietaryFilter
         case inventoryCheck
         case pantryManagement
@@ -608,7 +1604,6 @@ class IntentRecognizer {
             case .dealSearch: return "Deal Search"
             case .listManagement: return "List Management"
             case .mealPlanning: return "Meal Planning"
-            case .storeInfo: return "Store Information"
             case .dietaryFilter: return "Dietary Filter"
             case .inventoryCheck: return "Inventory Check"
             case .pantryManagement: return "Pantry Management"
@@ -902,20 +1897,6 @@ class IntentRecognizer {
         ("30 minute meals", 5.0)
     ]
     
-    private let storeInfoPatterns: [(pattern: String, weight: Double)] = [
-        ("store", 8.0),
-        ("hours", 9.0),
-        ("open", 7.0),
-        ("close", 7.0),
-        ("address", 8.0),
-        ("phone", 6.0),
-        ("location", 5.0),
-        ("near", 4.0),
-        ("directions", 5.0),
-        ("contact", 4.0),
-        ("information", 3.0),
-        ("details", 3.0)
-    ]
     
     private let dietaryFilterPatterns: [(pattern: String, weight: Double)] = [
         ("diet", 8.0),
@@ -1147,7 +2128,6 @@ class IntentRecognizer {
         case .dealSearch: return dealSearchPatterns
         case .listManagement: return listManagementPatterns
         case .mealPlanning: return mealPlanningPatterns
-        case .storeInfo: return storeInfoPatterns
         case .dietaryFilter: return dietaryFilterPatterns
         case .inventoryCheck: return inventoryCheckPatterns
         case .pantryManagement: return pantryManagementPatterns

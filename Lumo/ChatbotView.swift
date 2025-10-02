@@ -550,9 +550,6 @@ struct ChatbotView: View {
         case .showDeals:
             showDealsPage()
             
-        case .navigateTo:
-            showStoreNavigation()
-            
         case .addToFavorites:
             if let recipe = message.recipe {
                 appState.addRecipeToFavorites(recipe)
@@ -580,9 +577,6 @@ struct ChatbotView: View {
                 showNutritionSheet = true
             }
             
-        case .findInStore:
-            showStoreFinder()
-            
         case .comparePrices:
             showPriceComparison()
             
@@ -598,9 +592,6 @@ struct ChatbotView: View {
         case .allergenCheck:
             showAllergenCheck()
             
-        case .storeInfo:
-            showStoreInfo()
-            
         case .showIngredients:
             if let recipe = message.recipe {
                 sheetRecipe = recipe
@@ -609,6 +600,46 @@ struct ChatbotView: View {
             
         case .surpriseMeal:
             generateSurpriseMeal()
+            
+        // New actions for enhanced chatbot spec
+        case .addItemToList:
+            handleAddItemToList(message)
+            
+        case .removeItemFromList:
+            handleRemoveItemFromList(message)
+            
+        case .updateItemQty:
+            handleUpdateItemQty(message)
+            
+        case .addRecipeToList:
+            handleAddRecipeToList(message)
+            
+        case .planSingleMeal:
+            handlePlanSingleMeal(message)
+            
+        case .planWeekAutofill:
+            handlePlanWeekAutofill(message)
+            
+        case .showMealPlan:
+            handleShowMealPlan(message)
+            
+        case .nutritionRecipe:
+            handleNutritionRecipe(message)
+            
+        case .nutritionDay:
+            handleNutritionDay(message)
+            
+        case .nutritionWeek:
+            handleNutritionWeek(message)
+            
+        case .recipeSearch:
+            handleRecipeSearch(message)
+            
+        case .leftovers:
+            handleLeftovers(message)
+            
+        case .startRoute:
+            handleStartRoute(message)
             
         case .showRecipe:
             if let recipe = message.recipe {
@@ -888,9 +919,6 @@ struct ChatbotView: View {
         // Show allergen check
     }
     
-    private func showStoreInfo() {
-        // Show store information
-    }
     
     // MARK: - AI Meal Builder Actions
     private func addMealToCart(_ message: ChatMessage) {
@@ -912,6 +940,118 @@ struct ChatbotView: View {
         // Generate a random meal suggestion
         Task {
             await chatbotEngine.sendMessage("Surprise me with a random meal")
+        }
+    }
+    
+    // MARK: - New Handler Functions for Enhanced Spec
+    
+    private func handleAddItemToList(_ message: ChatMessage) {
+        // This would trigger the chatbot to ask for item details
+        Task {
+            await chatbotEngine.sendMessage("What item would you like to add to your grocery list?")
+        }
+    }
+    
+    private func handleRemoveItemFromList(_ message: ChatMessage) {
+        // This would trigger the chatbot to ask which item to remove
+        Task {
+            await chatbotEngine.sendMessage("What item would you like to remove from your grocery list?")
+        }
+    }
+    
+    private func handleUpdateItemQty(_ message: ChatMessage) {
+        // This would trigger the chatbot to ask for item and new quantity
+        Task {
+            await chatbotEngine.sendMessage("Which item would you like to update the quantity for?")
+        }
+    }
+    
+    private func handleAddRecipeToList(_ message: ChatMessage) {
+        if let recipe = message.recipe {
+            // Add recipe ingredients to grocery list
+            addRecipeIngredientsToGroceryList(recipe)
+        } else {
+            // Ask for recipe name
+            Task {
+                await chatbotEngine.sendMessage("Which recipe would you like to add ingredients for?")
+            }
+        }
+    }
+    
+    private func handlePlanSingleMeal(_ message: ChatMessage) {
+        if let recipe = message.recipe {
+            // Plan this recipe as a meal
+            Task {
+                await chatbotEngine.sendMessage("Plan \(recipe.name) for dinner tomorrow")
+            }
+        } else {
+            // Ask for meal details
+            Task {
+                await chatbotEngine.sendMessage("What meal would you like to plan? Please specify the recipe, date, and meal type.")
+            }
+        }
+    }
+    
+    private func handlePlanWeekAutofill(_ message: ChatMessage) {
+        // Generate weekly meal plan
+        Task {
+            await chatbotEngine.sendMessage("Generate a weekly meal plan for 2 people with vegetarian options")
+        }
+    }
+    
+    private func handleShowMealPlan(_ message: ChatMessage) {
+        // Show current meal plan
+        Task {
+            await chatbotEngine.sendMessage("Show my meal plan for this week")
+        }
+    }
+    
+    private func handleNutritionRecipe(_ message: ChatMessage) {
+        if let recipe = message.recipe {
+            // Show nutrition for this recipe
+            Task {
+                await chatbotEngine.sendMessage("Show nutrition information for \(recipe.name)")
+            }
+        } else {
+            // Ask for recipe name
+            Task {
+                await chatbotEngine.sendMessage("Which recipe would you like nutrition information for?")
+            }
+        }
+    }
+    
+    private func handleNutritionDay(_ message: ChatMessage) {
+        // Show daily nutrition
+        Task {
+            await chatbotEngine.sendMessage("Show nutrition for today's meals")
+        }
+    }
+    
+    private func handleNutritionWeek(_ message: ChatMessage) {
+        // Show weekly nutrition
+        Task {
+            await chatbotEngine.sendMessage("Show nutrition for this week's meals")
+        }
+    }
+    
+    private func handleRecipeSearch(_ message: ChatMessage) {
+        // Search for recipes
+        Task {
+            await chatbotEngine.sendMessage("Find vegetarian pasta recipes under 30 minutes")
+        }
+    }
+    
+    private func handleLeftovers(_ message: ChatMessage) {
+        // Suggest meals from available ingredients
+        Task {
+            await chatbotEngine.sendMessage("What can I make with chicken, rice, and vegetables?")
+        }
+    }
+    
+    private func handleStartRoute(_ message: ChatMessage) {
+        // Start navigation route
+        Task {
+            await chatbotEngine.sendMessage("Start my route")
         }
     }
 
