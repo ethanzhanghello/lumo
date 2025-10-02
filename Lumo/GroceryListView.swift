@@ -80,11 +80,7 @@ struct GroceryListView: View {
     private var headerSection: some View {
         VStack(spacing: 16) {
             HStack {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark")
-                        .foregroundColor(.white)
-                        .font(.title2)
-                }
+                // Removed xmark close button
                 Spacer()
                 Text("Grocery List")
                     .font(.title2)
@@ -349,18 +345,24 @@ struct FlatGroceryListView: View {
     @State private var showingUndoToast = false
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) { // Increased spacing between cards
-                ForEach(appState.groceryList.groceryItems) { groceryItem in
-                    GroceryItemCard(groceryItem: groceryItem)
-                        .environmentObject(appState)
-                        .padding(.horizontal, 8) // Add horizontal padding
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                }
-                .padding(.bottom, 8)
+        List {
+            ForEach(appState.groceryList.groceryItems) { groceryItem in
+                GroceryItemCard(groceryItem: groceryItem)
+                    .environmentObject(appState)
+                    .padding(.horizontal, 8)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .listRowBackground(Color.clear)
             }
-            .padding(.top, 8)
+            .onDelete { indexSet in
+                for index in indexSet {
+                    let item = appState.groceryList.groceryItems[index]
+                    appState.groceryList.removeItem(item.item, store: item.store)
+                }
+            }
         }
+        .listStyle(PlainListStyle())
+        .background(Color.black)
+        .scrollContentBackground(.hidden)
     }
 }
 
@@ -418,9 +420,16 @@ struct GroupedGroceryListView: View {
                             .background(Color.clear)
                             .listRowInsets(EdgeInsets())
                         ) {
-                            ForEach(groupedItems[store]![category] ?? [], id: \.id) { groceryItem in
+                            let items = groupedItems[store]![category] ?? []
+                            ForEach(items, id: \.id) { groceryItem in
                                 GroceryItemCard(groceryItem: groceryItem)
                                     .listRowBackground(Color.clear)
+                            }
+                            .onDelete { indexSet in
+                                for index in indexSet {
+                                    let item = items[index]
+                                    appState.groceryList.removeItem(item.item, store: item.store)
+                                }
                             }
                         }
                     }
@@ -428,6 +437,8 @@ struct GroupedGroceryListView: View {
             }
         }
         .listStyle(PlainListStyle())
+        .background(Color.black)
+        .scrollContentBackground(.hidden)
     }
 }
 
