@@ -523,12 +523,6 @@ struct ChatbotView: View {
                 showConfirmationToast("No recipe found to add to meal plan")
             }
             
-        case .showAisle:
-            if let recipe = message.recipe {
-                showRecipeRoute(recipe)
-            } else if let product = message.product {
-                showProductLocation(product)
-            }
             
         case .scaleRecipe:
             if let recipe = message.recipe {
