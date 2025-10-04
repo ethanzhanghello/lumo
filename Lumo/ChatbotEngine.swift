@@ -1105,6 +1105,36 @@ class ChatbotEngine: ObservableObject {
     
     // MARK: - AI Response Functions
     
+    private func generateRecipeWithOpenAI(query: String) async -> ChatMessage {
+        let prompt = """
+        You are a professional chef and nutritionist. A user is asking for: "\(query)"
+        
+        Please provide a complete recipe that matches their request. Include:
+        1. Recipe name
+        2. Brief description
+        3. Prep time and cook time
+        4. Number of servings
+        5. Complete ingredient list with quantities
+        6. Step-by-step cooking instructions
+        7. Any dietary notes or substitutions
+        
+        Format your response as a well-structured recipe that's easy to follow.
+        Keep it practical and delicious!
+        """
+        
+        let aiResponse = await openAIService.makeOpenAIRequest(prompt: prompt)
+        
+        return ChatMessage(
+            content: "🍽️ **AI-Generated Recipe**\n\n\(aiResponse)\n\n*This recipe was generated using AI. Tap 'Add to Cart' to add ingredients to your shopping list!*",
+            isUser: false,
+            actionButtons: [
+                ChatActionButton(title: "Add to Cart", action: .addToCart, icon: "cart.badge.plus"),
+                ChatActionButton(title: "Find More Recipes", action: .recipeSearch, icon: "magnifyingglass"),
+                ChatActionButton(title: "Surprise Me", action: .surpriseMeal, icon: "dice")
+            ]
+        )
+    }
+    
     private func getGeneralResponse(for query: String) async -> String {
         let prompt = """
         You are a helpful AI shopping assistant for a grocery store. A user asks: "\(query)"
@@ -1154,14 +1184,9 @@ class ChatbotEngine: ObservableObject {
                 )
                 
                 if recipes.isEmpty {
-                    return ChatMessage(
-                        content: "I couldn't find any recipes matching your request. Try asking for something more specific like 'Build a healthy dinner for 4' or 'Plan a vegetarian lunch'.",
-                        isUser: false,
-                        actionButtons: [
-                            ChatActionButton(title: "Try Again", action: .mealPlan, icon: "arrow.clockwise"),
-                            ChatActionButton(title: "Browse Recipes", action: .recipeSearch, icon: "book")
-                        ]
-                    )
+                    // Fallback to OpenAI for recipe generation
+                    print("[ChatbotEngine] No recipes found in Spoonacular, falling back to OpenAI")
+                    return await generateRecipeWithOpenAI(query: query)
                 }
                 
                 // Format the response with found recipes
@@ -1192,13 +1217,9 @@ class ChatbotEngine: ObservableObject {
                 )
                 
             } catch {
-                return ChatMessage(
-                    content: "I'm having trouble finding recipes right now. Please try again in a moment.",
-                    isUser: false,
-                    actionButtons: [
-                        ChatActionButton(title: "Try Again", action: .mealPlan, icon: "arrow.clockwise")
-                    ]
-                )
+                // Fallback to OpenAI for recipe generation
+                print("[ChatbotEngine] Spoonacular API failed: \(error.localizedDescription)")
+                return await generateRecipeWithOpenAI(query: query)
             }
         }
         
