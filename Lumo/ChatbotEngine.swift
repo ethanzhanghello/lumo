@@ -1133,6 +1133,114 @@ class ChatbotEngine: ObservableObject {
             ]
         )
     }
+    
+    private func handleMealPlanning(_ query: String) async -> ChatMessage {
+        // Enhanced AI Meal Builder functionality using Spoonacular API
+        let lowercased = query.lowercased()
+        
+        // Check for specific meal builder requests
+        if lowercased.contains("build") || lowercased.contains("dinner") || lowercased.contains("lunch") || 
+           lowercased.contains("breakfast") || lowercased.contains("bbq") || lowercased.contains("party") ||
+           lowercased.contains("week") || lowercased.contains("plan") || lowercased.contains("surprise") ||
+           lowercased.contains("pantry") || lowercased.contains("healthy") || lowercased.contains("vegetarian") ||
+           lowercased.contains("vegan") || lowercased.contains("budget") {
+            
+            // Use Spoonacular API to find recipes based on the query
+            do {
+                let recipes = try await spoonacularService.searchRecipes(
+                    query: query,
+                    diet: extractDietaryPreferences(query),
+                    number: 3
+                )
+                
+                if recipes.isEmpty {
+                    return ChatMessage(
+                        content: "I couldn't find any recipes matching your request. Try asking for something more specific like 'Build a healthy dinner for 4' or 'Plan a vegetarian lunch'.",
+                        isUser: false,
+                        actionButtons: [
+                            ChatActionButton(title: "Try Again", action: .mealPlan, icon: "arrow.clockwise"),
+                            ChatActionButton(title: "Browse Recipes", action: .recipeSearch, icon: "book")
+                        ]
+                    )
+                }
+                
+                // Format the response with found recipes
+                var response = "🍽️ **Found \(recipes.count) recipes for you!**\n\n"
+                
+                for (index, recipe) in recipes.enumerated() {
+                    response += "**\(index + 1). \(recipe.name)**\n"
+                    response += "⏱️ Ready in: \(recipe.prepTime + recipe.cookTime) minutes\n"
+                    response += "👥 Serves: \(recipe.servings) people\n"
+                    response += "⭐ Rating: \(recipe.rating)/5 (\(recipe.reviewCount) reviews)\n"
+                    response += "\n"
+                }
+                
+                response += "Tap 'Add All to Cart' to add ingredients to your shopping list!"
+                
+                let actionButtons = [
+                    ChatActionButton(title: "Add All to Cart", action: .addToCart, icon: "cart.badge.plus"),
+                    ChatActionButton(title: "View Recipe Details", action: .showIngredients, icon: "list.bullet"),
+                    ChatActionButton(title: "Find More Recipes", action: .recipeSearch, icon: "magnifyingglass"),
+                    ChatActionButton(title: "Surprise Me", action: .surpriseMeal, icon: "dice")
+                ]
+                
+                return ChatMessage(
+                    content: response,
+                    isUser: false,
+                    recipe: recipes.first, // Pass the first recipe for action handling
+                    actionButtons: actionButtons
+                )
+                
+            } catch {
+                return ChatMessage(
+                    content: "I'm having trouble finding recipes right now. Please try again in a moment.",
+                    isUser: false,
+                    actionButtons: [
+                        ChatActionButton(title: "Try Again", action: .mealPlan, icon: "arrow.clockwise")
+                    ]
+                )
+            }
+        }
+        
+        // General meal planning options
+        let actionButtons = [
+            ChatActionButton(title: "🍽️ AI Meal Builder", action: .mealPlan, icon: "brain.head.profile"),
+            ChatActionButton(title: "Quick Meals", action: .mealPlan, icon: "bolt"),
+            ChatActionButton(title: "Budget Meals", action: .budgetFilter, icon: "dollarsign.circle"),
+            ChatActionButton(title: "Pantry Check", action: .pantryCheck, icon: "cabinet"),
+            ChatActionButton(title: "30-Min Meals", action: .timeFilter, icon: "clock"),
+            ChatActionButton(title: "Surprise Me", action: .surpriseMeal, icon: "dice")
+        ]
+        
+        let response = """
+        🍽️ **AI Meal Builder** — Your Smart Shopping Companion!
+        
+        I can create complete, personalized meal plans that automatically build your shopping list and integrate with your calendar.
+        
+        **Try asking me:**
+        • "Build a dinner for four"
+        • "Give me a healthy meal plan for the week"
+        • "Plan a summer BBQ"
+        • "Surprise me with a vegetarian dinner"
+        • "Build meals around what I have in my pantry"
+        
+        **What I'll do:**
+        ✅ Generate 1-7 meals based on your preferences
+        ✅ Auto-populate shopping list with exact quantities
+        ✅ Show aisle locations for every ingredient
+        ✅ Suggest substitutions for dietary restrictions
+        ✅ Add meals to your calendar with reminders
+        ✅ Integrate with your shopping cart
+        
+        What type of meal would you like me to build for you? 🎯
+        """
+        
+        return ChatMessage(
+            content: response,
+            isUser: false,
+            actionButtons: actionButtons
+        )
+    }
 }
 
 // MARK: - Supporting Data Structures for Spec Implementation
@@ -1330,73 +1438,6 @@ struct RecipeConstraints {
         )
     }
     
-    private func handleMealPlanning(_ query: String) async -> ChatMessage {
-        // Enhanced AI Meal Builder functionality
-        let lowercased = query.lowercased()
-        
-        // Check for specific meal builder requests
-        if lowercased.contains("build") || lowercased.contains("dinner") || lowercased.contains("lunch") || 
-           lowercased.contains("breakfast") || lowercased.contains("bbq") || lowercased.contains("party") ||
-           lowercased.contains("week") || lowercased.contains("plan") || lowercased.contains("surprise") ||
-           lowercased.contains("pantry") || lowercased.contains("healthy") || lowercased.contains("vegetarian") ||
-           lowercased.contains("vegan") || lowercased.contains("budget") {
-            
-            let mealBuilderResponse = "Meal builder feature coming soon" // Simplified for now
-            let actionButtons = [
-                ChatActionButton(title: "Add All to Cart", action: .addToCart, icon: "cart.badge.plus"),
-                ChatActionButton(title: "Add to Meal Plan", action: .mealPlan, icon: "calendar.badge.plus"),
-                ChatActionButton(title: "View Ingredients", action: .showIngredients, icon: "list.bullet"),
-                ChatActionButton(title: "Find Substitutions", action: .findAlternatives, icon: "arrow.triangle.2.circlepath"),
-                ChatActionButton(title: "Surprise Me", action: .surpriseMeal, icon: "dice"),
-                ChatActionButton(title: "Build from Pantry", action: .pantryCheck, icon: "cabinet")
-            ]
-            
-            return ChatMessage(
-                content: mealBuilderResponse,
-                isUser: false,
-                actionButtons: actionButtons
-            )
-        }
-        
-        // General meal planning options
-        let actionButtons = [
-            ChatActionButton(title: "🍽️ AI Meal Builder", action: .mealPlan, icon: "brain.head.profile"),
-            ChatActionButton(title: "Quick Meals", action: .mealPlan, icon: "bolt"),
-            ChatActionButton(title: "Budget Meals", action: .budgetFilter, icon: "dollarsign.circle"),
-            ChatActionButton(title: "Pantry Check", action: .pantryCheck, icon: "cabinet"),
-            ChatActionButton(title: "30-Min Meals", action: .timeFilter, icon: "clock"),
-            ChatActionButton(title: "Surprise Me", action: .surpriseMeal, icon: "dice")
-        ]
-        
-        let response = """
-        🍽️ **AI Meal Builder** — Your Smart Shopping Companion!
-        
-        I can create complete, personalized meal plans that automatically build your shopping list and integrate with your calendar.
-        
-        **Try asking me:**
-        • "Build a dinner for four"
-        • "Give me a healthy meal plan for the week"
-        • "Plan a summer BBQ"
-        • "Surprise me with a vegetarian dinner"
-        • "Build meals around what I have in my pantry"
-        
-        **What I'll do:**
-        ✅ Generate 1-7 meals based on your preferences
-        ✅ Auto-populate shopping list with exact quantities
-        ✅ Show aisle locations for every ingredient
-        ✅ Suggest substitutions for dietary restrictions
-        ✅ Add meals to your calendar with reminders
-        ✅ Integrate with your shopping cart
-        
-        What type of meal would you like me to build for you? 🎯
-        """
-        
-        return ChatMessage(
-            content: response,
-            isUser: false,
-            actionButtons: actionButtons
-        )
-    }
     
     
     private func handleDietaryFilter(_ query: String) async -> ChatMessage {
@@ -1616,6 +1657,66 @@ struct RecipeConstraints {
             isUser: false,
             actionButtons: actionButtons
         )
+    }
+    
+    // MARK: - Recipe Search Helper Methods
+    
+    private func extractDietaryPreferences(_ query: String) -> String? {
+        let lowercased = query.lowercased()
+        
+        if lowercased.contains("vegetarian") {
+            return "vegetarian"
+        } else if lowercased.contains("vegan") {
+            return "vegan"
+        } else if lowercased.contains("keto") {
+            return "ketogenic"
+        } else if lowercased.contains("paleo") {
+            return "paleo"
+        } else if lowercased.contains("gluten free") {
+            return "gluten free"
+        }
+        
+        return nil
+    }
+    
+    private func extractIntolerances(_ query: String) -> String? {
+        let lowercased = query.lowercased()
+        
+        if lowercased.contains("dairy") || lowercased.contains("lactose") {
+            return "dairy"
+        } else if lowercased.contains("nuts") || lowercased.contains("nut") {
+            return "tree nuts"
+        } else if lowercased.contains("peanut") {
+            return "peanut"
+        } else if lowercased.contains("soy") {
+            return "soy"
+        } else if lowercased.contains("egg") {
+            return "egg"
+        } else if lowercased.contains("shellfish") {
+            return "shellfish"
+        }
+        
+        return nil
+    }
+    
+    private func extractMealType(_ query: String) -> String? {
+        let lowercased = query.lowercased()
+        
+        if lowercased.contains("breakfast") {
+            return "breakfast"
+        } else if lowercased.contains("lunch") {
+            return "lunch"
+        } else if lowercased.contains("dinner") {
+            return "dinner"
+        } else if lowercased.contains("snack") {
+            return "snack"
+        } else if lowercased.contains("appetizer") {
+            return "appetizer"
+        } else if lowercased.contains("dessert") {
+            return "dessert"
+        }
+        
+        return nil
     }
     
     // MARK: - Helper Methods
