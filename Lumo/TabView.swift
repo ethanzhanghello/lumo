@@ -32,6 +32,14 @@ struct MainTabView: View {
                 Text("List")
             }
             
+            // Store Map Tab
+            NavigationStack {
+                StoreMapView()
+            }
+            .tabItem {
+                Image(systemName: "map.fill")
+                Text("Map")
+            }
             
             // MEAL PLANNING TAB
             MealPlanningView()

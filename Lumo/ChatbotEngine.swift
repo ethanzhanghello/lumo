@@ -1102,6 +1102,37 @@ class ChatbotEngine: ObservableObject {
         
         return deduplicated
     }
+    
+    // MARK: - AI Response Functions
+    
+    private func getGeneralResponse(for query: String) async -> String {
+        let prompt = """
+        You are a helpful AI shopping assistant for a grocery store. A user asks: "\(query)"
+        
+        Provide a helpful response that:
+        1. Answers their question if it's shopping-related
+        2. Offers to help them with recipes, finding items, deals, or store information
+        3. Keeps the response friendly and conversational
+        4. Mentions your capabilities as a shopping assistant
+        
+        Keep the response under 200 words.
+        """
+        return await openAIService.makeOpenAIRequest(prompt: prompt)
+    }
+    
+    private func handleGeneralQuery(_ query: String) async -> ChatMessage {
+        let aiResponse = await getGeneralResponse(for: query)
+        return ChatMessage(
+            content: aiResponse,
+            isUser: false,
+            actionButtons: [
+                ChatActionButton(title: "Find Recipes", action: .recipeSearch, icon: "book"),
+                ChatActionButton(title: "Add to List", action: .addItemToList, icon: "plus.circle"),
+                ChatActionButton(title: "Meal Plan", action: .planSingleMeal, icon: "calendar"),
+                ChatActionButton(title: "Store Info", action: .startRoute, icon: "map")
+            ]
+        )
+    }
 }
 
 // MARK: - Supporting Data Structures for Spec Implementation
@@ -1587,11 +1618,6 @@ struct RecipeConstraints {
         )
     }
     
-    private func handleGeneralQuery(_ query: String) async -> ChatMessage {
-        let aiResponse = "General response feature coming soon" // Simplified for now
-        return ChatMessage(content: aiResponse, isUser: false)
-    }
-    
     // MARK: - Helper Methods
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
@@ -2048,6 +2074,25 @@ class IntentRecognizer {
         ("best", 3.0)
     ]
     
+    private let generalPatterns: [(pattern: String, weight: Double)] = [
+        ("help", 5.0),
+        ("what", 3.0),
+        ("how", 3.0),
+        ("where", 3.0),
+        ("when", 3.0),
+        ("why", 3.0),
+        ("can you", 4.0),
+        ("do you", 4.0),
+        ("tell me", 4.0),
+        ("explain", 4.0),
+        ("show me", 4.0),
+        ("i need", 3.0),
+        ("i want", 3.0),
+        ("i'm looking for", 3.0),
+        ("question", 2.0),
+        ("?", 1.0)
+    ]
+    
     // MARK: - Entity Patterns
     private let entityPatterns: [(type: EntityType, patterns: [String])] = [
         (.product, ["organic", "fresh", "frozen", "canned", "dried", "whole grain", "low fat", "sugar free"]),
@@ -2152,7 +2197,7 @@ class IntentRecognizer {
         case .sharedList: return sharedListPatterns
         case .budgetOptimization: return budgetOptimizationPatterns
         case .smartSuggestions: return smartSuggestionsPatterns
-        case .general: return []
+        case .general: return generalPatterns
         }
     }
     
@@ -2412,20 +2457,6 @@ class OpenAIService {
         return await makeOpenAIRequest(prompt: prompt)
     }
     
-    func getGeneralResponse(for query: String) async -> String {
-        let prompt = """
-        You are a helpful AI shopping assistant for a grocery store. A user asks: "\(query)"
-        
-        Provide a helpful response that:
-        1. Answers their question if it's shopping-related
-        2. Offers to help them with recipes, finding items, deals, or store information
-        3. Keeps the response friendly and conversational
-        4. Mentions your capabilities as a shopping assistant
-        
-        Keep the response under 200 words.
-        """
-        return await makeOpenAIRequest(prompt: prompt)
-    }
     
     func getMealBuilderResponse(for query: String) async -> String {
         let prompt = """
@@ -2475,7 +2506,7 @@ class OpenAIService {
         return await makeOpenAIRequest(prompt: prompt)
     }
     
-    private func makeOpenAIRequest(prompt: String) async -> String {
+    func makeOpenAIRequest(prompt: String) async -> String {
         guard !apiKey.isEmpty else {
             print("[OpenAIService] ERROR: API key is empty")
             return "I'm sorry, I'm having trouble connecting right now. Please try again in a moment."
