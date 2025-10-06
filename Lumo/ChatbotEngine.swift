@@ -1168,17 +1168,44 @@ class ChatbotEngine: ObservableObject {
         // Enhanced AI Meal Builder functionality using Spoonacular API
         let lowercased = query.lowercased()
         
+        // Hardcoded prompts for specific meal types
+        var spoonacularQuery = query
+        
+        if lowercased.contains("high protein") || lowercased.contains("protein meal") {
+            spoonacularQuery = "high protein meal"
+        } else if lowercased.contains("healthy") || lowercased.contains("healthy meal") {
+            spoonacularQuery = "healthy meal"
+        } else if lowercased.contains("vegetarian") || lowercased.contains("vegetarian meal") {
+            spoonacularQuery = "vegetarian meal"
+        } else if lowercased.contains("vegan") || lowercased.contains("vegan meal") {
+            spoonacularQuery = "vegan meal"
+        } else if lowercased.contains("low carb") || lowercased.contains("keto") {
+            spoonacularQuery = "low carb meal"
+        } else if lowercased.contains("budget") || lowercased.contains("cheap") {
+            spoonacularQuery = "budget meal"
+        } else if lowercased.contains("quick") || lowercased.contains("fast") {
+            spoonacularQuery = "quick meal"
+        } else if lowercased.contains("breakfast") {
+            spoonacularQuery = "breakfast"
+        } else if lowercased.contains("lunch") {
+            spoonacularQuery = "lunch"
+        } else if lowercased.contains("dinner") {
+            spoonacularQuery = "dinner"
+        }
+        
         // Check for specific meal builder requests
-        if lowercased.contains("build") || lowercased.contains("dinner") || lowercased.contains("lunch") || 
+        if lowercased.contains("build") || lowercased.contains("dinner") || lowercased.contains("lunch") ||
            lowercased.contains("breakfast") || lowercased.contains("bbq") || lowercased.contains("party") ||
            lowercased.contains("week") || lowercased.contains("plan") || lowercased.contains("surprise") ||
            lowercased.contains("pantry") || lowercased.contains("healthy") || lowercased.contains("vegetarian") ||
-           lowercased.contains("vegan") || lowercased.contains("budget") {
+           lowercased.contains("vegan") || lowercased.contains("budget") || lowercased.contains("protein") ||
+           lowercased.contains("quick") || lowercased.contains("fast") || lowercased.contains("keto") ||
+           lowercased.contains("low carb") {
             
-            // Use Spoonacular API to find recipes based on the query
+            // Use Spoonacular API to find recipes based on the hardcoded query
             do {
                 let recipes = try await spoonacularService.searchRecipes(
-                    query: query,
+                    query: spoonacularQuery,
                     diet: extractDietaryPreferences(query),
                     number: 3
                 )
