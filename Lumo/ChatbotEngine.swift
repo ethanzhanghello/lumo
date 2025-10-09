@@ -37,6 +37,21 @@ class ChatbotEngine: ObservableObject {
     func clearMessages() {
         messages.removeAll()
     }
+
+    // MARK: - Constraint Types (restored)
+    struct MealPlanConstraints {
+        var people: Int?
+        var timePerMeal: Int?
+        var budget: Double?
+        var diet: [String]?
+        var intolerances: [String]?
+    }
+
+    struct RecipeConstraints {
+        var maxTime: Int?
+        var diet: [String]?
+        var maxCalories: Int?
+    }
     
     // MARK: - Message Processing
     private func processMessage(_ content: String) async -> ChatMessage {
@@ -970,11 +985,7 @@ class ChatbotEngine: ObservableObject {
         return calendar.date(byAdding: .day, value: -daysFromMonday, to: date) ?? date
     }
     
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
-    }
+    // duplicate removed
     
     private func formatWeekMealPlan(_ weekPlan: [MealPlan], weekStart: Date) -> String {
         var response = "📅 **Weekly Meal Plan** (Week of \(formatDate(weekStart)))\n\n"
@@ -1417,23 +1428,6 @@ class ChatbotEngine: ObservableObject {
             actionButtons: actionButtons
         )
     }
-}
-
-// MARK: - Supporting Data Structures for Spec Implementation
-
-struct MealPlanConstraints {
-    var people: Int?
-    var timePerMeal: Int?
-    var budget: Double?
-    var diet: [String]?
-    var intolerances: [String]?
-}
-
-struct RecipeConstraints {
-    var maxTime: Int?
-    var diet: [String]?
-    var maxCalories: Int?
-}
     
     // MARK: - Enhanced Intent Handlers
     private func handleRecipeRequest(_ query: String) async -> ChatMessage {
@@ -2681,6 +2675,7 @@ class IntentRecognizer {
     func clearConversationHistory() {
         conversationHistory.removeAll()
     }
+}
 }
 
 // MARK: - OpenAI Service
