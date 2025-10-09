@@ -115,7 +115,7 @@ struct AutoFillView: View {
                             } else {
                                 Text("empty")
                                     .font(.caption2)
-                                    .foregroundColor(isSelected ? .green : .gray)
+                                    .foregroundColor(isSelected ? .black : .gray)
                             }
                         }
                         .frame(maxWidth: .infinity)

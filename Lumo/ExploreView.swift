@@ -22,7 +22,7 @@ struct ExploreView: View {
             ZStack {
                 Color.black.ignoresSafeArea()
                 
-                ScrollView {
+                ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 24) {
                         // Header
                         VStack(alignment: .leading, spacing: 16) {
@@ -78,7 +78,9 @@ struct ExploreView: View {
                         
                         Spacer(minLength: 100)
                     }
+                    .padding(.top, 1) // Prevent over-scrolling
                 }
+                .scrollContentBackground(.hidden)
                 // NavigationLink for Store Detail
                 NavigationLink(
                     destination: Group {

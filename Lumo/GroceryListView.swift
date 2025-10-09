@@ -363,6 +363,7 @@ struct FlatGroceryListView: View {
         .listStyle(PlainListStyle())
         .background(Color.black)
         .scrollContentBackground(.hidden)
+        .scrollBounceBehavior(.basedOnSize)
     }
 }
 
@@ -439,6 +440,7 @@ struct GroupedGroceryListView: View {
         .listStyle(PlainListStyle())
         .background(Color.black)
         .scrollContentBackground(.hidden)
+        .scrollBounceBehavior(.basedOnSize)
     }
 }
 
