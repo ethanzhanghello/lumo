@@ -82,6 +82,120 @@ class ChatbotEngine: ObservableObject {
         }
     }
     
+    // MARK: - Hardcoded Meal Responses
+    
+    private func getHardcodedMealForFour() async -> ChatMessage {
+        do {
+            // Use different queries to get varied recipes
+            let queries = ["balanced healthy dinner", "family dinner recipe", "nutritious meal for four", "complete dinner meal", "healthy family meal"]
+            let randomQuery = queries.randomElement() ?? "balanced healthy dinner"
+            
+            // Search for a balanced, healthy meal suitable for 4 people
+            let recipes = try await spoonacularService.searchRecipes(
+                query: randomQuery,
+                diet: nil,
+                number: 3
+            )
+            
+            if let recipe = recipes.randomElement() {
+                let response = """
+                🍽️ **Perfect Meal for Four!**
+                
+                **\(recipe.name)**
+                ⏱️ Ready in: \(recipe.prepTime + recipe.cookTime) minutes
+                👥 Serves: \(recipe.servings) people
+                ⭐ Rating: \(recipe.rating)/5 (\(recipe.reviewCount) reviews)
+                
+                This balanced meal is perfect for a family of four! It includes a good mix of protein, vegetables, and carbohydrates to keep everyone satisfied and healthy.
+                
+                Tap 'Add All to Cart' to add all ingredients to your shopping list!
+                """
+                
+                let actionButtons = [
+                    ChatActionButton(title: "Add All to Cart", action: .addToCart, icon: "cart.badge.plus"),
+                    ChatActionButton(title: "View Recipe Details", action: .showIngredients, icon: "list.bullet"),
+                    ChatActionButton(title: "Find More Recipes", action: .recipeSearch, icon: "magnifyingglass"),
+                    ChatActionButton(title: "Surprise Me", action: .surpriseMeal, icon: "dice")
+                ]
+                
+                return ChatMessage(
+                    content: response,
+                    isUser: false,
+                    recipe: recipe,
+                    actionButtons: actionButtons
+                )
+            } else {
+                return await generateRecipeWithOpenAI(query: "balanced healthy dinner for four people")
+            }
+        } catch {
+            print("[ChatbotEngine] Spoonacular API failed for meal for four: \(error.localizedDescription)")
+            return await generateRecipeWithOpenAI(query: "balanced healthy dinner for four people")
+        }
+    }
+    
+    private func getHardcodedAllergyFreeMeal() async -> ChatMessage {
+        do {
+            // Use different queries to get varied allergy-free recipes
+            let queries = ["healthy dinner", "simple dinner recipe", "easy dinner meal", "nutritious dinner", "quick dinner recipe"]
+            let randomQuery = queries.randomElement() ?? "healthy dinner"
+            
+            // Search for a meal that excludes eggs and tree nuts
+            let recipes = try await spoonacularService.searchRecipes(
+                query: randomQuery,
+                diet: nil,
+                number: 5
+            )
+            
+            // Filter recipes to exclude eggs and tree nuts
+            let allergyFreeRecipes = recipes.filter { recipe in
+                let ingredients = recipe.ingredients.map { $0.name.lowercased() }
+                let hasEggs = ingredients.contains { $0.contains("egg") }
+                let hasTreeNuts = ingredients.contains { ingredient in
+                    ["almond", "walnut", "pecan", "cashew", "pistachio", "hazelnut", "macadamia", "brazil nut", "pine nut", "nut", "nuts"].contains { nut in
+                        ingredient.contains(nut)
+                    }
+                }
+                return !hasEggs && !hasTreeNuts
+            }
+            
+            if let recipe = allergyFreeRecipes.randomElement() {
+                let response = """
+                🍽️ **Allergy-Safe Meal Found!**
+                
+                **\(recipe.name)**
+                ⏱️ Ready in: \(recipe.prepTime + recipe.cookTime) minutes
+                👥 Serves: \(recipe.servings) people
+                ⭐ Rating: \(recipe.rating)/5 (\(recipe.reviewCount) reviews)
+                
+                ✅ **Allergy-Safe**: This recipe contains NO eggs or tree nuts
+                🥗 **Healthy**: Balanced nutrition with fresh ingredients
+                👨‍👩‍👧‍👦 **Family-Friendly**: Perfect for everyone to enjoy safely
+                
+                Tap 'Add All to Cart' to add all ingredients to your shopping list!
+                """
+                
+                let actionButtons = [
+                    ChatActionButton(title: "Add All to Cart", action: .addToCart, icon: "cart.badge.plus"),
+                    ChatActionButton(title: "View Recipe Details", action: .showIngredients, icon: "list.bullet"),
+                    ChatActionButton(title: "Find More Allergy-Safe Recipes", action: .recipeSearch, icon: "magnifyingglass"),
+                    ChatActionButton(title: "Surprise Me", action: .surpriseMeal, icon: "dice")
+                ]
+                
+                return ChatMessage(
+                    content: response,
+                    isUser: false,
+                    recipe: recipe,
+                    actionButtons: actionButtons
+                )
+            } else {
+                return await generateRecipeWithOpenAI(query: "healthy dinner recipe without eggs or tree nuts")
+            }
+        } catch {
+            print("[ChatbotEngine] Spoonacular API failed for allergy-free meal: \(error.localizedDescription)")
+            return await generateRecipeWithOpenAI(query: "healthy dinner recipe without eggs or tree nuts")
+        }
+    }
+    
     // MARK: - Enhanced Intent Handlers for Spec Implementation
     
     // Grocery List Management
@@ -1167,14 +1281,19 @@ class ChatbotEngine: ObservableObject {
     private func handleMealPlanning(_ query: String) async -> ChatMessage {
         // Enhanced AI Meal Builder functionality using Spoonacular API
         let lowercased = query.lowercased()
+        print("[ChatbotEngine] handleMealPlanning called with: \(query)")
         
         // Hardcoded responses for specific scenarios
-        if lowercased.contains("build a meal for four") || lowercased.contains("build meal for four") {
+        if lowercased.contains("build") && (lowercased.contains("meal") || lowercased.contains("dinner") || lowercased.contains("lunch") || lowercased.contains("breakfast")) && (lowercased.contains("four") || lowercased.contains("4")) {
+            print("[ChatbotEngine] Detected 'build meal for four' - calling getHardcodedMealForFour")
             return await getHardcodedMealForFour()
         }
         
-        if lowercased.contains("allergic") && (lowercased.contains("eggs") || lowercased.contains("tree nuts")) {
-            return await getHardcodedAllergyFreeMeal()
+        if lowercased.contains("allergic") || lowercased.contains("allergy") {
+            if lowercased.contains("egg") || lowercased.contains("tree nut") || lowercased.contains("almond") || lowercased.contains("walnut") || lowercased.contains("pecan") || lowercased.contains("cashew") {
+                print("[ChatbotEngine] Detected allergy request - calling getHardcodedAllergyFreeMeal")
+                return await getHardcodedAllergyFreeMeal()
+            }
         }
         
         // Hardcoded prompts for specific meal types
@@ -1297,112 +1416,6 @@ class ChatbotEngine: ObservableObject {
             isUser: false,
             actionButtons: actionButtons
         )
-    }
-    
-    // MARK: - Hardcoded Meal Responses
-    
-    private func getHardcodedMealForFour() async -> ChatMessage {
-        do {
-            // Search for a balanced, healthy meal suitable for 4 people
-            let recipes = try await spoonacularService.searchRecipes(
-                query: "balanced healthy dinner",
-                diet: nil,
-                number: 1
-            )
-            
-            if let recipe = recipes.first {
-                let response = """
-                🍽️ **Perfect Meal for Four!**
-                
-                **\(recipe.name)**
-                ⏱️ Ready in: \(recipe.prepTime + recipe.cookTime) minutes
-                👥 Serves: \(recipe.servings) people
-                ⭐ Rating: \(recipe.rating)/5 (\(recipe.reviewCount) reviews)
-                
-                This balanced meal is perfect for a family of four! It includes a good mix of protein, vegetables, and carbohydrates to keep everyone satisfied and healthy.
-                
-                Tap 'Add All to Cart' to add all ingredients to your shopping list!
-                """
-                
-                let actionButtons = [
-                    ChatActionButton(title: "Add All to Cart", action: .addToCart, icon: "cart.badge.plus"),
-                    ChatActionButton(title: "View Recipe Details", action: .showIngredients, icon: "list.bullet"),
-                    ChatActionButton(title: "Find More Recipes", action: .recipeSearch, icon: "magnifyingglass"),
-                    ChatActionButton(title: "Surprise Me", action: .surpriseMeal, icon: "dice")
-                ]
-                
-                return ChatMessage(
-                    content: response,
-                    isUser: false,
-                    recipe: recipe,
-                    actionButtons: actionButtons
-                )
-            } else {
-                return await generateRecipeWithOpenAI(query: "balanced healthy dinner for four people")
-            }
-        } catch {
-            print("[ChatbotEngine] Spoonacular API failed for meal for four: \(error.localizedDescription)")
-            return await generateRecipeWithOpenAI(query: "balanced healthy dinner for four people")
-        }
-    }
-    
-    private func getHardcodedAllergyFreeMeal() async -> ChatMessage {
-        do {
-            // Search for a meal that excludes eggs and tree nuts
-            let recipes = try await spoonacularService.searchRecipes(
-                query: "healthy dinner",
-                diet: nil,
-                number: 3
-            )
-            
-            // Filter recipes to exclude eggs and tree nuts
-            let allergyFreeRecipes = recipes.filter { recipe in
-                let ingredients = recipe.ingredients.map { $0.name.lowercased() }
-                let hasEggs = ingredients.contains { $0.contains("egg") }
-                let hasTreeNuts = ingredients.contains { ingredient in
-                    ["almond", "walnut", "pecan", "cashew", "pistachio", "hazelnut", "macadamia", "brazil nut", "pine nut"].contains { nut in
-                        ingredient.contains(nut)
-                    }
-                }
-                return !hasEggs && !hasTreeNuts
-            }
-            
-            if let recipe = allergyFreeRecipes.first {
-                let response = """
-                🍽️ **Allergy-Safe Meal Found!**
-                
-                **\(recipe.name)**
-                ⏱️ Ready in: \(recipe.prepTime + recipe.cookTime) minutes
-                👥 Serves: \(recipe.servings) people
-                ⭐ Rating: \(recipe.rating)/5 (\(recipe.reviewCount) reviews)
-                
-                ✅ **Allergy-Safe**: This recipe contains NO eggs or tree nuts
-                🥗 **Healthy**: Balanced nutrition with fresh ingredients
-                👨‍👩‍👧‍👦 **Family-Friendly**: Perfect for everyone to enjoy safely
-                
-                Tap 'Add All to Cart' to add all ingredients to your shopping list!
-                """
-                
-                let actionButtons = [
-                    ChatActionButton(title: "Add All to Cart", action: .addToCart, icon: "cart.badge.plus"),
-                    ChatActionButton(title: "View Recipe Details", action: .showIngredients, icon: "list.bullet"),
-                    ChatActionButton(title: "Find More Allergy-Safe Recipes", action: .recipeSearch, icon: "magnifyingglass"),
-                    ChatActionButton(title: "Surprise Me", action: .surpriseMeal, icon: "dice")
-                ]
-                
-                return ChatMessage(
-                    content: response,
-                    isUser: false,
-                    recipe: recipe,
-                    actionButtons: actionButtons
-                )
-            } else {
-                return await generateRecipeWithOpenAI(query: "healthy dinner recipe without eggs or tree nuts")
-            }
-        } catch {
-            print("[ChatbotEngine] Spoonacular API failed for allergy-free meal: \(error.localizedDescription)")
-            return await generateRecipeWithOpenAI(query: "healthy dinner recipe without eggs or tree nuts")
-        }
     }
 }
 
@@ -1604,6 +1617,17 @@ struct RecipeConstraints {
     
     
     private func handleDietaryFilter(_ query: String) async -> ChatMessage {
+        let lowercased = query.lowercased()
+        print("[ChatbotEngine] handleDietaryFilter called with: \(query)")
+        
+        // Check for allergy requests and route to hardcoded response
+        if lowercased.contains("allergic") || lowercased.contains("allergy") {
+            if lowercased.contains("egg") || lowercased.contains("tree nut") || lowercased.contains("almond") || lowercased.contains("walnut") || lowercased.contains("pecan") || lowercased.contains("cashew") {
+                print("[ChatbotEngine] Detected allergy request in dietary filter - calling getHardcodedAllergyFreeMeal")
+                return await getHardcodedAllergyFreeMeal()
+            }
+        }
+        
         let actionButtons = [
             ChatActionButton(title: "Vegetarian", action: .filterByDiet, icon: "leaf"),
             ChatActionButton(title: "Vegan", action: .filterByDiet, icon: "leaf.arrow.circlepath"),
