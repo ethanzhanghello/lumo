@@ -101,11 +101,11 @@ struct AutoFillView: View {
                             Text(dayName)
                                 .font(.caption)
                                 .fontWeight(.semibold)
-                                .foregroundColor(isSelected ? .white : .gray)
+                                .foregroundColor(isSelected ? .black : .gray)
                             
                             Text(dateString)
                                 .font(.caption2)
-                                .foregroundColor(isSelected ? .white : .gray)
+                                .foregroundColor(isSelected ? .black : .gray)
                             
                             if mealCount > 0 {
                                 Text("\(mealCount) meals")
