@@ -7,6 +7,20 @@
 
 import SwiftUI
 
+// MARK: - Custom Text Field Style
+struct DashedBorderTextFieldStyle: TextFieldStyle {
+    func _body(configuration: TextField<Self._Label>) -> some View {
+        configuration
+            .padding()
+            .background(Color.gray.opacity(0.05))
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.gray.opacity(0.3), style: StrokeStyle(lineWidth: 1, dash: [5]))
+            )
+    }
+}
+
 struct AddMealView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var mealManager = MealPlanManager.shared
@@ -153,7 +167,7 @@ struct AddMealView: View {
                 .foregroundColor(.white)
             
             TextField("Enter meal name", text: $recipeName)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .textFieldStyle(DashedBorderTextFieldStyle())
                 .foregroundColor(.white)
         }
     }
@@ -169,7 +183,7 @@ struct AddMealView: View {
             // Add ingredient field
             HStack {
                 TextField("Add ingredient", text: $newIngredient)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .textFieldStyle(DashedBorderTextFieldStyle())
                     .foregroundColor(.white)
                 
                 Button("Add") {
@@ -268,7 +282,7 @@ struct AddMealView: View {
                 .foregroundColor(.white)
             
             TextField("Add notes...", text: $notes, axis: .vertical)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .textFieldStyle(DashedBorderTextFieldStyle())
                 .foregroundColor(.white)
                 .lineLimit(3...6)
         }
@@ -322,7 +336,7 @@ struct RecipePickerView: View {
                 VStack {
                     // Search bar
                     TextField("Search recipes...", text: $searchText)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .textFieldStyle(DashedBorderTextFieldStyle())
                         .padding()
                     
                     // Recipe list
