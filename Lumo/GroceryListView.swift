@@ -24,8 +24,7 @@ struct GroceryListView: View {
     @State private var showingStoreSelection = false
     
     var body: some View {
-        NavigationView {
-            ZStack {
+        ZStack {
                 Color.black.ignoresSafeArea()
                 mainContent
             }
@@ -63,7 +62,6 @@ struct GroceryListView: View {
             }
 
             .overlay(undoToastOverlay)
-        }
     }
     
     private var mainContent: some View {
@@ -119,7 +117,6 @@ struct GroceryListView: View {
                 summarySection
             }
         }
-        .padding(.top)
     }
     
     private var summarySection: some View {

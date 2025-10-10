@@ -18,8 +18,7 @@ struct ExploreView: View {
     @State private var selectedFavoriteStore: Store? = nil
     
     var body: some View {
-        NavigationView {
-            ZStack {
+        ZStack {
                 Color.black.ignoresSafeArea()
                 
                 ScrollView(.vertical, showsIndicators: false) {
@@ -78,7 +77,6 @@ struct ExploreView: View {
                         
                         Spacer(minLength: 100)
                     }
-                    .padding(.top, 1) // Prevent over-scrolling
                 }
                 .scrollContentBackground(.hidden)
                 // NavigationLink for Store Detail
@@ -143,7 +141,6 @@ struct ExploreView: View {
                 ) {
                     EmptyView()
                 }
-            }
         }
         .task {
             await authViewModel.fetchProfile()
